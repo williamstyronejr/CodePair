@@ -70,6 +70,10 @@ jobs:
           HD_GITHUB_SECRET: ${{secrets.GH_SECRET}}
           HD_GITHUB_CALLBACK: ${{secrets.GH_CALLBACK}}
 
+          # Skip husky and cypress install on heroku
+          HD_HUSKY_SKIP_INSTALL: "1"
+          HD_CYPRESS_INSTALL_BINARY: 0
+
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "codingpair" # Must be unique in Heroku
