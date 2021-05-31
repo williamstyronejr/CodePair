@@ -19,6 +19,7 @@
     "runner:prod": "npm run production --prefix launcher",
     "precommit": "lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
     "prepush": "lerna run --concurrency 1 --stream test --since HEAD --exclude-dependents",
+    "heroku-prebuild": "npm install pm2 -g",
     "heroku-postbuild": "npm install --prefix server && npm install --prefix client && npm build --prefix client"
   },
   "repository": {
