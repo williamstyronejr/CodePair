@@ -11,7 +11,7 @@
     "start": "node src/index.js --ignore temp/",
     "dev": "nodemon src/index.js --ignore temp/",
     "precommit": "lint-staged",
-    "production": "pm2 start src/index.js",
+    "production": "NODE_ENV=production pm2 start src/index.js",
     "test": "jest"
   },
   "author": "",

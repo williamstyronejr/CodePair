@@ -69,7 +69,6 @@ jobs:
           HD_GITHUB_ID: ${{secrets.GH_ID}}
           HD_GITHUB_SECRET: ${{secrets.GH_SECRET}}
           HD_GITHUB_CALLBACK: ${{secrets.GH_CALLBACK}}
-          NODE_ENV: production
 
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
