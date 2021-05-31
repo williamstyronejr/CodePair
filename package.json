@@ -1,11 +1,11 @@
 {
   "name": "codepair",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "Site containing challenges to be completed through pair programming.",
   "main": "index.js",
   "engines": {
     "node": "16",
-    "npm": "6"
+    "npm": "7"
   },
   "scripts": {
     "prepare": "husky install",
@@ -19,23 +19,25 @@
     "runner:prod": "npm run production --prefix launcher",
     "precommit": "lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
     "prepush": "lerna run --concurrency 1 --stream test --since HEAD --exclude-dependents",
-    "heroku-prebuild": "npm install pm2 -g",
     "heroku-postbuild": "npm install --prefix server && npm install --prefix client && npm build --prefix client"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/williamstyronejr/pair-programming.git"
+    "url": "git+https://github.com/williamstyronejr/codepair.git"
   },
   "author": "Tyrone Williams",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/williamstyronejr/pair-programming/issues"
+    "url": "https://github.com/williamstyronejr/codepair/issues"
   },
-  "homepage": "https://github.com/williamstyronejr/pair-programming#readme",
+  "homepage": "https://github.com/williamstyronejr/codepair#readme",
   "devDependencies": {
     "concurrently": "^6.1.0",
     "husky": "^6.0.0",
     "lerna": "^4.0.0",
     "lint-staged": "^10.5.4"
+  },
+  "dependencies": {
+    "pm2": "^4.5.6"
   }
 }

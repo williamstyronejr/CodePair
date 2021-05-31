@@ -2,10 +2,10 @@
   "name": "codepair-server",
   "version": "1.0.0",
   "description": "Server to handle request from client.",
-  "main": "index.js",
+  "main": "src/index.js",
   "engines": {
     "node": "16",
-    "npm": "6"
+    "npm": "7"
   },
   "scripts": {
     "start": "node src/index.js --ignore temp/",
@@ -13,10 +13,6 @@
     "precommit": "lint-staged",
     "production": "pm2 start src/index.js",
     "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://www.github.com/itenory/psite"
   },
   "author": "",
   "license": "ISC",

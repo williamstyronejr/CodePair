@@ -1,11 +1,11 @@
 {
   "name": "codepair-client",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "proxy": "http://localhost:5000",
   "engines": {
     "node": "16",
-    "npm": "6"
+    "npm": "7"
   },
   "dependencies": {
     "axios": "^0.21.1",
