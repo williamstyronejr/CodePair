@@ -1,0 +1,19 @@
+{
+  "env": {
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
+  "extends": ["airbnb-base", "prettier"],
+  "plugins": ["import"],
+  "parser": "babel-eslint",
+  "rules": {
+    "no-unused-vars": "warn",
+    "comma-dangle": 0,
+    "consistent-return": "warn",
+    "no-underscore-dangle": 0,
+    "arrow-body-style": 0,
+    "no-unused-expressions": [1, { "allowTernary": true }],
+    "prefer-destructuring": [0]
+  }
+}

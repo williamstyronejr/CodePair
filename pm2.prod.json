@@ -1,0 +1,17 @@
+{
+  "apps": [
+    {
+      "name": "launcher",
+      "exec_mode": "cluster",
+      "instances": 2,
+      "instance_var": "APP_INSTANCE_CID",
+      "listen_timeout": "10000",
+      "restart_delay": "10000",
+      "cwd": "./launcher",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "script": "src/index.js"
+    }
+  ]
+}

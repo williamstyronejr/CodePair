@@ -1,0 +1,57 @@
+.queue {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex-flow: column wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1em;
+}
+
+.queue__notification {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.queue__box {
+  display: block;
+  background-color: #ffffff;
+  width: 90%;
+  text-align: center;
+  border-radius: 5px;
+  padding: 60px 0;
+}
+
+.queue__match-timer {
+  display: block;
+  margin: 20px 0;
+  font-size: 2em;
+  font-weight: 400;
+}
+
+.queue__header {
+  width: 100%;
+}
+
+.queue__heading {
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.queue__info {
+  width: 100%;
+  text-align: center;
+}
+
+@media only screen and (min-width: 600px) {
+  .queue__box {
+    width: 600px;
+  }
+}

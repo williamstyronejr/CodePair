@@ -1,0 +1,162 @@
+.chat {
+  display: none;
+  z-index: 7;
+  background-color: #fafafa;
+  position: absolute;
+  right: 10px;
+  width: 200px;
+  bottom: 0;
+}
+
+.chat--active {
+  display: flex;
+  flex-flow: column nowrap;
+  flex: 1 0 auto;
+  height: 300px;
+}
+
+.chat--hidden {
+  display: block;
+  background-color: transparent;
+  width: 30px;
+  height: 30px;
+  bottom: 18px;
+  right: 25px;
+}
+
+.chat__icon {
+  font-size: 1.3em;
+  padding: 12px;
+  color: white;
+  border-radius: 50%;
+  background-color: #fd378e;
+  box-shadow: 0 6px 12px 0 rgb(0 0 0 / 20%);
+  z-index: 2;
+}
+
+.chat__icon:hover {
+  cursor: pointer;
+  background-color: #c21c64;
+}
+
+.chat__header {
+  display: flex;
+  flex-flow: row nowrap;
+  position: relative;
+  align-items: center;
+  width: 100%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.chat__heading {
+  height: 100%;
+  flex: 1 0 auto;
+  text-align: left;
+  margin: 0;
+}
+
+.chat__settings {
+  display: none;
+  position: absolute;
+  border-radius: 5px;
+  padding: 10px;
+  right: 10px;
+  background-color: white;
+  z-index: 3;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+}
+
+.chat__settings--active {
+  display: block;
+}
+
+.chat__messages {
+  width: 100%;
+  margin: 0;
+  height: 1px;
+  padding: 0 0.5em;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+/* Chat Message styles */
+.message {
+  display: block;
+  position: relative;
+  flex: 0 1 auto;
+  list-style: none;
+  color: black;
+  margin: 0.5em 0 0 0;
+}
+
+.message-notification {
+  color: gray;
+  text-align: center;
+}
+
+/* Message sent by client (Right) */
+.message-client {
+  text-align: right;
+}
+
+/* Message sent by server (Left) */
+.message-server {
+  text-align: left;
+}
+
+.message-client__content {
+  display: inline-block;
+  max-width: 80%;
+  padding: 10px;
+  margin: 0;
+  border-radius: 10px;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  background-color: #e4e6eb;
+  font-weight: 400;
+  color: rgb(5, 5, 5);
+  box-shadow: 2px 2px 3px 0 rgba(117, 124, 129, 0.12);
+}
+
+.message-server__content {
+  display: inline-block;
+  max-width: 80%;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 0;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  background-color: #0099ff;
+  color: white;
+  font-weight: 400;
+}
+
+.message-notification__content {
+  display: inline-block;
+}
+
+.content__text {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.chat__input {
+  width: 100%;
+  height: 60px;
+  flex: 0 0 auto;
+}
+
+.input__text {
+  display: inline-block;
+  resize: none;
+  height: 100%;
+  width: 100%;
+}
+
+.input__submit {
+  display: inline-block;
+  vertical-align: top;
+  height: 100%;
+  width: 20px;
+}

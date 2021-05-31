@@ -1,0 +1,43 @@
+{
+  "name": "codepair-launcher",
+  "version": "1.0.0",
+  "description": "Server used to launcher code runners.",
+  "main": "index.js",
+  "engines": {
+    "node": "16",
+    "npm": "6"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon --ignore '/temp/' src/index.js",
+    "production": "NODE_ENV=production pm2 start src/index.js -2",
+    "precommmit": "lint-staged",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.8.0",
+    "dockerode": "^3.3.0",
+    "dotenv": "^9.0.2",
+    "vm2": "^3.9.3",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^27.0.1",
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.3",
+    "jest": "^27.0.1",
+    "lint-staged": "^11.0.0",
+    "nodemon": "^2.0.7"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "eslint --fix ./src"
+    ]
+  }
+}
