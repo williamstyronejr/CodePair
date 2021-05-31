@@ -9,7 +9,7 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "start": "npm run dev",
+    "start": "npm run server:prod",
     "dev": "concurrently \"npm run server:watch\" \"npm run client:watch\" \"npm run runner:watch\" ",
     "server:watch": "npm run dev --prefix server",
     "client:watch": "npm start --prefix client",
