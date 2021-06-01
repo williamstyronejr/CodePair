@@ -143,3 +143,12 @@ exports.markRoomCompleted = (id, options = null) => {
     options
   ).exec();
 };
+
+/**
+ * Deletes all rooms that are marked completed.
+ * @return {Promise<Object>} Returns a promise to resolve with data on deleted
+ *  object (Does not return deleted objects).
+ */
+exports.deleteCompletedRooms = () => {
+  return Room.deleteMany({ completed: true }).exec();
+};
