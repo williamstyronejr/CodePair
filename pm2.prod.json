@@ -1,6 +1,16 @@
 {
   "apps": [
     {
+      "name": "server",
+      "cwd": "./server",
+      "exec_mode": "cluster",
+      "instances": 1,
+      "instance_var": "SERVER_INSTANCE_CID",
+      "listen_timeout": "10000",
+      "restart_delay": "10000",
+      "script": "src/index.js"
+    },
+    {
       "name": "launcher",
       "exec_mode": "cluster",
       "instances": 2,

@@ -53,7 +53,7 @@ jobs:
             npm install
             docker build . --no-cache -t ${{secrets.IMAGE_NODE}}
             cd ..
-            pm2 startOrReload pm2.prod.json
+            npm run launcher:prod
 
       - name: Heroku Deploy
         #  Only deploy main branch on pushes

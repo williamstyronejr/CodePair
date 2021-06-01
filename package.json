@@ -15,8 +15,8 @@
     "client:watch": "npm start --prefix client",
     "runner:watch": "npm run dev --prefix launcher",
     "build": "npm run build --prefix client",
-    "server:prod": "npm run production --prefix server",
-    "runner:prod": "npm run production --prefix launcher",
+    "server:prod": "NODE_ENV=production pm2 startOrReload pm2.prod.json --only server",
+    "launcher:prod": "NODE_ENV=production pm2 startOrReload pm2.prod.json --only launcher",
     "precommit": "lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
     "prepush": "lerna run --concurrency 1 --stream test --since HEAD --exclude-dependents",
     "heroku-postbuild": "npm ci --prefix server && npm ci --prefix client --production=false && npm run build"
