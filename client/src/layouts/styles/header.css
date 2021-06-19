@@ -183,19 +183,24 @@
 
 .menu__link {
   display: block;
-  padding: 0.5em;
+  padding: 0.7em;
   border: none;
   border-bottom: 2px solid transparent;
   background-color: transparent;
-  color: white;
+  color: #ffffff;
   width: 100%;
   text-decoration: none;
   font-family: 'Rubik', 'sans-serif';
 }
 
+.menu__link-active {
+  color: #929292;
+}
+
 .menu__link:hover {
   cursor: pointer;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+  /* color: #929292; */
 }
 
 .menu__item--block .menu__link {
