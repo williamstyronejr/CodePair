@@ -217,7 +217,7 @@ const Challenge = (props) => {
             onClick={convertRoomToPublic}
             data-cy="public"
           >
-            Create Link
+            Invite Link
           </button>
         ) : (
           <>
@@ -227,7 +227,7 @@ const Challenge = (props) => {
               data-cy="showInvite"
               onClick={() => setInviteVisibility(!inviteVisible)}
             >
-              Show Invite
+              Invite Link
             </button>
 
             <div
