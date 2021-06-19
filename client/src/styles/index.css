@@ -94,6 +94,7 @@ body {
   background-color: #ffffff;
   border: 1px solid #c8cdd2;
   box-shadow: 2px 2px 3px 0 rgba(117, 124, 129, 0.12);
+  margin-bottom: 10px;
 }
 
 .form__drag-child {
