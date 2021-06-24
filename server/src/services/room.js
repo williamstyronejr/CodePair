@@ -152,3 +152,16 @@ exports.markRoomCompleted = (id, options = null) => {
 exports.deleteCompletedRooms = () => {
   return Room.deleteMany({ completed: true }).exec();
 };
+
+/**
+ * Marks all room that are past the provided time as completed.
+ * @param {Date} date Datetime the room must be less than to be excluded
+ * @return {Promise<Object>} Returns a promise to resolve with data on updated
+ *  objects.
+ */
+exports.expireOldRooms = (date) => {
+  return Room.updateMany(
+    { createdBy: { $gt: date }, completed: false },
+    { completed: true }
+  ).exec();
+};
