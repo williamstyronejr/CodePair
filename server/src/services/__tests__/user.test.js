@@ -32,7 +32,7 @@ describe('Creating users', () => {
     expect(user.hash === password).toBe(false);
   }, 10000);
 
-  test('Usernames are unique', async () => {
+  test('Creating user with an already used username should result in an error', async () => {
     // Assumes a user was already created previously with "username"
     const email2 = createRandomString(8, '@email.com');
 
@@ -45,9 +45,9 @@ describe('Creating users', () => {
     }
     expect(err).toBeDefined();
     expect(user2).toBeUndefined();
-  }, 10000);
+  }, 20000);
 
-  test('Emails are unique', async () => {
+  test('Creating user with an already used email should result in an error', async () => {
     // Assumes a user was already created previously with "username"
     const username2 = createRandomString(8);
 
@@ -60,7 +60,7 @@ describe('Creating users', () => {
     }
     expect(err).toBeDefined();
     expect(user2).toBeUndefined();
-  }, 10000);
+  }, 20000);
 });
 
 describe('Finding users', () => {
@@ -77,19 +77,19 @@ describe('Finding users', () => {
     ]);
   }, 10000);
 
-  test('By email', async () => {
+  test('An existing user with email should return a user object', async () => {
     const user = await findUserByEmail(email);
     expect(user).toBeDefined();
     expect((user.email = email));
   });
 
-  test('By username', async () => {
+  test('An existing user with the username should return a user object', async () => {
     const user = await findUserByUsername(username);
     expect(user).toBeDefined();
     expect(user.username).toBe(username);
   });
 
-  test('Mutilple users at once', async () => {
+  test('Searching for all users should return an array of users', async () => {
     const users = await findUsers({});
     expect(users).toBeDefined();
     expect(Array.isArray(users)).toBeTruthy();
@@ -106,14 +106,14 @@ describe('Checking username/email availability', () => {
     await createUser(username, email, password);
   }, 10000);
 
-  test('User exists', async () => {
+  test('An existing username should return a user object', async () => {
     const user = await usernameEmailAvailability(username, email);
 
     expect(user).toBeDefined();
     expect(user.username).toBe(username);
   }, 10000);
 
-  test('User does not exists', async () => {
+  test('A non-existing username should return null', async () => {
     const user = await usernameEmailAvailability('', '');
 
     expect(user).toBeNull();
@@ -130,7 +130,7 @@ describe('Updating user', () => {
     user = await createUser(username, email, password);
   }, 10000);
 
-  test('Invalid id will throw error', async () => {
+  test('Invalid id should throw an error', async () => {
     const invalidId = 'test';
     const newPassword = 'test';
 

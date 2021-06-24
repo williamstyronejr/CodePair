@@ -1,5 +1,9 @@
 const http = require('http');
-const { setUpChallengeQueue } = require('./services/scheduler');
+const {
+  setUpChallengeQueue,
+  setUpRoomCleanUp,
+  setUpRoomDeletion,
+} = require('./services/scheduler');
 const { connectDatabase } = require('./services/database');
 const app = require('./services/app');
 const { setupRedis } = require('./services/redis');
@@ -33,6 +37,8 @@ async function startServer() {
 
     // Schedule corn jobs
     setUpChallengeQueue();
+    setUpRoomCleanUp();
+    setUpRoomDeletion();
 
     server.listen(PORT, IP, () => {
       // Setup listener for receiving code testing results through rabbitmq

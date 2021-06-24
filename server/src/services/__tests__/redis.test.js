@@ -19,11 +19,10 @@ beforeAll(async () => {
 });
 
 // Close Redis client
-afterAll((done) => {
+afterAll(() => {
   if (redisClient) {
     redisClient.quit();
   }
-  done();
 });
 
 afterEach(async () => {
@@ -56,8 +55,8 @@ test('Removing user from queue', async () => {
 describe('Popping users from queue', () => {
   const max = 2;
 
-  beforeEach((done) => {
-    addUserToQueue(queueId, userId).then(done());
+  beforeEach(async () => {
+    await addUserToQueue(queueId, userId);
   });
 
   test('Not enough users returns null without popping users', async () => {
@@ -92,7 +91,7 @@ describe('Handling user responses to queue pairs', () => {
     addUsersToPendingQueue(pendingQueueId, [userId1, userId2]);
   });
 
-  test('Wrong user trying to accept queue', async (done) => {
+  test('Wrong user trying to accept queue', async () => {
     const wrongUser = 'user';
     const result = await markUserAsAccepted(pendingQueueId, wrongUser);
     expect(result).toBe(null); // Queue is not ready for room creation
@@ -100,7 +99,6 @@ describe('Handling user responses to queue pairs', () => {
     // Get pending queue and check if both users are false
     const pendingQueue = Object.values(await getPendingQueue(pendingQueueId));
     expect(pendingQueue).not.toContain('true');
-    done();
   });
 
   test('Both users accepting queue', async () => {

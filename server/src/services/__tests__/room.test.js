@@ -4,6 +4,7 @@ const {
   setRoomToJoinable,
   addUserToRoom,
   markRoomCompleted,
+  deleteCompletedRooms,
 } = require('../room');
 const { connectDatabase, disconnectDatabase } = require('../database');
 
@@ -123,5 +124,23 @@ describe('Updating room', () => {
 
     expect(updatedRoom).toBeDefined();
     expect(updatedRoom.completed).toBeTruthy();
+  });
+});
+
+describe('Deleting rooms', () => {
+  const challengeId = 'testmk';
+  const users = [];
+  const lang = 'node';
+  let room;
+
+  beforeAll(async () => {
+    room = await createRoom(challengeId, users, lang);
+    await markRoomCompleted(room.id);
+  });
+
+  test('Mark room should no longer exists after mass delete', async () => {
+    await deleteCompletedRooms();
+    const attempt = await findRoom(room.id);
+    expect(attempt).toBe(null);
   });
 });

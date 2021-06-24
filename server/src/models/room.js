@@ -17,6 +17,7 @@ const roomSchema = new mongoose.Schema({
   usersInRoom: { type: Number, default: 0 },
   completed: { type: Boolean, default: false },
   inviteKey: { type: String },
+  createdBy: { type: Date, default: Date.now },
 });
 
 const Room = mongoose.model('room', roomSchema);
