@@ -28,21 +28,27 @@ const socketUserId2 = 'user2';
 const attackUserId = 'user3'; // Id of user trying to force an action on system
 
 // Set up fake server, redis, and socket.io, and mongoose
-beforeAll(async (done) => {
-  redisClient = await setupRedis();
+beforeAll((done) => {
   setupSocket(server);
-  await connectDatabase(DB_TEST_URI);
-  server.listen(PORT, IP, () => {
-    done();
+
+  setupRedis().then((client) => {
+    redisClient = client;
+
+    connectDatabase(DB_TEST_URI).then(() => {
+      server.listen(PORT, IP, () => {
+        done();
+      });
+    });
   });
 });
 
 // Close connections
-afterAll(async (done) => {
+afterAll((done) => {
   closeSocket();
   closeRedis();
-  await disconnectDatabase();
-  server.close(done());
+  disconnectDatabase().then(() => {
+    server.close(done());
+  });
 });
 
 // Connect client sockets to server
@@ -124,7 +130,7 @@ describe('Accepting/Declining pending queue', () => {
     await addUsersToPendingQueue(pendingQueue, [socketUserId1, socketUserId2]);
   });
 
-  test('Client not in pending queue attempting to accept should not change pending queue state', async (done) => {
+  test('Client not in pending queue attempting to accept should not change pending queue state', (done) => {
     socket3 = io.connect(`http://${IP}:${PORT}`, {
       transports: ['websocket'],
     });
@@ -146,11 +152,12 @@ describe('Accepting/Declining pending queue', () => {
           done();
         });
       });
+
       socket3.emit('logUser', socketUserId1);
     });
   });
 
-  test('Accepting pending queue should set that client status to accepted', async (done) => {
+  test('Accepting pending queue should set that client status to accepted', (done) => {
     socket1.emit('acceptMatch', pendingQueue);
 
     // Give time for socket to emit message
@@ -165,7 +172,7 @@ describe('Accepting/Declining pending queue', () => {
     }, 100);
   });
 
-  test('All clients accepting queue should removes queue, creates room, and emits to clients', async (done) => {
+  test('All clients accepting queue should removes queue, creates room, and emits to clients', (done) => {
     socket1.on('roomCreated', async (roomId) => {
       const queue = await getPendingQueue(pendingQueue);
 
@@ -183,7 +190,7 @@ describe('Joining and leaving room', () => {
   const pendingQueue = 'pendingqueue2';
   let roomId;
 
-  beforeEach(async (done) => {
+  beforeEach((done) => {
     // Event handler for room creation
     socket1.on('roomCreated', (rId) => {
       roomId = rId;
@@ -199,14 +206,16 @@ describe('Joining and leaving room', () => {
     });
 
     // Add users to pending queue
-    await addUsersToPendingQueue(pendingQueue, [socketUserId1, socketUserId2]);
-
-    // Users accept queue
-    socket1.emit('acceptMatch', pendingQueue);
-    socket2.emit('acceptMatch', pendingQueue);
+    addUsersToPendingQueue(pendingQueue, [socketUserId1, socketUserId2]).then(
+      () => {
+        // Users accept queue
+        socket1.emit('acceptMatch', pendingQueue);
+        socket2.emit('acceptMatch', pendingQueue);
+      }
+    );
   });
 
-  test('Sending message to room should be received by both clients', async (done) => {
+  test('Sending message to room should be received by both clients', (done) => {
     const event = 'event';
     const message = 'test';
     let messageCounter = 0;
@@ -226,7 +235,7 @@ describe('Joining and leaving room', () => {
     emitMessageToRoom(event, roomId, message);
   });
 
-  test('Leaving the room should be seen by an event to other clients in the room', async (done) => {
+  test('Leaving the room should be seen by an event to other clients in the room', (done) => {
     socket2.on('leaveMessage', (msg) => {
       expect(msg).toBeDefined();
       expect(msg.includes(socketUserId1)).toBeTruthy();
@@ -241,7 +250,7 @@ describe('Sending message in room', () => {
   const pendingQueue = createRandomString(8);
   let roomId;
 
-  beforeEach(async (done) => {
+  beforeEach((done) => {
     // Event handler for room creation
     socket1.on('roomCreated', (rId) => {
       roomId = rId;
@@ -257,11 +266,13 @@ describe('Sending message in room', () => {
     });
 
     // Add users to pending queue
-    await addUsersToPendingQueue(pendingQueue, [socketUserId1, socketUserId2]);
-
-    // Users accept queue
-    socket1.emit('acceptMatch', pendingQueue);
-    socket2.emit('acceptMatch', pendingQueue);
+    addUsersToPendingQueue(pendingQueue, [socketUserId1, socketUserId2]).then(
+      () => {
+        // Users accept queue
+        socket1.emit('acceptMatch', pendingQueue);
+        socket2.emit('acceptMatch', pendingQueue);
+      }
+    );
   });
 
   test('Client sending message to room should be received by other client in the room', (done) => {
@@ -278,7 +289,7 @@ describe('Sending message in room', () => {
     socket1.emit('sendMessage', roomId, message, timestamp);
   });
 
-  test('Client sending code to room should be received by other clients in the room', async (done) => {
+  test('Client sending code to room should be received by other clients in the room', (done) => {
     const codeSent = 'this is code to be sent';
 
     socket2.on('receiveCode', (codeReceived) => {
