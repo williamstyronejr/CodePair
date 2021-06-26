@@ -58,24 +58,34 @@ exports.createChallenge = async (req, res, next) => {
  * @param {Function} next Next function to be called
  */
 exports.getChallengeList = async (req, res, next) => {
+  const { page, search, orderBy } = req.query;
+
   // Check if page param is a number
-  if (Number.isNaN(req.query.page - 0)) {
+  if (Number.isNaN(page - 0)) {
     const err = new Error('A non-numberical was used for pages');
     err.status = 400;
     return next(err);
   }
 
   const limit = 10; // Max number of items to response with
-  const page = parseInt(req.query.page, 10) || 0;
+  const skip = parseInt(page, 10) * limit || 0;
+  const filter = {};
+  const sort = {};
 
-  if (page < 0) {
+  if (search) filter.title = new RegExp(search, 'i');
+  if (orderBy) {
+    if (orderBy === 'oldest') sort.createBy = '1';
+    if (orderBy === 'newest') sort.createBy = '-1';
+  }
+
+  if (skip < 0) {
     const err = new Error('A negative number was used for pages');
     err.status = 400;
     return next(err);
   }
 
   try {
-    const challenges = await getChallengeList(page * limit, limit);
+    const challenges = await getChallengeList(skip, limit, filter, sort);
 
     res.json({ challenges });
   } catch (err) {

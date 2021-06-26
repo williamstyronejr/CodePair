@@ -1,7 +1,5 @@
 const request = require('supertest');
 const app = require('../../services/app');
-const challengeRoutes = require('../challenge');
-const userRoutes = require('../user');
 const {
   connectDatabase,
   disconnectDatabase,
@@ -13,9 +11,6 @@ const { DB_TEST_URI } = process.env;
 
 // Mocked to prevent sending emails during testing
 jest.mock('../../services/amqp');
-
-app.use(userRoutes);
-app.use(challengeRoutes);
 
 const title = 'title';
 const solution = 'solution';
@@ -151,6 +146,26 @@ describe('/POST /challenge/:id/create', () => {
 });
 
 describe('/GET /challenge/list?page', () => {
+  const routeToTest = (page = '0', sort = '', filter = '') =>
+    `/challenge/list?page=${page}&search=${filter}&orderBy=${sort}`;
+
+  const title1 = createRandomString(8);
+  const title2 = createRandomString(8);
+  beforeAll(async () => {
+    // Create two challenges
+    const tag = '';
+    await Promise.all([
+      request(app)
+        .post('/challenge/create')
+        .set('Accept', 'application/json')
+        .send({ title: title1, prompt: 'prompt', tags: tag, initialCode }),
+      request(app)
+        .post('/challenge/create')
+        .set('Accept', 'application/json')
+        .send({ title: title2, prompt: 'prompt', tags: tag, initialCode }),
+    ]);
+  });
+
   test('Non-number page should throw 400 error', async () => {
     await request(app).get('/challenge/list?page=test').expect(400);
   });
@@ -159,15 +174,59 @@ describe('/GET /challenge/list?page', () => {
     await request(app).get(`/challenge/list?page=-1`).expect(400);
   });
 
-  test('Valid request should response 200 with array', async () => {
+  test('Valid request should response 200 with array of challenges', async () => {
+    const page = 0;
+
     await request(app)
-      .get('/challenge/list?page=0')
+      .get(routeToTest(page))
       .expect(200)
       .then((res) => {
         expect(res).toBeDefined();
         expect(res.body).toBeDefined();
         expect(res.body.challenges).toBeDefined();
         expect(Array.isArray(res.body.challenges)).toBeTruthy();
+      });
+  });
+
+  test('Sorting by oldest should response 200 with sorted array of challenges', async () => {
+    const sort = 'oldest';
+    const page = '0';
+    const filter = '';
+
+    await request(app)
+      .get(routeToTest(page, sort, filter))
+      .expect(200)
+      .then((res) => {
+        expect(res.body.challenges).toBeDefined();
+        expect(Array.isArray(res.body.challenges)).toBeTruthy();
+        expect(res.body.challenges.length).toBeGreaterThan(1);
+
+        const date1 = new Date(res.body.challenges[0].createBy).getTime();
+        const date2 = new Date(res.body.challenges[1].createBy).getTime();
+        expect(date1).toBeLessThanOrEqual(date2);
+      });
+  });
+
+  test('Filtering should response 200 with array of challenges matching title', async () => {
+    const sort = '';
+    const page = '0';
+    const filter = title2;
+
+    await request(app)
+      .get(routeToTest(page, sort, filter))
+      .expect(200)
+      .then((res) => {
+        expect(res.body.challenges).toBeDefined();
+        expect(Array.isArray(res.body.challenges)).toBeTruthy();
+        expect(res.body.challenges.length).toBeGreaterThan(0);
+
+        expect(res.body.challenges).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              title: expect.stringMatching(new RegExp(filter, 'i')),
+            }),
+          ])
+        );
       });
   });
 });

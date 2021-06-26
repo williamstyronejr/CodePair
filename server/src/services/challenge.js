@@ -30,13 +30,21 @@ exports.createChallenge = (
  *  results are consistent to prevent duplicates.
  * @param {Number} skip The amount of challenge to skip
  * @param {Number} limit The number of challenge to return
+ * @param {Object} filter Object containing fieldsto filter by
+ * @param {Object} sort Object containing fields to sort by
  * @param {Object} projection Object containing fields to include/exclude
  * @return {Promise<Array>} A promise to resolve with an array of
  *  challenge objects, null if none are found.
  */
-exports.getChallengeList = (skip = 0, limit = 10, projection = null) => {
-  return Challenge.find({}, projection)
-    .sort({ _id: +1 })
+exports.getChallengeList = (
+  skip = 0,
+  limit = 10,
+  filter = {},
+  sort = {},
+  projection = null
+) => {
+  return Challenge.find(filter, projection)
+    .sort(sort)
     .skip(skip)
     .limit(limit)
     .exec();
