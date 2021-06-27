@@ -2,6 +2,57 @@
   height: 100%;
   width: 100%;
 }
+
+.challenges__header {
+  width: 100%;
+}
+
+.challenges__filter-outer {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px -1px black;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 15px;
+}
+
+.challenges__filter {
+  width: 100%;
+}
+
+.challenges__option {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.challenges__option--flex {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.challenges__option-heading {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.challenges__search {
+  width: 1px;
+  flex: 1 0 auto;
+  padding: 8px 12px;
+}
+
+.challenges__search-btn {
+  flex: 0 1 auto;
+  background-color: #f2f2f2;
+  border: none;
+  color: black;
+}
+
+.challenges__sort {
+  width: 100%;
+  padding: 8px 40px 8px 12px;
+}
+
 .challenges__list {
   position: relative;
   max-width: 100%;
@@ -121,8 +172,21 @@
 
 @media only screen and (min-width: 600px) {
   .challenges {
+    display: flex;
     flex: 1 0 auto;
     width: auto;
+    margin-top: 10px;
+  }
+
+  .challenges__header {
+    width: 250px;
+    margin-left: 10px;
+    flex: 1 0 auto;
+  }
+
+  .challenges__filter-outer {
+    margin: 0;
+    margin-top: 15px;
   }
 
   .challenges__item {
