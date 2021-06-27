@@ -11,10 +11,8 @@ const challengeSchema = new mongoose.Schema({
     },
   ],
   isPublic: { type: Boolean, default: false },
-  meta: {
-    created: { type: Date, default: Date.now },
-    completed: { type: Number, default: 0 },
-  },
+  createBy: { type: Date, default: Date.now },
+  completed: { type: Number, default: 0 },
 });
 
 const Challenge = mongoose.model('challenge', challengeSchema);

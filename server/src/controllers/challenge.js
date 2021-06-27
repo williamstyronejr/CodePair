@@ -18,15 +18,6 @@ const { publishToQueue } = require('../services/amqp');
 const { PRODUCER_QUEUE } = process.env;
 
 /**
- * Creates a invite key for a room. Current just using the room's id.
- * @param {Stirng} rId Id for room to create invite link for
- * @return {String} Returns a string to be the invite key.
- */
-function createInviteKey(rId) {
-  return rId;
-}
-
-/**
  * Route handler for creating challenges. Only used for
  *  development purposes.
  * @param {object} req Request object
@@ -69,13 +60,13 @@ exports.getChallengeList = async (req, res, next) => {
 
   const limit = 10; // Max number of items to response with
   const skip = parseInt(page, 10) * limit || 0;
-  const filter = {};
-  const sort = {};
+  const filter = { isPublic: true };
+  let sort = {};
 
-  if (search) filter.title = new RegExp(search, 'i');
+  if (search && search !== '') filter.title = new RegExp(search, 'i');
   if (orderBy) {
-    if (orderBy === 'oldest') sort.createBy = '1';
-    if (orderBy === 'newest') sort.createBy = '-1';
+    if (orderBy === 'oldest') sort = 'createBy';
+    if (orderBy === 'newest') sort = '-createBy';
   }
 
   if (skip < 0) {
