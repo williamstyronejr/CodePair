@@ -185,3 +185,24 @@ exports.validateCodeTest = [
   body('language').exists().withMessage('A language must be provided.'),
   checkValdation,
 ];
+
+/**
+ * Middle for validating pagination by throwing 404 error if page is out of
+ *  bounds (< 1) or invalid.
+ * @param {Object} req Request object
+ * @param {Object} res Response object
+ * @param {Object} next Next function to be called
+ */
+exports.validatePagination = (req, res, next) => {
+  const { page } = req.query;
+
+  // eslint-disable-next-line no-restricted-globals
+  if (page && (isNaN(page) || page < 1)) {
+    const error = new Error(`Pagination error, ${page}.`);
+    error.status = 404;
+
+    return next(error);
+  }
+
+  return next();
+};
