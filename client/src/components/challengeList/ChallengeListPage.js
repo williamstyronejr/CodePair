@@ -1,9 +1,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Link, withRouter } from 'react-router-dom';
-import InfiniteScroll from 'react-infinite-scroller';
-import { ajaxRequest } from '../../utils/utils';
-import LoadingComponent from '../shared/Loading';
+import useInfiniteScroll from 'react-infinite-scroll-hook';
+import { ajaxRequest, CancelToken } from '../../utils/utils';
+import Loading from '../shared/Loading';
 import Notification from '../shared/Notification';
 import './styles/challengeList.css';
 
@@ -63,40 +63,74 @@ const ChallengeItem = ({ challenge, createPrivateRoom }) => {
 };
 
 const ChallengeListPage = (props) => {
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState(1);
   const [endOfList, setEndOfList] = React.useState(false);
   const [challenges, setChallenge] = React.useState([]);
   const [loadingList, setLoadingList] = React.useState(false);
   const [listError, setListError] = React.useState(null);
   const [creatingRoom, setCreatingRoom] = React.useState(false);
   const [roomError, setRoomError] = React.useState(null);
+  const [search, setSearch] = React.useState('');
+  const [sortBy, setSortBy] = React.useState('newest');
+  let cancelToken;
 
   const getChallenges = () => {
     if (loadingList) return; // Stops from sending multiple request to update
-
     setLoadingList(true);
 
-    ajaxRequest(`/challenge/list?page=${page}`, 'GET')
+    if (cancelToken) cancelToken();
+
+    const CToken = CancelToken;
+    ajaxRequest(
+      `/challenge/list?page=${page}&orderBy=${sortBy}&search=${search}`,
+      'GET',
+      {
+        cancelToken: new CToken((c) => {
+          cancelToken = c;
+        }),
+      }
+    )
       .then((res) => {
-        // If list is empty, set end of list to be true
+        /*
+         * If list is empty, reset list for filter changes and set end of list
+         *  to be true
+         */
         if (res.data.challenges.length === 0) {
+          if (page === 1) setChallenge([]);
           setEndOfList(true);
           return setLoadingList(false);
         }
 
+        setChallenge(
+          page === 1
+            ? [...res.data.challenges]
+            : [...challenges, ...res.data.challenges]
+        );
         setPage(page + 1);
-        setChallenge([...challenges, ...res.data.challenges]);
         setLoadingList(false);
       })
       .catch((err) => {
+        setEndOfList(true);
         setListError(true);
         setLoadingList(false);
       });
   };
 
+  const [infiniteRef] = useInfiniteScroll({
+    loading: loadingList,
+    hasNextPage: !endOfList,
+    onLoadMore: getChallenges,
+    disabled: !!listError,
+    rootMargin: '0px 0px 200px 0px',
+  });
+
   React.useEffect(() => {
-    if (challenges.length === 0) getChallenges(0);
+    getChallenges(page, sortBy, search);
   }, []);
+
+  React.useEffect(() => {
+    if (page === 1) getChallenges();
+  }, [page]);
 
   const createPrivateRoom = (cId, language) => {
     if (creatingRoom) return; // Stop user from creating multiple rooms at once
@@ -123,11 +157,6 @@ const ChallengeListPage = (props) => {
       });
   };
 
-  // Displays loading indicator
-  if (challenges.length === 0) {
-    return <LoadingComponent error={endOfList} />;
-  }
-
   const listItems = challenges.map((challenge) => (
     <ChallengeItem
       key={`challenge-${challenge._id}`}
@@ -139,22 +168,72 @@ const ChallengeListPage = (props) => {
   return (
     <section className="challenges">
       {roomError ? <Notification message={roomError} /> : null}
-      <header className="">
-        <div className="challenges__filter-list" />
+
+      <header className="challenges__header">
+        <div className="challenges__filter-outer">
+          <div className="challenges__filter">
+            <div className="challenges__option challenges__option--flex">
+              <input
+                className="challenges__search"
+                type="text"
+                placeholder="Search"
+                value={search}
+                onChange={(evt) => setSearch(evt.target.value)}
+              />
+              <button
+                className="challenges__search-btn"
+                type="button"
+                onClick={() => {
+                  setEndOfList(false);
+                  setPage(1);
+                }}
+              >
+                Search
+              </button>
+            </div>
+
+            <div className="challenges__option">
+              <label htmlFor="sortBy">
+                <span className="challenges__option-heading">Sort By</span>
+                <select
+                  id="sortBy"
+                  className="challenges__sort"
+                  value={sortBy}
+                  onChange={(evt) => {
+                    setSortBy(evt.target.value);
+                    setEndOfList(false);
+                    setPage(1);
+                  }}
+                >
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <ul className="challenges__list">
-        <InfiniteScroll
-          key="scroll"
-          pageStart={0}
-          loadMore={getChallenges}
-          hasMore={!endOfList}
-          loader={<LoadingComponent key={0} />}
-          useWindow={false}
-        >
+      <div className="challenges__content">
+        <ul className="challenges__list">
+          {endOfList && challenges.length === 0 ? (
+            <li className="challenges__item">
+              <p>No challenge matching this search</p>
+            </li>
+          ) : null}
+
           {listItems}
-        </InfiniteScroll>
-      </ul>
+
+          {!endOfList ? (
+            <li
+              ref={infiniteRef}
+              className=" challenge__item challenges__item--end"
+            >
+              <Loading message="Loading ..." />
+            </li>
+          ) : null}
+        </ul>
+      </div>
     </section>
   );
 };
