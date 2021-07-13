@@ -199,7 +199,7 @@ exports.validatePagination = (req, res, next) => {
   // eslint-disable-next-line no-restricted-globals
   if (page && (isNaN(page) || page < 1)) {
     const error = new Error(`Pagination error, ${page}.`);
-    error.status = 404;
+    error.status = 400;
 
     return next(error);
   }
