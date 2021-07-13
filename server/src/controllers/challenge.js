@@ -59,7 +59,7 @@ exports.getChallengeList = async (req, res, next) => {
   }
 
   const limit = 10; // Max number of items to response with
-  const skip = parseInt(page, 10) * limit || 0;
+  const skip = page ? (page - 1) * limit : 1;
   const filter = { isPublic: true };
   let sort = {};
 

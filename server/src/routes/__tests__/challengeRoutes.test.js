@@ -5,6 +5,7 @@ const {
   disconnectDatabase,
 } = require('../../services/database');
 const { publishToQueue } = require('../../services/amqp');
+const { createChallenge } = require('../../services/challenge');
 const { createRandomString } = require('../../utils/utils');
 
 const { DB_TEST_URI } = process.env;
@@ -13,7 +14,6 @@ const { DB_TEST_URI } = process.env;
 jest.mock('../../services/amqp');
 
 const title = 'title';
-const solution = 'solution';
 const prompt = 'prompt';
 const tags = 'greedy,functions';
 const initialCode = [{ language: 'node', code: 'function main() {}' }];
@@ -34,14 +34,9 @@ beforeAll(async () => {
   await connectDatabase(DB_TEST_URI);
 
   await Promise.all([
-    request(app)
-      .post('/challenge/create')
-      .send({ title, prompt, solution, tags, initialCode })
-      .set('Accept', 'application/json')
-      .expect(200)
-      .then((res) => {
-        challenge = res.body.challenge;
-      }),
+    createChallenge(title, prompt, tags, initialCode, true).then((res) => {
+      challenge = res;
+    }),
     request(app)
       .post('/signup')
       .send({ username, email, password })
@@ -105,32 +100,6 @@ function makeRoomJoinableRoute(roomId, cookie, status = 200) {
     .then((res) => res.body.invite);
 }
 
-describe('/POST /challenge/create', () => {
-  const challengeTitle = 'title';
-  const challengePrompt = 'prompt';
-  const challengeTags = 'greedy,functions';
-  const chalengeInitialCode = [{ language: 'node', code: 'function add() {}' }];
-
-  test('Valid request should response 200 with success message', async () => {
-    return request(app)
-      .post('/challenge/create')
-      .send({
-        title: challengeTitle,
-        prompt: challengePrompt,
-        tags: challengeTags,
-        initialCode: chalengeInitialCode,
-      })
-      .set('Accept', 'application/json')
-      .expect(200)
-      .then((res) => {
-        expect(res.body.challenge).toBeDefined();
-        expect(res.body.challenge.title).toBe(challengeTitle);
-        expect(res.body.challenge.prompt).toBe(challengePrompt);
-        expect(res.body.challenge.tags).toBe(challengeTags);
-      });
-  });
-});
-
 describe('/POST /challenge/:id/create', () => {
   test('Unauth request should throws 401 error', async () => {
     await createRoomRoute('123', '123', 'node', 401);
@@ -145,7 +114,7 @@ describe('/POST /challenge/:id/create', () => {
   });
 });
 
-describe('/GET /challenge/list?page', () => {
+describe('/GET /challenge/list', () => {
   const routeToTest = (page = '0', sort = '', filter = '') =>
     `/challenge/list?page=${page}&search=${filter}&orderBy=${sort}`;
 
@@ -153,29 +122,22 @@ describe('/GET /challenge/list?page', () => {
   const title2 = createRandomString(8);
   beforeAll(async () => {
     // Create two challenges
-    const tag = '';
     await Promise.all([
-      request(app)
-        .post('/challenge/create')
-        .set('Accept', 'application/json')
-        .send({ title: title1, prompt: 'prompt', tags: tag, initialCode }),
-      request(app)
-        .post('/challenge/create')
-        .set('Accept', 'application/json')
-        .send({ title: title2, prompt: 'prompt', tags: tag, initialCode }),
+      createChallenge(title1, 'prompt', 'tag', initialCode, true),
+      createChallenge(title2, 'prompt', 'tag', initialCode, true),
     ]);
   });
 
   test('Non-number page should throw 400 error', async () => {
-    await request(app).get('/challenge/list?page=test').expect(400);
+    await request(app).get(routeToTest('test')).expect(400);
   });
 
   test('Negative numbers throws a 400 error', async () => {
-    await request(app).get(`/challenge/list?page=-1`).expect(400);
+    await request(app).get(routeToTest(-1)).expect(400);
   });
 
   test('Valid request should response 200 with array of challenges', async () => {
-    const page = 0;
+    const page = 1;
 
     await request(app)
       .get(routeToTest(page))
@@ -190,7 +152,7 @@ describe('/GET /challenge/list?page', () => {
 
   test('Sorting by oldest should response 200 with sorted array of challenges', async () => {
     const sort = 'oldest';
-    const page = '0';
+    const page = 1;
     const filter = '';
 
     await request(app)
@@ -208,8 +170,8 @@ describe('/GET /challenge/list?page', () => {
   });
 
   test('Filtering should response 200 with array of challenges matching title', async () => {
+    const page = 1;
     const sort = '';
-    const page = '0';
     const filter = title2;
 
     await request(app)

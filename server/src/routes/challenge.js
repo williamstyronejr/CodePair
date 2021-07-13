@@ -9,12 +9,15 @@ const {
   convertRoomToPublic,
   joinRoomByInvite,
 } = require('../controllers/challenge');
-const { validateCodeTest } = require('../middlewares/validation');
+const {
+  validateCodeTest,
+  validatePagination,
+} = require('../middlewares/validation');
 const { requireAuth } = require('../controllers/authentication');
 
 const jsonParser = bodyParser.json();
 router.post('/challenge/create', jsonParser, createChallenge);
-router.get('/challenge/list', getChallengeList);
+router.get('/challenge/list', validatePagination, getChallengeList);
 
 router.post(
   '/challenge/:id/create',
