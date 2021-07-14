@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Link, withRouter } from 'react-router-dom';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
-import { ajaxRequest, CancelToken } from '../../utils/utils';
+import { ajaxRequest } from '../../utils/utils';
 import Loading from '../shared/Loading';
 import Notification from '../shared/Notification';
 import './styles/challengeList.css';
@@ -72,29 +72,17 @@ const ChallengeListPage = (props) => {
   const [roomError, setRoomError] = React.useState(null);
   const [search, setSearch] = React.useState('');
   const [sortBy, setSortBy] = React.useState('newest');
-  let cancelToken;
 
   const getChallenges = () => {
     if (loadingList) return; // Stops from sending multiple request to update
     setLoadingList(true);
 
-    if (cancelToken) cancelToken();
-
-    const CToken = CancelToken;
     ajaxRequest(
       `/challenge/list?page=${page}&orderBy=${sortBy}&search=${search}`,
-      'GET',
-      {
-        cancelToken: new CToken((c) => {
-          cancelToken = c;
-        }),
-      }
+      'GET'
     )
       .then((res) => {
-        /*
-         * If list is empty, reset list for filter changes and set end of list
-         *  to be true
-         */
+        // Empty list if first page  to clear results from previous filtering
         if (res.data.challenges.length === 0) {
           if (page === 1) setChallenge([]);
           setEndOfList(true);
@@ -129,6 +117,7 @@ const ChallengeListPage = (props) => {
   }, []);
 
   React.useEffect(() => {
+    // Fetch list whenever page is set to 1 due to filter changes
     if (page === 1) getChallenges();
   }, [page]);
 
@@ -172,7 +161,14 @@ const ChallengeListPage = (props) => {
       <header className="challenges__header">
         <div className="challenges__filter-outer">
           <div className="challenges__filter">
-            <div className="challenges__option challenges__option--flex">
+            <form
+              className="challenges__option challenges__option--flex"
+              onSubmit={(evt) => {
+                evt.preventDefault();
+                setEndOfList(false);
+                setPage(1);
+              }}
+            >
               <input
                 className="challenges__search"
                 type="text"
@@ -180,17 +176,10 @@ const ChallengeListPage = (props) => {
                 value={search}
                 onChange={(evt) => setSearch(evt.target.value)}
               />
-              <button
-                className="challenges__search-btn"
-                type="button"
-                onClick={() => {
-                  setEndOfList(false);
-                  setPage(1);
-                }}
-              >
+              <button className="challenges__search-btn" type="submit">
                 Search
               </button>
-            </div>
+            </form>
 
             <div className="challenges__option">
               <label htmlFor="sortBy">
