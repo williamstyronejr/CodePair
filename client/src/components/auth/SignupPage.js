@@ -13,7 +13,7 @@ const SignupPage = (props) => {
   const [confirm, setConfirm] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [requesting, setRequesting] = React.useState(false);
-  const [error, setError] = React.useState(false);
+  const [error, setError] = React.useState({});
 
   if (props.user.authenticated) return <Redirect to="/challenges" />;
 
@@ -22,7 +22,7 @@ const SignupPage = (props) => {
     if (requesting) return;
 
     setRequesting(true);
-    setError(false);
+    setError({});
 
     ajaxRequest('/signup', 'POST', {
       username: user,
@@ -59,7 +59,7 @@ const SignupPage = (props) => {
           <label className="form__label" htmlFor="email">
             <span className="form__labeling">Email</span>
 
-            {error && error.email && (
+            {error.email && (
               <span className="form__error" data-cy="error">
                 {error.email}
               </span>
@@ -81,7 +81,7 @@ const SignupPage = (props) => {
           <label className="form__label" htmlFor="username">
             <span className="form__labeling">Username</span>
 
-            {error && error.username && (
+            {error.username && (
               <span className="form__error" data-cy="error">
                 {error.username}
               </span>
@@ -102,7 +102,7 @@ const SignupPage = (props) => {
           <label className="form__label" htmlFor="password">
             <span className="form__labeling">Password</span>
 
-            {error && error.password && (
+            {error.password && (
               <span className="form__error" data-cy="error">
                 {error.password}
               </span>
@@ -122,7 +122,7 @@ const SignupPage = (props) => {
         <fieldset className="form__field">
           <label className="form__label" htmlFor="confirm">
             <span className="form__labeling">Confirm Password</span>
-            {error && error.confirm && (
+            {error.confirm && (
               <span className="form__error" data-cy="error">
                 {error.confirm}
               </span>
