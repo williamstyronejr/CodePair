@@ -16,13 +16,8 @@ import {
 import './styles/challengeQueuePage.css';
 
 const ChallengeQueuePage = (props) => {
-  const {
-    leavingQueue,
-    roomId,
-    matchFound,
-    acceptedMatch,
-    declinedMatch,
-  } = props.queue;
+  const { leavingQueue, roomId, matchFound, acceptedMatch, declinedMatch } =
+    props.queue;
   const { cId, lang } = props.match.params;
   const [matchTimer, setMatchTimer] = React.useState(10);
   const queueId = `${cId}-${lang}`; // Id of queue the user is joining
