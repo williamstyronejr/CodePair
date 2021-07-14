@@ -23,10 +23,11 @@
 
 .challenge__heading {
   margin: 0;
+  color: #efefef;
 }
 
 .challenge__saving {
-  color: grey;
+  color: #efefef;
 }
 
 .challenge__saving i {
@@ -125,13 +126,13 @@
   align-items: center;
   top: 0;
   right: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(45, 45, 45, 0.5);
   z-index: 6;
 }
 
 .challenge__completed {
   color: white;
-  background-color: rgba(2, 3, 2, 1);
+  background-color: rgb(28, 28, 28);
   width: 90%;
   padding: 2em 0;
   text-align: center;

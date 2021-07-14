@@ -112,17 +112,6 @@
   cursor: pointer;
 }
 
-/* .menu__content {
-  position: fixed;
-  height: 100%;
-  background-color: #151728;
-  top
-}
-
-.menu--active .menu__content {
-  width: 200px;
-} */
-
 .menu--collasped .menu__content {
   display: none;
 }
@@ -184,6 +173,7 @@
 .menu__link {
   display: block;
   padding: 0.7em;
+  font-weight: 400;
   border: none;
   border-bottom: 2px solid transparent;
   background-color: transparent;

@@ -1,6 +1,7 @@
 .loading {
   text-align: center;
   padding: 10px 0;
+  color: #efefef;
 }
 
 .loading__dots {
@@ -16,7 +17,7 @@
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  background: rgb(102, 99, 99);
+  background: rgb(244, 244, 244);
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 .loading__dots div:nth-child(1) {
