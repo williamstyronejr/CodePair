@@ -358,6 +358,7 @@ body {
   padding: 1em;
   margin: 0 auto;
   border: 2px solid grey;
+  background-color: #efefef;
 }
 
 .btn--cancel:hover {
@@ -436,11 +437,19 @@ body {
 }
 
 .btn--pair-accept {
-  background-color: #fd378e;
+  background-color: #3b82f6;
+}
+
+.btn--pair-accept:hover {
+  background-color: #1e67de;
 }
 
 .btn--pair-decline {
   background-color: #86003a;
+}
+
+.btn--pair-decline:hover {
+  background-color: #6a002e;
 }
 
 /* General styles */

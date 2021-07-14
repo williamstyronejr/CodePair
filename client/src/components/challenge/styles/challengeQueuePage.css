@@ -16,13 +16,12 @@
   position: absolute;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.2);
   z-index: 2;
 }
 
 .queue__box {
   display: block;
-  background-color: #ffffff;
+  background-color: #262729;
   width: 90%;
   text-align: center;
   border-radius: 5px;
@@ -34,6 +33,7 @@
   margin: 20px 0;
   font-size: 2em;
   font-weight: 400;
+  color: #efefef;
 }
 
 .queue__header {
@@ -43,11 +43,13 @@
 .queue__heading {
   margin: 0 0 20px 0;
   text-align: center;
+  color: #efefef;
 }
 
 .queue__info {
   width: 100%;
   text-align: center;
+  color: #efefef;
 }
 
 @media only screen and (min-width: 600px) {
