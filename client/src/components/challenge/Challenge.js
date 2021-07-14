@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import ChatRoom from './ChatRoom';
 import useDetectOutsideClick from '../shared/useDetectOutsideClick';
 import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/material.css';
+import 'codemirror/theme/dracula.css';
 import 'codemirror/mode/javascript/javascript';
 import './styles/challenge.css';
 
@@ -184,7 +184,7 @@ const Challenge = (props) => {
             options={{
               lineNumbers: true,
               lineWrapping: true,
-              theme: 'material',
+              theme: 'dracula',
               tabSize: 2,
               mode: 'javascript',
             }}
@@ -271,7 +271,7 @@ const Challenge = (props) => {
         <div className="challenge__popup">
           <div className="challenge__completed">
             <h2>Challenge Completed!</h2>
-            <Link to="/challenges">Click here</Link> to go dashboard.
+            <Link to="/challenges">Click here</Link> to go to challenge list.
           </div>
         </div>
       )}
