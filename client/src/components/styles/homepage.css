@@ -158,6 +158,34 @@
   font-family: 'Rubik', 'sans-serif';
 }
 
+.contribute {
+  padding: 60px 0;
+  text-align: center;
+  color: #efefef;
+}
+
+.contribute__link {
+  text-decoration: none;
+  font-size: 1em;
+  font-weight: 400;
+  color: #efefef;
+  padding: 10px;
+  font-size: 1em;
+  background-color: rgba(250, 0, 118, 0.8);
+  border-radius: 5px;
+}
+
+.contribute__link:hover {
+  background-color: rgba(157, 16, 81, 0.8);
+}
+
+.footer {
+  padding-top: 50px;
+  background-color: rgb(38, 39, 41);
+  color: #efefef;
+  text-align: center;
+}
+
 @media only screen and (min-width: 600px) {
   .home__signup {
     display: block;

@@ -20,6 +20,12 @@ body {
   height: 100%;
 }
 
+.max-wrapper {
+  margin: auto;
+  width: 100%;
+  max-width: 1920px;
+}
+
 .page-main {
   width: 100%;
   height: auto; /* Fallback  */
