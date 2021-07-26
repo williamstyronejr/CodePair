@@ -35,5 +35,3 @@ export function validateUsername(username) {
     return 'Username must only contain letters, numbers, and _';
   return null;
 }
-
-export const CancelToken = axios.CancelToken;
