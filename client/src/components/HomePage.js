@@ -4,7 +4,7 @@ import './styles/homepage.css';
 const HomePage = () => (
   <>
     <section className="home">
-      <header className="home__header">
+      <header className="home__header max-wrapper">
         <h1 className="home__heading">Pair program through challenges</h1>
         <p className="home__content">
           Pair up with other coders or a friend to complete challenges.
@@ -12,7 +12,7 @@ const HomePage = () => (
       </header>
     </section>
 
-    <section className="language">
+    <section className="language max-wrapper">
       <h4 className="langauge__heading">Supported Langauage</h4>
       <div className="langauge__content">
         <ul className="langauge__list">
@@ -38,7 +38,7 @@ const HomePage = () => (
     </section>
 
     <section className="info">
-      <div className="info__grid">
+      <div className="info__grid max-wrapper">
         <div className="info__tile">
           <h5 className="info__heading">Upgrade your skills</h5>
           <p className="info__text">
@@ -57,10 +57,26 @@ const HomePage = () => (
 
         <div className="info__tile">
           <h5 className="info__heading">Compete</h5>
-          <p className="info__text">Compete on a leaderboard.</p>
+          <p className="info__text">
+            Compete against others on the leaderboard for the top rank.
+          </p>
         </div>
       </div>
     </section>
+
+    <section className="contribute">
+      <h3> Want to contribute to creating new challenges for the community?</h3>
+      <a
+        className="contribute__link"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://github.com/williamstyronejr/CodePair/blob/main/CONTRIBUTING.md"
+      >
+        Click here to learn more!
+      </a>
+    </section>
+
+    <section className="footer">© 2021 CodePair</section>
   </>
 );
 
