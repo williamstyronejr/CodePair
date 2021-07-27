@@ -180,7 +180,8 @@
 }
 
 .footer {
-  padding-top: 50px;
+  padding-top: 75px;
+  padding-bottom: 7px;
   background-color: rgb(38, 39, 41);
   color: #efefef;
   text-align: center;
