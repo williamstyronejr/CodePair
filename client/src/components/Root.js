@@ -17,6 +17,7 @@ import NotFoundPage from './NotFoundPage';
 import GithubRegisterPage from './auth/GithubRegisterPage';
 import RoadmapPage from './roadmap/RoadmapPage';
 import PasswordResetPage from './auth/PasswordResetPage';
+import ProfilePage from './profile/ProfilePage';
 
 const appRoutes = [
   {
@@ -35,6 +36,10 @@ const appRoutes = [
   {
     path: '/settings/:type?',
     component: SettingsPage,
+  },
+  {
+    path: '/profile/:username',
+    component: ProfilePage,
   },
 ];
 
