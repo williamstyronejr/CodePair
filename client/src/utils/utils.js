@@ -35,3 +35,17 @@ export function validateUsername(username) {
     return 'Username must only contain letters, numbers, and _';
   return null;
 }
+
+/**
+ * Creates a string format for provided date.
+ * @param {String} date Date string
+ * @returns {String} Returns a formatted string of the format of M-D-Y
+ */
+export function dateToText(date) {
+  const createdDate = new Date(date);
+  return !isNaN(createdDate)
+    ? `${createdDate.toLocaleDateString('default', {
+        month: 'short',
+      })} ${createdDate.getDate()}, ${createdDate.getFullYear()}`
+    : '';
+}
