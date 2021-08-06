@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Proptypes from 'prop-types';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import useDetectOutsideClick from '../components/shared/useDetectOutsideClick';
 import './styles/header.css';
@@ -96,6 +96,15 @@ const AppHeader = (props) => {
               <nav className="menu__nav">
                 <ul className="menu__list menu__list--stack">
                   <li className="menu__item menu__item--block">
+                    <Link
+                      className="menu__link"
+                      to={`/profile/${props.username}`}
+                    >
+                      Profile
+                    </Link>
+                  </li>
+
+                  <li className="menu__item menu__item--block">
                     <Link className="menu__link" to="/settings">
                       Settings
                     </Link>
@@ -124,8 +133,9 @@ const AppHeader = (props) => {
 };
 
 AppHeader.propTypes = {
-  signout: Proptypes.func.isRequired,
-  profileImage: Proptypes.string.isRequired,
+  username: PropTypes.string.isRequired,
+  signout: PropTypes.func.isRequired,
+  profileImage: PropTypes.string.isRequired,
 };
 
 export default AppHeader;
