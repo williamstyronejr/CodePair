@@ -10,7 +10,12 @@ const userSchema = new mongoose.Schema({
   githubId: { type: String }, // Used if github login
   verified: { type: Boolean, default: false },
   created: { type: Date, default: Date.now },
-  completed: { type: Object },
+  achievements: [
+    {
+      name: { type: String, required: true },
+    },
+  ],
+  completed: { type: Number, default: 0 },
 });
 
 /**
