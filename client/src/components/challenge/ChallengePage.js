@@ -19,11 +19,12 @@ import {
   resetChatData,
 } from '../../actions/chat';
 import { openSocket, closeSocket } from '../../actions/socket';
+import './styles/challenge.css';
 
 const ChallengeErrorPage = ({ message }) => {
   return (
     <section className="challenge challenge--error">
-      <p>{message}</p>
+      <p className="challenge__error-msg">{message}</p>
     </section>
   );
 };
