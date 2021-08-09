@@ -147,14 +147,11 @@
 }
 
 .solutions__code {
-  /* display: block; */
+  display: block;
   position: relative;
-  /* padding: 10px 4px; */
   width: 95%;
-  min-height: 1px;
-
-  /* height: 100px; */
-  /* margin: 0 auto; */
+  height: 100px;
+  margin: 0 auto;
 }
 
 @media only screen and (min-width: 600px) {
