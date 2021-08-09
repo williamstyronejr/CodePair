@@ -87,7 +87,7 @@ const Solutions = ({ username }) => {
 
   const solutionList = solutions.map((item) => (
     <li key={item._id} className="solutions__item">
-      <h3 className="solutions__heading">{item.challengeId}</h3>
+      <h3 className="solutions__heading">{item.challengeName}</h3>
       <div className="solutions__language">{item.language}</div>
       <div className="solutions__content">
         <CodeMirror
