@@ -8,6 +8,7 @@ import {
   TEST_FINISH,
   SAVE_CODE,
   CODE_SAVED,
+  UPDATE_CODE,
 } from '../actions/challenge';
 
 const initState = {
@@ -76,7 +77,7 @@ const ChallengeReducer = (state = initState, action) => {
         savingCode: false,
       };
 
-    case 'UPDATE_CODE':
+    case UPDATE_CODE:
       return {
         ...state,
         code: action.payload,
