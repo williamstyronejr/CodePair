@@ -32,34 +32,11 @@ describe('Creating users', () => {
     expect(user.hash === password).toBe(false);
   }, 10000);
 
-  test('Creating user with an already used username should result in an error', async () => {
-    // Assumes a user was already created previously with "username"
-    const email2 = createRandomString(8, '@email.com');
-
-    let err;
-    let user2;
-    try {
-      user2 = await createUser(username, email2, password);
-    } catch (e) {
-      err = e;
-    }
-    expect(err).toBeDefined();
-    expect(user2).toBeUndefined();
-  }, 20000);
-
   test('Creating user with an already used email should result in an error', async () => {
     // Assumes a user was already created previously with "username"
     const username2 = createRandomString(8);
 
-    let user2;
-    let err;
-    try {
-      user2 = await createUser(username2, email, password);
-    } catch (e) {
-      err = e;
-    }
-    expect(err).toBeDefined();
-    expect(user2).toBeUndefined();
+    await expect(createUser(username2, email, password)).rejects.toBeDefined();
   }, 20000);
 });
 
