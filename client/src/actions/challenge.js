@@ -11,6 +11,7 @@ export const CODE_SAVED = 'code_saved';
 export const ADD_INVITE_LINK = 'add_invite_link';
 export const TEST_CODE = 'test_code';
 export const TEST_FINISH = 'test_finish';
+export const UPDATE_CODE = 'update_code';
 
 /**
  * Redux action creator for setting challenge/room data.
@@ -93,9 +94,10 @@ export function addInvite(inviteLink) {
  *  results and errors.
  * @returns {Object} Returns a redux action object.
  */
-export function testingCode() {
+export function testingCode(roomId) {
   return {
     type: TEST_CODE,
+    payload: roomId,
   };
 }
 
@@ -116,7 +118,7 @@ export function getChallenge(cId, rId) {
       })
       .catch((err) => {
         if (err.response && err.response.status === 404)
-          return dispatch(challengeError('This room does not exists.'));
+          return dispatch(challengeError('This room does not exist.'));
 
         dispatch(
           challengeError('An error occurred on the server, please try again.')
@@ -154,7 +156,7 @@ export function convertRoomToPublic(rId) {
  */
 export function testCode(cId, rId, code, language) {
   return (dispatch) => {
-    dispatch(testingCode());
+    dispatch(testingCode(rId));
     ajaxRequest(`/challenge/${cId}/room/${rId}/test`, 'POST', {
       code,
       language,
