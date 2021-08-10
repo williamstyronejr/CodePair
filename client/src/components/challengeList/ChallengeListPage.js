@@ -207,7 +207,9 @@ const ChallengeListPage = (props) => {
         <ul className="challenges__list">
           {endOfList && challenges.length === 0 ? (
             <li className="challenges__item">
-              <p>No challenge matching this search</p>
+              <p className="challenges__empty">
+                No challenge matching this search
+              </p>
             </li>
           ) : null}
 

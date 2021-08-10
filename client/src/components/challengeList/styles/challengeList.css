@@ -102,6 +102,16 @@
   width: 100%;
 }
 
+.challenges__empty {
+  display: block;
+  width: 100%;
+  text-align: center;
+  color: #efefef;
+  font-weight: 400;
+  line-height: 1.5;
+  font-size: 1.4em;
+}
+
 .challenges__title {
   margin: 0;
   color: #efefef;
