@@ -9,11 +9,9 @@ const User = require('../models/user');
  */
 function hashPassword(password) {
   return bcrypt
-    .genSalt(16)
+    .genSalt(13)
     .then((salt) => bcrypt.hash(password, salt).then((hash) => hash));
 }
-
-exports.hashPassword = hashPassword;
 
 /**
  * Searchs DB for users based on given params.
@@ -21,7 +19,9 @@ exports.hashPassword = hashPassword;
  * @return {Promise<OBject>} Returns a promise to resolve with a user object if
  *  found, otherwise.
  */
-exports.findUsers = (params) => User.find(params).exec();
+exports.findUsers = (params) => {
+  return User.find(params).exec();
+};
 
 /**
  * Finds and returns a user by it's username.
@@ -30,8 +30,9 @@ exports.findUsers = (params) => User.find(params).exec();
  * @return {Promise<Object>} A promise to resolve with a user object of null if no
  *  user is found.
  */
-exports.findUserByUsername = (username, projection = null) =>
-  User.findOne({ username }, projection).exec();
+exports.findUserByUsername = (username, projection = null) => {
+  return User.findOne({ username }, projection).exec();
+};
 
 /**
  * Finds and returns a user by it's email.
@@ -39,8 +40,9 @@ exports.findUserByUsername = (username, projection = null) =>
  * @return {Promise<Object>} A promise to resolve with a user object of null if no
  *  user is found.
  */
-exports.findUserByEmail = (email, projection) =>
-  User.findOne({ email }, projection).exec();
+exports.findUserByEmail = (email, projection) => {
+  return User.findOne({ email }, projection).exec();
+};
 
 /**
  * Hashes provided password and then updates user wiht the new hash.
