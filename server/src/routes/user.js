@@ -17,6 +17,7 @@ const {
   validateSettingsUpdate,
   validatePasswordUpdate,
   validatePasswordReset,
+  validatePagination,
 } = require('../middlewares/validation');
 const {
   getUserData,
@@ -25,6 +26,8 @@ const {
   updateUserPassword,
   sendPasswordEmail,
   passwordReset,
+  getUserProfileStats,
+  getUserSolutions,
 } = require('../controllers/user');
 const { profileUpload } = require('./utils');
 
@@ -53,9 +56,15 @@ router.post('/inputvalidator', jsonParser, validateInputs, verifyInputs);
 router.get('/auth/github', requireGitSignin, (req, res) => {});
 router.get('/auth/github/callback', verifyGitSignin);
 
-// Route for getting logged in user data
+// Route for getting user data
 router.get('/user/:user/data', getUserData);
 router.get('/user/data', requireAuth, getCurrentUserData);
+router.get('/user/:username/profile/stats', getUserProfileStats);
+router.get(
+  '/user/:username/profile/solutions',
+  validatePagination,
+  getUserSolutions
+);
 
 // Routes for updating/reseting user data
 router.post(

@@ -4,6 +4,7 @@ const {
   updateUserPassword,
   updateUser,
 } = require('../services/user');
+const { findUserSolutions } = require('../services/solution');
 const {
   generateToken,
   findTokenById,
@@ -65,6 +66,64 @@ exports.getUserData = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+};
+
+/**
+ * Route handler for getting user profile data along with their stats.
+ * @param {Object} req Request object
+ * @param {Object} res Response object
+ * @param {Function} next Next function to be called
+ */
+exports.getUserProfileStats = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const user = await findUserByUsername(username, {
+      hash: false,
+      __v: false,
+    });
+
+    if (!user) {
+      const error = new Error(`Username, ${username}, was not found.`);
+      error.status = 404;
+      throw error;
+    }
+
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Route handler for getting a list of user's solutions based on page number.
+ *  If no page is provided, will default to page one.
+ * @param {Object} req Request object
+ * @param {Object} res Response object
+ * @param {Function} next Next function to be called
+ */
+exports.getUserSolutions = async (req, res, next) => {
+  const { username } = req.params;
+  const { page } = req.query;
+
+  const limit = 10; // Max number of items to response with
+  const skip = page ? (page - 1) * limit : 1;
+
+  try {
+    const user = await findUserByUsername(username);
+
+    if (!user) {
+      const error = new Error(`User, ${username}, does not exist.`);
+      error.status = 404;
+      throw error;
+    }
+
+    const solutions = await findUserSolutions(user.id, limit, skip);
+
+    return res.json({ solutions });
+  } catch (err) {
+    return next(err);
   }
 };
 
