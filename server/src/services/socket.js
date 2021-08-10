@@ -149,6 +149,16 @@ async function acceptQueue(pendingQueueId) {
 }
 
 /**
+ * Emits to all users in room that a test is being ran.
+ * @param {String} roomId Id of room being tested
+ */
+function testingCode(roomId) {
+  if (this.rooms.has(roomId)) {
+    this.in(roomId).emit('testingCode');
+  }
+}
+
+/**
  * Initialize event handlers for sockets.
  * @param {Object} server HTTP Server to attach socket to
  */
@@ -165,6 +175,7 @@ exports.setupSocket = (server) => {
     client.on('sendMessage', sendMessage);
     client.on('sendCode', sendCode);
     client.on('saveCode', saveCode);
+    client.on('testRequested', testingCode);
 
     // Handlers for Challenge Queue
     client.on('joinQueue', joinQueue);

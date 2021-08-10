@@ -3,7 +3,9 @@ import {
   CODE_SAVED,
   SAVE_CODE,
   SET_CODE,
+  TEST_CODE,
   TEST_FINISH,
+  UPDATE_CODE,
 } from '../actions/challenge';
 import {
   SEND_MESSAGE,
@@ -68,6 +70,10 @@ export function socketMiddlware() {
 
         case SAVE_CODE:
           socket.emit('saveCode', action.payload.roomId, action.payload.code);
+          return next(action);
+
+        case TEST_CODE:
+          socket.emit('testRequested', action.payload);
           return next(action);
 
         // Queue handlers
@@ -150,7 +156,7 @@ export default (store) => {
   // Handles receiving code updates
   socket.on('receiveCode', (code) => {
     store.dispatch({
-      type: 'UPDATE_CODE',
+      type: UPDATE_CODE,
       payload: code,
     });
   });
@@ -159,6 +165,12 @@ export default (store) => {
   socket.on('codeSaved', () => {
     store.dispatch({
       type: CODE_SAVED,
+    });
+  });
+
+  socket.on('testingCode', () => {
+    store.dispatch({
+      type: TEST_CODE,
     });
   });
 
