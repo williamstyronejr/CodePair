@@ -1,4 +1,5 @@
 const { emitMessageToRoom } = require('../services/socket');
+const { createSolution } = require('../services/solution');
 const {
   createRoom,
   findRoom,
@@ -6,6 +7,7 @@ const {
   addUserToRoom,
   markRoomCompleted,
   findRoomByInvite,
+  saveCodeById,
 } = require('../services/room');
 const {
   createChallenge,
@@ -14,6 +16,7 @@ const {
   findChallengeById,
 } = require('../services/challenge');
 const { publishToQueue } = require('../services/amqp');
+const { updateUser } = require('../services/user');
 
 const { PRODUCER_QUEUE } = process.env;
 
@@ -43,7 +46,7 @@ exports.createChallenge = async (req, res, next) => {
 
 /**
  * Route handler for getting list of challenges based on a page number.
- *  Defaults to page one and list is limited to 1 challenge per request.
+ *  If no page is provided, will default to first page.
  * @param {Object} req Request object
  * @param {Object} res Response object
  * @param {Function} next Next function to be called
@@ -252,9 +255,27 @@ exports.receiveSolution = async (channel, msg) => {
       );
     }
 
-    // If no error, success and no test failed, mark room as completed server side
-    if (!error && success && failedTests === 0)
-      markRoomCompleted(correlationId);
+    // If success, mark room completed, and update solution/users
+    if (!error && success && failedTests === 0) {
+      const room = await markRoomCompleted(correlationId);
+      const challenge = await findChallenge(room.challenge);
+
+      const proms = [
+        createSolution(
+          room.challenge,
+          challenge.title,
+          room.code,
+          room.users,
+          room.language
+        ),
+      ];
+
+      room.users.forEach((user) => {
+        proms.push(updateUser(user, { $inc: { completed: 1 } }));
+      });
+
+      await Promise.all(proms);
+    }
 
     emitMessageToRoom(
       'testCompleted',
@@ -279,6 +300,7 @@ exports.receiveSolution = async (channel, msg) => {
 exports.testSolution = async (req, res, next) => {
   const { code, language } = req.body;
   const { cId, rId } = req.params;
+  const { id: userId } = req.user;
 
   try {
     const challenge = await findChallenge(cId);
@@ -288,6 +310,17 @@ exports.testSolution = async (req, res, next) => {
       err.msg = 'Challenge being tested does not exist.';
       err.status = 422;
       throw err;
+    }
+
+    // Save code to room
+    const room = await saveCodeById(rId, userId, code);
+
+    if (!room) {
+      const error = new Error(
+        `Room, ${rId}, could not be found with User, ${userId}`
+      );
+      error.status = 422;
+      throw error;
     }
   } catch (err) {
     if (err.status) return next(err);
