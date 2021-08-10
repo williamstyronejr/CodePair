@@ -85,7 +85,6 @@ client/build
 .env.production.local
 
 # Public/Build folder
-server/src/public/images
 !client/public
 
 # Temp files
