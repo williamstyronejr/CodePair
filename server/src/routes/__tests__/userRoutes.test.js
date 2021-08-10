@@ -555,3 +555,67 @@ describe('/POST /account/register', () => {
       });
   });
 });
+
+describe('/GET /user/:username/profile/stats', () => {
+  const routeToTest = (username) => `/user/${username}/profile/stats`;
+  const username = createRandomString(8);
+  const email = createRandomString(8, '@email.com');
+  const password = 'pass';
+
+  beforeAll(async () => {
+    await createUserRoute(username, email, password);
+  }, 10000);
+
+  test('Non-existing username should throw 404 error', async () => {
+    const nonExistingUsername = createRandomString(8);
+
+    await request(app).get(routeToTest(nonExistingUsername)).expect(404);
+  });
+
+  test('Valid request should response 200 with user data', async () => {
+    await request(app)
+      .get(routeToTest(username))
+      .expect(200)
+      .then((res) => {
+        expect(res.body.username).toBe(username);
+      });
+  });
+});
+
+describe('/GET /user/:username/profile/solutions', () => {
+  const routeToTest = (username, page = 1) =>
+    `/user/${username}/profile/solutions?page=${page}`;
+
+  const username = createRandomString(8);
+  const email = createRandomString(8, '@email.com');
+  const password = 'pass';
+
+  beforeAll(async () => {
+    // Create a new user
+    await createUserRoute(username, email, password);
+  }, 10000);
+
+  test('Non-number page should throw 400 error', async () => {
+    await request(app).get(routeToTest('t', 'test')).expect(400);
+  });
+
+  test('Negative numbers throws a 400 error', async () => {
+    await request(app).get(routeToTest('t', -1)).expect(400);
+  });
+
+  test('Non-existing username should throw 404 error ', async () => {
+    const nonExistingUsername = createRandomString(8);
+
+    await request(app).get(routeToTest(nonExistingUsername)).expect(404);
+  });
+
+  test('Valid request should response 200 with array of solutions', async () => {
+    await request(app)
+      .get(routeToTest(username, 1))
+      .expect(200)
+      .then((res) => {
+        expect(res.body.solutions).toBeDefined();
+        expect(Array.isArray(res.body.solutions)).toBeTruthy();
+      });
+  });
+});
