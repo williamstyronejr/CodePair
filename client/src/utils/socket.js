@@ -12,6 +12,9 @@ import {
   ADD_MESSAGE,
   JOIN_MESSAGE,
   LEAVE_MESSAGE,
+  USER_TYPE_START,
+  USER_TYPE_END,
+  MESSAGE_INDICATOR,
 } from '../actions/chat';
 import {
   OPEN_SOCKET,
@@ -60,6 +63,13 @@ export function socketMiddlware() {
             action.payload.msg,
             Date.now(),
             action.payload.userId
+          );
+          return next(action);
+        case MESSAGE_INDICATOR:
+          socket.emit(
+            action.payload.type,
+            action.payload.roomId,
+            action.payload.username
           );
           return next(action);
 
@@ -145,11 +155,30 @@ export default (store) => {
     });
   });
 
-  // Handles when client socket receives a char message from server
+  // Handles when client socket receives a chat message from server
   socket.on('receiveMessage', (msg, time, author) => {
     store.dispatch({
       type: ADD_MESSAGE,
       payload: { msg, time, author },
+    });
+  });
+
+  // Handling add user to typing list
+  socket.on('chatTyping', (username) => {
+    // Add user to typing list while avoiding duplicates
+    if (!store.getState().chat.usersTyping.includes(username)) {
+      store.dispatch({
+        type: USER_TYPE_START,
+        payload: username,
+      });
+    }
+  });
+
+  // Handles removing user frrom typing list
+  socket.on('chatTypingFinish', (username) => {
+    store.dispatch({
+      type: USER_TYPE_END,
+      payload: username,
     });
   });
 
