@@ -77,6 +77,28 @@ function sendMessage(roomId, msg, time, author) {
 }
 
 /**
+ * Emits a message to room that a user is typing.
+ * @param {String} roomId Id of room
+ * @param {String} author Username of user typing
+ */
+function typingMessage(roomId, author) {
+  if (this.rooms.has(roomId)) {
+    this.in(roomId).emit('chatTyping', author);
+  }
+}
+
+/**
+ * Emits a message to room that a user has finished typing.
+ * @param {String} roomId Id of room
+ * @param {String} author Username of user who finished typing
+ */
+function typingMessageEnd(roomId, author) {
+  if (this.rooms.has(roomId)) {
+    this.in(roomId).emit('chatTypingFinish', author);
+  }
+}
+
+/**
  * Emits a message sending code to the room. Only works if the socket making
  *  the request is in the room.
  * @param {String} roomId Id of room to send code to
@@ -169,13 +191,17 @@ exports.setupSocket = (server) => {
     client.on('logUser', logSocket);
     client.on('disconnecting', disconnecting);
 
-    // Handlers for Challenge and chat room
+    // Handlers for Challenge
     client.on('joinRoom', joinRoom);
     client.on('leaveRoom', leaveRoom);
-    client.on('sendMessage', sendMessage);
     client.on('sendCode', sendCode);
     client.on('saveCode', saveCode);
     client.on('testRequested', testingCode);
+
+    // Handlers for Chat
+    client.on('sendMessage', sendMessage);
+    client.on('userTyping', typingMessage);
+    client.on('userTypingEnd', typingMessageEnd);
 
     // Handlers for Challenge Queue
     client.on('joinQueue', joinQueue);
