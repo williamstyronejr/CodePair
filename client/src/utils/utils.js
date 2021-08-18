@@ -43,6 +43,8 @@ export function validateUsername(username) {
  */
 export function dateToText(date) {
   const createdDate = new Date(date);
+
+  // eslint-disable-next-line no-restricted-globals
   return !isNaN(createdDate)
     ? `${createdDate.toLocaleDateString('default', {
         month: 'short',
