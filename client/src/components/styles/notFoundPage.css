@@ -11,10 +11,10 @@
 }
 
 .missing__link {
-  color: #60a5fa;
+  color: #2191fb;
   text-decoration: none;
 }
 
 .missing__link:hover {
-  color: #4284d5;
+  color: #1474ce;
 }

@@ -2,7 +2,7 @@
   display: flex;
   width: 100%;
   height: 60px;
-  background-color: #212121;
+  background-color: #1e1b0b;
   position: relative;
 }
 
@@ -28,7 +28,7 @@
   height: 100%;
   width: 0;
   z-index: 5;
-  background-color: #151728;
+  background-color: #1e1b0b;
   transition: width 0.3s;
 }
 
@@ -56,6 +56,11 @@
   border-radius: 5px;
   background-color: transparent;
   border: none;
+}
+
+.menu__btn--user {
+  width: 55px;
+  height: 55px;
 }
 
 .menu__btn:focus,
@@ -231,7 +236,6 @@
 .menu__link:hover {
   cursor: pointer;
   border-bottom: 2px solid rgba(255, 255, 255, 0.5);
-  /* color: #929292; */
 }
 
 .menu__link--logo {
@@ -245,7 +249,7 @@
 }
 
 .menu__item--block .menu__link:hover {
-  background-color: #7d0964;
+  background-color: #373737;
 }
 
 .menu__dividor {
@@ -276,6 +280,10 @@
     visibility: visible;
     margin: auto 0 auto 5px;
     padding: 0;
+  }
+
+  .menu__nav--user {
+    margin: auto 0;
   }
 
   .menu__list {

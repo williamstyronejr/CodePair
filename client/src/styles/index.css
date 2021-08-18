@@ -138,7 +138,7 @@ body {
   margin: 5px auto;
   padding: 20px;
   font-size: 1.2em;
-  background-color: #f04546;
+  background-color: #d64045;
   color: white;
   border-radius: 5px;
 }
@@ -271,12 +271,12 @@ body {
 }
 .form__input--text:focus,
 .form__input--textarea:focus {
-  box-shadow: 0 0 0 4px #23b3e4;
+  box-shadow: 0 0 0 4px #2191fb;
   outline: none;
 }
 
 .form__input--error {
-  border-color: red;
+  border-color: #d64045;
 }
 
 .form__input--textarea {
@@ -321,28 +321,21 @@ body {
   font-family: 'Rubik', 'sans-serif';
   font-weight: 500;
   border-radius: 3px;
-  background-image: -moz-linear-gradient(122deg, #e54595 0%, #fd378e 100%);
-  background-image: -webkit-linear-gradient(122deg, #e54595 0%, #fd378e 100%);
-  background-image: -ms-linear-gradient(122deg, #e54595 0%, #fd378e 100%);
-  background-image: linear-gradient(122deg, #e54595 0%, #fd378e 100%);
-  box-shadow: 0px 9px 32px 0px rgb(0 0 0 / 20%);
+  background-color: #2191fb;
 }
 
 .btn--submit:hover {
-  background-image: linear-gradient(122deg, #fd378e 0%, #e54595 100%);
+  background-color: #1474ce;
 }
 
 .btn--submit:disabled {
   cursor: default;
   cursor: not-allowed;
-  background-image: linear-gradient(122deg, #545454 0%, #252525 100%);
+  background-color: #8b8b8b;
 }
 
 .btn--test {
-  background-image: -moz-linear-gradient(122deg, #e54595 0%, #fd378e 100%);
-  background-image: -webkit-linear-gradient(122deg, #e54595 0%, #fd378e 100%);
-  background-image: -ms-linear-gradient(122deg, #e54595 0%, #fd378e 100%);
-  background-image: linear-gradient(122deg, #e54595 0%, #fd378e 100%);
+  background-color: #2191fb;
   box-shadow: 0px 9px 32px 0px rgb(0 0 0 / 20%);
   color: white;
   width: auto;
@@ -351,7 +344,7 @@ body {
 }
 
 .btn--test:hover {
-  background-image: linear-gradient(122deg, #fd378e 0%, #e54595 100%);
+  background-color: #1474ce;
 }
 
 .btn--test:disabled {
@@ -363,12 +356,12 @@ body {
   width: auto;
   padding: 1em;
   margin: 0 auto;
-  border: 2px solid grey;
-  background-color: #efefef;
+  border: 2px solid #d64045;
+  background-color: #d64045;
 }
 
 .btn--cancel:hover {
-  border-color: tomato;
+  background-color: #a82b2f;
 }
 
 .btn--close {
@@ -416,21 +409,20 @@ body {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
-.btn--social:hover {
-  background-color: #3f3f46;
+.btn--pair-decline:hover {
+  background-color: #a82b2f;
 }
 
 .btn--public {
-  background-color: #3b82f6;
+  background-color: #d64045;
   color: white;
-  border: 1px solid #3b82f6;
   width: auto;
   padding: 6px;
   margin: 0 5px 0 5px;
 }
 
 .btn--public:hover {
-  background-color: #60a5fa;
+  background-color: #a82b2f;
 }
 
 .btn--pair {
@@ -443,19 +435,19 @@ body {
 }
 
 .btn--pair-accept {
-  background-color: #3b82f6;
+  background-color: #2191fb;
 }
 
 .btn--pair-accept:hover {
-  background-color: #1e67de;
+  background-color: #1474ce;
 }
 
 .btn--pair-decline {
-  background-color: #86003a;
+  background-color: #d64045;
 }
 
 .btn--pair-decline:hover {
-  background-color: #6a002e;
+  background-color: #a82b2f;
 }
 
 /* General styles */
@@ -465,10 +457,10 @@ body {
 }
 
 .github-logo {
+  /* font-size: 2em; */
   font-size: 2em;
   line-height: 0;
-  margin: 0 10px 0 0;
-  color: black;
+  margin: 0 0 0 10px;
 }
 
 .wrapper {

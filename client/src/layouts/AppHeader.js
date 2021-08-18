@@ -11,10 +11,10 @@ const AppHeader = (props) => {
   const [userMenu, setUserMenu] = useDetectOutsideClick(userMenuRef, false);
 
   return (
-    <header className="page-header bg-grad">
+    <header className="page-header ">
       <div className="header__container">
         <div
-          className={`menu ${navMenu ? 'menu--active' : ''}  bg-grad`}
+          className={`menu ${navMenu ? 'menu--active' : ''}`}
           ref={navMenuRef}
         >
           <button
@@ -80,7 +80,7 @@ const AppHeader = (props) => {
             ref={userMenuRef}
           >
             <button
-              className="menu__btn"
+              className="menu__btn menu__btn--user"
               data-cy="menu"
               type="button"
               onClick={() => setUserMenu(!userMenu)}
@@ -92,8 +92,8 @@ const AppHeader = (props) => {
               />
             </button>
 
-            <div className="menu__content bg-grad">
-              <nav className="menu__nav">
+            <div className="menu__content">
+              <nav className="menu__nav menu__nav--user">
                 <ul className="menu__list menu__list--stack">
                   <li className="menu__item menu__item--block">
                     <Link

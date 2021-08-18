@@ -4,8 +4,9 @@
 
 .signin__recovery {
   display: block;
+  font-weight: 400;
   text-decoration: none;
-  color: #e38cb7;
+  color: #2191fb;
   margin: 15px 0 0 0;
   text-align: center;
 }

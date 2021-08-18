@@ -29,14 +29,14 @@
   padding: 12px;
   color: white;
   border-radius: 50%;
-  background-color: #fd378e;
+  background-color: #d64045;
   box-shadow: 0 6px 12px 0 rgb(0 0 0 / 20%);
   z-index: 2;
 }
 
 .chat__icon:hover {
   cursor: pointer;
-  background-color: #c21c64;
+  background-color: #a82b2f;
 }
 
 .chat__header {

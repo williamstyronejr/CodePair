@@ -3,6 +3,7 @@
   width: 100%;
 
   font-family: 'Rubik', 'sans-serif';
+  background-color: #1e1b0b;
   background-image: -moz-linear-gradient(
     135deg,
     rgba(60, 8, 118, 0.8) 0%,
@@ -35,11 +36,11 @@
   text-align: center;
   font-size: 40px;
   color: white;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .home__content {
-  color: rgb(255, 184, 246);
+  color: white;
   font-size: 23px;
   text-align: center;
   font-weight: 300;
@@ -171,12 +172,12 @@
   color: #efefef;
   padding: 10px;
   font-size: 1em;
-  background-color: rgba(250, 0, 118, 0.8);
+  background-color: #2191fb;
   border-radius: 5px;
 }
 
 .contribute__link:hover {
-  background-color: rgba(157, 16, 81, 0.8);
+  background-color: #1474ce;
 }
 
 .footer {

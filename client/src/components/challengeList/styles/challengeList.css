@@ -129,7 +129,7 @@
   list-style: none;
   width: 100%;
   padding: 0;
-  margin: 0;
+  margin: 0 0 10px 0;
 }
 
 .challenges__tag {
@@ -170,7 +170,7 @@
   padding: 10px 0;
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.2);
-  color: rgba(147, 197, 253);
+  color: #2191fb;
   font-weight: 400;
   border: none;
   text-decoration: none;

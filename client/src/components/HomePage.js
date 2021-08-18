@@ -40,7 +40,7 @@ const HomePage = () => (
     <section className="info">
       <div className="info__grid max-wrapper">
         <div className="info__tile">
-          <h5 className="info__heading">Upgrade your skills</h5>
+          <h5 className="info__heading">Learn</h5>
           <p className="info__text">
             Challenge yourself with coding challenges to strengthen your
             knowledge.
@@ -48,10 +48,9 @@ const HomePage = () => (
         </div>
 
         <div className="info__tile">
-          <h5 className="info__heading">Collaborative with others</h5>
+          <h5 className="info__heading">Collaborative</h5>
           <p className="info__text">
-            Pair up with a random partner or a friend to tackle a challenge
-            together with real-time pair programming.
+            Pair up with a partner to tackle a challenge together.
           </p>
         </div>
 

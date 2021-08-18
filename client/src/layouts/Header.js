@@ -8,9 +8,9 @@ const Header = () => {
   const [navMenu, setNavMenu] = useDetectOutsideClick(navMenuRef, false);
 
   return (
-    <header className="page-header bg-grad">
+    <header className="page-header">
       <div className="header__container">
-        <div className={`menu  ${navMenu ? 'menu--active' : ''} bg-grad`}>
+        <div className={`menu  ${navMenu ? 'menu--active' : ''}`}>
           <button
             className="menu__btn"
             onClick={() => {
