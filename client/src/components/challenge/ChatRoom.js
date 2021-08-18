@@ -10,13 +10,35 @@ const ChatRoom = ({
   toggleChat,
   chatInput,
   messages,
+  usersTyping,
+  messageIndicator,
 }) => {
   const chatRef = React.useRef();
+  let typingTmeout;
 
   React.useEffect(() => {
     if (chatRef.current)
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
   }, [messages]);
+
+  React.useEffect(() => {
+    if (chatInput !== '') {
+      messageIndicator(true);
+    } else {
+      messageIndicator(false);
+    }
+
+    typingTmeout = setTimeout(() => {
+      if (chatInput !== '') {
+        messageIndicator(false);
+      }
+    }, 5000);
+
+    return () => {
+      if (typingTmeout) clearTimeout(typingTmeout);
+    };
+  }, [chatInput]);
+
   if (visible) {
     return (
       <div className="chat chat--hidden" data-cy="chat">
@@ -74,6 +96,19 @@ const ChatRoom = ({
 
       <ul className="chat__messages" ref={chatRef}>
         {messageList}
+
+        {usersTyping.map((username) => (
+          <li className="message message--typing">
+            <div className="chat__content--typing">
+              <div className="chat__dots">
+                <div className="chat__dot chat__dot--first" />
+                <div className="chat__dot chat__dot--second" />
+                <div className="chat__dot chat__dot--third" />
+              </div>
+            </div>
+            <p className="content__text chat__user">{username}</p>
+          </li>
+        ))}
       </ul>
 
       <div className="chat__input">
@@ -98,6 +133,8 @@ ChatRoom.propTypes = {
   chatInput: PropTypes.string.isRequired,
   messages: PropTypes.array.isRequired,
   visible: PropTypes.bool.isRequired,
+  usersTyping: PropTypes.array.isRequired,
+  messageIndicator: PropTypes.func.isRequired,
 };
 
 export default ChatRoom;

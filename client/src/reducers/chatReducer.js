@@ -7,12 +7,15 @@ import {
   TOGGLE_CHAT_VISIBILITY,
   RESET_CHAT_DATA,
   SET_INITIAL_MESSAGES,
+  USER_TYPE_START,
+  USER_TYPE_END,
 } from '../actions/chat';
 
 const initState = {
   messages: [],
   chatInput: '',
   visible: false,
+  usersTyping: [],
 };
 
 /**
@@ -109,6 +112,18 @@ const ChatReducer = (state = initState, action) => {
       return {
         ...state,
         messages: action.payload,
+      };
+
+    case USER_TYPE_START:
+      return {
+        ...state,
+        usersTyping: [...state.usersTyping, action.payload],
+      };
+
+    case USER_TYPE_END:
+      return {
+        ...state,
+        usersTyping: state.usersTyping.filter((val) => val !== action.payload),
       };
 
     case RESET_CHAT_DATA:

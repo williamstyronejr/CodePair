@@ -30,6 +30,7 @@ const Challenge = (props) => {
     testResults,
     testErrors,
     savingCode,
+    usersTyping,
   } = props;
   const inviteRef = React.useRef(null);
   const [lastCode, setLastCode] = React.useState(code);
@@ -259,10 +260,12 @@ const Challenge = (props) => {
             userId={props.userId}
             chatInput={chatInput}
             messages={messages}
+            usersTyping={usersTyping}
             setMessage={setMessage}
             sendMessage={sendMessage}
             visible={chatVisible}
             toggleChat={toggleChatVisibility}
+            messageIndicator={props.messageIndicator}
           />
         ) : null}
       </div>
@@ -288,6 +291,7 @@ Challenge.propTypes = {
   savingCode: PropTypes.bool.isRequired,
   testPassed: PropTypes.bool.isRequired,
   testResults: PropTypes.array.isRequired,
+  usersTyping: PropTypes.array.isRequired,
   testCode: PropTypes.func.isRequired,
   setCode: PropTypes.func.isRequired,
   saveCode: PropTypes.func.isRequired,
@@ -296,6 +300,7 @@ Challenge.propTypes = {
   sendMessage: PropTypes.func.isRequired,
   toggleChatVisibility: PropTypes.func.isRequired,
   convertRoomToPublic: PropTypes.func.isRequired,
+  messageIndicator: PropTypes.func.isRequired,
   privateRoom: PropTypes.bool.isRequired,
   inviteLink: PropTypes.string,
   chatInput: PropTypes.string.isRequired,

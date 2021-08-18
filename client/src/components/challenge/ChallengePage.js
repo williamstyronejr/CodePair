@@ -17,6 +17,7 @@ import {
   sendMessage,
   toggleChatVisibility,
   resetChatData,
+  messageIndicator,
 } from '../../actions/chat';
 import { openSocket, closeSocket } from '../../actions/socket';
 import './styles/challenge.css';
@@ -94,9 +95,13 @@ const ChallengePage = (props) => {
       messages={chat.messages}
       chatInput={chat.chatInput}
       chatVisible={chat.visible}
+      usersTyping={chat.usersTyping}
       userId={props.userId}
       toggleChatVisibility={props.toggleChatVisibility}
       setMessage={props.setMessage}
+      messageIndicator={(typing) =>
+        props.messageIndicator(props.match.params.rId, props.username, typing)
+      }
       sendMessage={(msg) =>
         props.sendMessage(props.match.params.rId, msg, props.userId)
       }
@@ -129,6 +134,8 @@ const mapDispatchToProps = (dispatch) => ({
   getChallenge: (cId, rId) => dispatch(getChallenge(cId, rId)),
   openSocket: () => dispatch(openSocket()),
   closeSocket: () => dispatch(closeSocket()),
+  messageIndicator: (roomId, username, typing) =>
+    dispatch(messageIndicator(roomId, username, typing)),
   joinRoom: (id, username) =>
     dispatch({ type: 'join_room', payload: { room: id, username } }),
   setMessage: (text) => dispatch(setMessage(text)),
@@ -144,6 +151,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 ChallengePage.propTypes = {
+  messageIndicator: PropTypes.func.isRequired,
   clearData: PropTypes.func.isRequired,
   resetChatData: PropTypes.func.isRequired,
   closeSocket: PropTypes.func.isRequired,
@@ -186,6 +194,7 @@ ChallengePage.propTypes = {
     messages: PropTypes.array,
     chatInput: PropTypes.string,
     visible: PropTypes.bool,
+    usersTyping: PropTypes.array,
   }).isRequired,
 };
 

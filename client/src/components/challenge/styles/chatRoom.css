@@ -72,7 +72,7 @@
 
 .chat__messages {
   width: 100%;
-  margin: 0;
+  margin: 0 0 5px 0;
   height: 1px;
   padding: 0 0.5em;
   flex: 1 1 auto;
@@ -92,6 +92,10 @@
 .message-notification {
   color: gray;
   text-align: center;
+}
+
+.message--typing {
+  text-align: left;
 }
 
 /* Message sent by client (Right) */
@@ -135,10 +139,64 @@
   display: inline-block;
 }
 
+.chat__content--typing {
+  display: inline-block;
+  max-width: 80%;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 0;
+  background-color: #0099ff;
+}
+
+@keyframes dot-blink {
+  0%,
+  100% {
+    background-color: #b1b0b0;
+  }
+  50% {
+    background-color: #efefef;
+  }
+}
+
+.chat__dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 2px;
+  border-radius: 50%;
+  background-color: #b1b0b0;
+  animation: dot-blink 2s infinite;
+}
+
+.chat__dot--first {
+  animation-delay: 0s;
+}
+
+.chat__dot--second {
+  animation-delay: 0.5s;
+}
+
+.chat__dot--third {
+  animation-delay: 1s;
+}
+
+/* Disable animation if user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .chat__dot {
+    animation: none;
+  }
+}
+
 .content__text {
   margin: 0;
   padding: 0;
   text-align: left;
+}
+
+.chat__user {
+  text-align: left;
+  font-size: 0.8em;
+  font-weight: 400;
 }
 
 .chat__input {

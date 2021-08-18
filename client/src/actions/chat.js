@@ -3,6 +3,9 @@ export const ADD_MESSAGE = 'add_message';
 export const JOIN_MESSAGE = 'join_message';
 export const LEAVE_MESSAGE = 'leave_message';
 
+export const USER_TYPE_START = 'userTypeStart';
+export const USER_TYPE_END = 'userTypeEnd';
+export const MESSAGE_INDICATOR = 'messageIndicator';
 export const SEND_MESSAGE = 'send_message';
 export const SET_INITIAL_MESSAGES = 'setInitialMessages';
 export const RESET_CHAT_DATA = 'resetChatData';
@@ -17,6 +20,48 @@ export const TOGGLE_CHAT_VISIBILITY = 'chat_visibility';
 export function toggleChatVisibility() {
   return {
     type: TOGGLE_CHAT_VISIBILITY,
+  };
+}
+
+/**
+ * Redux action creator for adding a user's typing indicator.
+ * @param {String} username Username of user typing
+ * @returns {Object} Returns a redux action object.
+ */
+export function addUserTyping(username) {
+  return {
+    type: USER_TYPE_START,
+    payload: username,
+  };
+}
+
+/**
+ * Redux action creator for removing a user's typing indicator.
+ * @param {String} username Username of user who "finished" typing
+ * @returns {Object} Returns a redux action object.
+ */
+export function removeUserTyping(username) {
+  return {
+    type: USER_TYPE_END,
+    payload: username,
+  };
+}
+
+/**
+ * Redux action creator setting chat notification for typing events. This action
+ *  is only handled by socket middleware.
+ * @param {String} username Username of user sending indicator
+ * @param {false} typing Flag indicating if user is typing
+ * @returns {Object} Returns a redux action object.
+ */
+export function messageIndicator(roomId, username, typing = true) {
+  return {
+    type: MESSAGE_INDICATOR,
+    payload: {
+      type: typing ? 'userTyping' : 'userTypingEnd',
+      username,
+      roomId,
+    },
   };
 }
 
