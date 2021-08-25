@@ -27,7 +27,9 @@ exports.getCurrentUserData = (req, res, next) => {
     id: req.user.id,
     displayName: req.user.displayName,
     email: req.user.email,
-    profileImage: req.user.profileImage,
+    profileImage: req.user.profileImage.includes('https://')
+      ? req.user.profileImage
+      : `/img/${req.user.profileImage}`,
     username: req.user.username,
     verified: req.user.verified,
     oauthUser: !!req.user.githubId,
@@ -62,7 +64,9 @@ exports.getUserData = async (req, res, next) => {
       username: user.username,
       displayName: user.displayName,
       email: user.email,
-      profileImage: user.profileImage,
+      profileImage: user.profileImage.includes('https://')
+        ? user.profileImage
+        : `/img/${user.profileImage}`,
     });
   } catch (err) {
     next(err);
@@ -90,7 +94,12 @@ exports.getUserProfileStats = async (req, res, next) => {
       throw error;
     }
 
-    res.json(user);
+    res.json({
+      ...user.toJSON(),
+      profileImage: user.profileImage.includes('https://')
+        ? user.profileImage
+        : `/img/${user.profileImage}`,
+    });
   } catch (err) {
     next(err);
   }

@@ -184,7 +184,7 @@ const ProfilePage = (props) => {
           <img
             className="profile__image"
             alt="User profile"
-            src={`/img/${profileData.profileImage}`}
+            src={profileData.profileImage}
           />
 
           <div className="profile__info">

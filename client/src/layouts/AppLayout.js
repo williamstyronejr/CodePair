@@ -16,21 +16,12 @@ const AppLayout = (props) => {
     return <Redirect to="/account/register" />;
   }
 
-  let profileImage;
-  if (!props.user.profileImage) {
-    profileImage = '/img/default.jpg';
-  } else {
-    profileImage = props.user.profileImage.includes('https://')
-      ? `${props.user.profileImage}`
-      : `/img/${props.user.profileImage}`;
-  }
-
   return (
     <>
       <Header
         signout={props.signoutUser}
         username={props.user.username}
-        profileImage={profileImage}
+        profileImage={props.user.profileImage}
       />
 
       <main className="page-main">{props.children}</main>
