@@ -1,3 +1,12 @@
+import { UPDATEUSER } from '../actions/user';
+import {
+  AUTHUSER,
+  UNAUTHUSER,
+  AUTHERROR,
+  SETUSERDATA,
+  GETUSERDATA,
+} from '../actions/authentication';
+
 const initState = {
   profileImage: '',
   id: '',
@@ -11,25 +20,25 @@ const initState = {
 
 const userReducer = (state = initState, action) => {
   switch (action.type) {
-    case 'GETTING_USER_DATA':
+    case GETUSERDATA:
       return {
         ...state,
         authenticating: true,
       };
 
-    case 'AUTH_USER':
+    case AUTHUSER:
       return {
         ...state,
         authenticated: true,
         authError: '',
       };
 
-    case 'UNAUTH_USER':
+    case UNAUTHUSER:
       return {
         ...initState,
       };
 
-    case 'AUTH_ERROR':
+    case AUTHERROR:
       return {
         ...state,
         authenticated: false,
@@ -37,7 +46,7 @@ const userReducer = (state = initState, action) => {
         authError: action.payload,
       };
 
-    case 'SET_USER_DATA':
+    case SETUSERDATA:
       return {
         ...state,
         id: action.payload.id,
@@ -48,6 +57,12 @@ const userReducer = (state = initState, action) => {
         authenticating: false,
         authenticated: true,
         authError: null,
+      };
+
+    case UPDATEUSER:
+      return {
+        ...state,
+        ...action.payload,
       };
 
     default:
