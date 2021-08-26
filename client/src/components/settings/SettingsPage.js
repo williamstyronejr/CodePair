@@ -4,15 +4,33 @@ import { connect } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
 import { ajaxRequest } from '../../utils/utils';
 import './styles/settingsPage.css';
+import { updateUser } from '../../actions/user';
 
-const AccountForm = ({ currentUsername, currentEmail, currentImage }) => {
+const AccountForm = ({
+  currentUsername,
+  currentEmail,
+  currentImage,
+  updateUserData,
+}) => {
   const [username, setUsername] = React.useState('');
   const [email, setEmail] = React.useState('');
-  const [profileImage, setProfileImage] = React.useState({});
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState({});
   const [notification, setNotification] = React.useState(null);
   const fileRef = React.createRef();
+  let notificationTimer;
+
+  // Timeout for clearing notification message
+  React.useEffect(() => {
+    if (notification)
+      notificationTimer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+
+    return () => {
+      clearTimeout(notificationTimer);
+    };
+  }, [notification]);
 
   const submitForm = (evt) => {
     evt.preventDefault();
@@ -24,15 +42,42 @@ const AccountForm = ({ currentUsername, currentEmail, currentImage }) => {
 
     if (username) formData.append('username', username);
     if (email) formData.append('email', email);
-    if (profileImage) formData.append('profileImage', profileImage);
 
     ajaxRequest('/settings/account', 'POST', formData, {
       headers: { 'content-type': 'multipart/form-data' },
     })
       .then((res) => {
         setSubmitting(false);
-        if (res.data.success)
+        if (res.data.success) {
+          updateUserData(res.data.data);
           return setNotification('Successfully updated user information.');
+        }
+        setNotification('An error has occurred. Please try again.');
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        if (err.response.status === 400) {
+          setError(err.response.data.errors);
+        }
+      });
+  };
+
+  const onSubmitProfileImage = (file, remove = false) => {
+    setError({});
+    const formData = new FormData();
+
+    if (file) formData.append('profileImage', file);
+    if (remove) formData.append('remove', remove);
+
+    ajaxRequest('/settings/account', 'POST', formData, {
+      headers: { 'content-type': 'multipart/form-data' },
+    })
+      .then((res) => {
+        setSubmitting(false);
+        if (res.data.success) {
+          updateUserData(res.data.data);
+          return setNotification('Successfully updated user information.');
+        }
         setNotification('An error has occurred. Please try again.');
       })
       .catch((err) => {
@@ -58,17 +103,10 @@ const AccountForm = ({ currentUsername, currentEmail, currentImage }) => {
           <button
             type="button"
             className="btn btn--small"
+            disabled={submitting}
             onClick={() => fileRef.current.click()}
           >
-            <img
-              src={
-                !currentImage.startsWith('http')
-                  ? `/img/${currentImage}`
-                  : currentImage
-              }
-              alt="Profile"
-              className="settings__image"
-            />
+            <img src={currentImage} alt="Profile" className="settings__image" />
           </button>
 
           <span className="settings__title settings__title--center">
@@ -81,7 +119,7 @@ const AccountForm = ({ currentUsername, currentEmail, currentImage }) => {
             name="profileImage"
             accept="image/jpeg,image/png"
             ref={fileRef}
-            onChange={(evt) => setProfileImage(evt.target.files[0])}
+            onChange={(evt) => onSubmitProfileImage(evt.target.files[0])}
           />
         </label>
       </fieldset>
@@ -154,6 +192,19 @@ const PasswordForm = () => {
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState({});
   const [notification, setNotification] = React.useState(null);
+  let notificationTimer;
+
+  // Timeout for clearing notification message
+  React.useEffect(() => {
+    if (notification)
+      notificationTimer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+
+    return () => {
+      clearTimeout(notificationTimer);
+    };
+  }, [notification]);
 
   const submitForm = (evt) => {
     evt.preventDefault();
@@ -284,6 +335,7 @@ const SettingsPage = (props) => {
           currentUsername={props.user.username}
           currentEmail={props.user.email}
           currentImage={props.user.profileImage}
+          updateUserData={props.updateUser}
         />
       );
       break;
@@ -338,13 +390,19 @@ const mapStateToProps = (state) => ({
   user: state.user,
 });
 
+const mapDispatchToProps = (dispatch) => ({
+  updateUser: (data) => dispatch(updateUser(data)),
+});
+
 AccountForm.propTypes = {
   currentUsername: PropTypes.string.isRequired,
   currentEmail: PropTypes.string.isRequired,
   currentImage: PropTypes.string.isRequired,
+  updateUserData: PropTypes.func.isRequired,
 };
 
 SettingsPage.propTypes = {
+  updateUser: PropTypes.func.isRequired,
   user: PropTypes.shape({
     username: PropTypes.string,
     email: PropTypes.string,
@@ -358,4 +416,4 @@ SettingsPage.propTypes = {
   }).isRequired,
 };
 
-export default connect(mapStateToProps, null)(SettingsPage);
+export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
