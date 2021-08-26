@@ -155,9 +155,12 @@ exports.updateUserData = async (req, res, next) => {
 
   // Update user's settings
   try {
-    await updateUser(req.user._id, params);
+    const user = await updateUser(req.user._id, params);
+    if (!user) return res.json({ success: false });
 
-    res.json({ success: true });
+    // Convert for clients
+    if (file) params.profileImage = `/img/${params.profileImage}`;
+    res.json({ success: true, data: params });
   } catch (err) {
     next(err);
   }

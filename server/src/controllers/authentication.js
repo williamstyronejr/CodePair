@@ -35,7 +35,7 @@ exports.localSignup = async (req, res, next) => {
         username: user.username,
         displayName: user.displayName,
         email: user.email,
-        profileImage: user.profileImage,
+        profileImage: `/img/${user.profileImage}`,
       },
     });
   } catch (err) {
@@ -60,7 +60,9 @@ exports.localSignin = (req, res, next) => {
       username: req.user.username,
       displayName: req.user.displayName,
       email: req.user.email,
-      profileImage: req.user.profileImage,
+      profileImage: req.user.profileImage.includes('https://')
+        ? req.user.profileImage
+        : `/img/${req.user.profileImage}`,
     },
   });
 };
