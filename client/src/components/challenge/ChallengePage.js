@@ -76,7 +76,7 @@ const ChallengePage = (props) => {
 
   // Display loading message until chat is connected in public room
   if (!challenge.private && (!socket.connected || !socket.inRoom)) {
-    return <LoadingScreen message="Connecting to room " />;
+    return <LoadingScreen message="Connecting to room" />;
   }
 
   return (
