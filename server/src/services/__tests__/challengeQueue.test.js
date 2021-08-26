@@ -1,3 +1,4 @@
+const { createRandomString } = require('../../utils/utils');
 const { checkActiveQueues } = require('../challengeQueue');
 const {
   setupRedis,
@@ -19,13 +20,16 @@ afterAll(() => {
 });
 
 describe('Running queue with one active queue', () => {
-  const userId1 = 'user1';
-  const userId2 = 'user2';
-  const queueId2 = 'queueId2';
-  const queueId3 = 'queueId3';
+  let userId1;
+  let userId2;
+  let queueId2;
+  let queueId3;
 
-  afterEach(async () => {
-    await redisClient.flushall();
+  beforeEach(async () => {
+    userId1 = createRandomString(8);
+    userId2 = createRandomString(8);
+    queueId2 = createRandomString(8);
+    queueId3 = createRandomString(8);
   });
 
   test('Queue will not be made if not enough users exists', async () => {
