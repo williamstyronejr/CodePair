@@ -9,33 +9,33 @@ export const GETUSERDATA = 'get_user_data';
 
 function authUser() {
   return {
-    type: 'AUTH_USER',
+    type: AUTHUSER,
   };
 }
 
 function unauthUser() {
   return {
-    type: 'UNAUTH_USER',
+    type: UNAUTHUSER,
   };
 }
 
 function authError(error) {
   return {
-    type: 'AUTH_ERROR',
+    type: AUTHERROR,
     payload: error,
   };
 }
 
 export function setUserData(data) {
   return {
-    type: 'SET_USER_DATA',
+    type: SETUSERDATA,
     payload: data,
   };
 }
 
 function authenticatingUser() {
   return {
-    type: 'GETTING_USER_DATA',
+    type: GETUSERDATA,
   };
 }
 
