@@ -1,10 +1,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/loading.css';
+import './styles/loading.css';
 
 const Loading = ({ message }) => (
-  <div className="container">
-    <div className="lds-ellipsis">
+  <div className="loading loading--full">
+    <div className="loading__dots">
       <div />
       <div />
       <div />
