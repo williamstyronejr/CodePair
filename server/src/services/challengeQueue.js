@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const logger = require('./logger');
 const {
   activeQueue,
   popUsersFromQueue,
@@ -23,12 +24,14 @@ function notifyUsers(queueId, users) {
  * Creates matches for a given queue and adds the users into a separate pending
  *  queue. If a queue is determined to not have enough users, it will be
  *  removed from the active queue list.
- * @param {String} queueId Id of queue to get users from
+ * @param {String} queueId Id of challenge queue "challengeId-language"
  * @param {Number} numOfUsers Number of users to match in queue
- * @return {Promise<String>} A promise to resolve with the id of pending queue if
- *  created, otherwise with null.
+ * @return {Promise<String>} A promise to resolve with the id of pending queue
+ *  if created, otherwise with null.
  */
 async function createMatch(queueId, numOfUsers) {
+  const challengeId = queueId.split('-')[0];
+
   const users = await popUsersFromQueue(queueId, numOfUsers);
 
   // Operation was interrupted (Queue may still have enough users)
@@ -44,11 +47,13 @@ async function createMatch(queueId, numOfUsers) {
   const pendingQueueId = crypto.pseudoRandomBytes(16).toString('hex');
 
   // Attempt to add users to a pending queue
-  return addUsersToPendingQueue(pendingQueueId, users).then((result) => {
-    if (result == null) return null;
-    notifyUsers(pendingQueueId, users);
-    return pendingQueueId;
-  });
+  return addUsersToPendingQueue(pendingQueueId, users, challengeId).then(
+    (result) => {
+      if (result == null) return null;
+      notifyUsers(pendingQueueId, users);
+      return pendingQueueId;
+    }
+  );
 }
 
 /**
@@ -68,8 +73,12 @@ exports.checkActiveQueues = () => {
     proms.push(createMatch(queueId, value));
   });
 
-  return Promise.all(proms).then((results) => {
-    inProgress = false;
-    return results;
-  });
+  return Promise.all(proms)
+    .then((results) => {
+      inProgress = false;
+      return results;
+    })
+    .catch((err) => {
+      logger.error(err);
+    });
 };

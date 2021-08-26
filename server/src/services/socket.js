@@ -6,6 +6,7 @@ const {
   markUserAsAccepted,
 } = require('./redis');
 const { createRoom, saveCodeById, addMessageById } = require('./room');
+const logger = require('./logger');
 
 /**
  * TODO: Better implementation of sockerId <-> userId
@@ -142,11 +143,11 @@ function leaveQueue(queueId) {
 /**
  * Creates a room for the queue and sends all users in the room a message with
  *  the room id.
- * @param {String} pendingQueueId Id of queue the room is for
+ * @param {String} challengeId Id of challenge in the room.
  * @param {Array<Object>} users Array of user objects
  */
-async function prepareRoom(pendingQueueId, users) {
-  const room = await createRoom(pendingQueueId, users, 'node');
+async function prepareRoom(challengeId, users) {
+  const room = await createRoom(challengeId, users, 'node');
 
   // Send all users in room a message with room Id
   users.forEach((user) => {
@@ -161,12 +162,23 @@ async function prepareRoom(pendingQueueId, users) {
  */
 async function acceptQueue(pendingQueueId) {
   const userId = socketClients[this.id];
-  const users = await markUserAsAccepted(pendingQueueId, userId);
 
-  // If all players ready, prepare room for users
-  if (users && users.length > 0) {
-    removePendingQueue(pendingQueueId);
-    prepareRoom(pendingQueueId, users);
+  if (!userId) return;
+
+  try {
+    const matchData = await markUserAsAccepted(pendingQueueId, userId);
+
+    if (matchData) {
+      const users = Object.keys(matchData).filter((v) => v !== 'challengeId');
+
+      // If all players ready, prepare room for users
+      if (users && users.length > 0) {
+        removePendingQueue(pendingQueueId);
+        prepareRoom(matchData.challengeId, users);
+      }
+    }
+  } catch (err) {
+    logger.error(err);
   }
 }
 

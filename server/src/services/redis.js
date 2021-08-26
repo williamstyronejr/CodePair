@@ -132,34 +132,40 @@ exports.popUsersFromQueue = async (queueId, numToPop = 2) => {
 };
 
 /**
- * Creates a pending queue and stores provided users. Pending queue in form of
- *  hash with userId as key and true/false as a value to indicate whether a
- *  user has accepted. Queue's key set to expires in 12 seconds of creation.
+ * Creates a pending queue and stores provided users and challenge id. Pending
+ *  queue in form of hash with userId as key and true/false as a value to
+ *  indicate whether a user has accepted. Queue's key set to expires in 12
+ *  seconds of creation.
  * @param {String} queueId Id of queue to add users to
  * @param {Array<String>} userIds Array of user ids to add to pending queue
+ * @param {String} challengeId Id of challenge for room
  * @return {Promise<String>} A Promise to resolve with a string if sucessful,
  *  or null if no queue was created.
  */
-exports.addUsersToPendingQueue = async (queueId, userIds) => {
+exports.addUsersToPendingQueue = async (queueId, userIds, challengeId) => {
   // Quick check to prevent unneeded calls
   if (!userIds || !queueId || queueId === '' || userIds.length < 1) {
     return null;
   }
 
-  // Adds 'false' after every element to store in hash.
-  const args = userIds.reduce((r, a) => r.concat(a, 'false'), []);
-  await redisClient.hmset(queueId, args);
+  // Adds 'false' after each userId as a ready flag
+  const args = userIds.reduce(
+    (r, a) => r.concat(a, 'false'),
+    ['challengeId', challengeId]
+  );
+
+  await redisClient.hset(queueId, ...args);
   return redisClient.expire(queueId, 12); // Expire key after 12 seconds
 };
 
 /**
  * Marks a user as having accepted the pending queue and checks if all users
- *  have accepted. When all users have accepted, returns an array of users
- *  that are ready for a room.
+ *  have accepted. When all users have accepted, returns an object containing
+ *  user ids and challenge id as keys.
  * @param {String} queueId Id of queue to mark user in
  * @param {String} userId Id of user to mark as accepted
- * @return {Promise<Array>} A promise to resolve with an array of userIds if
- *  all users have accepted, otherwise with null.
+ * @return {Promise<Object>} A promise to resolve with an object with userIds
+ *  and challengeId as keys, otherwise with null.
  */
 exports.markUserAsAccepted = async (queueId, userId) => {
   if (queueId == null || userId == null) return false; // Quick parameter check
@@ -181,11 +187,9 @@ exports.markUserAsAccepted = async (queueId, userId) => {
     }
 
     // Check if a user is still not ready
-    if (Object.values(results[1]).includes('false')) {
-      return null;
-    }
+    if (Object.values(results[1]).includes('false')) return null;
 
-    return Object.keys(results[1]);
+    return results[1];
   }
 
   return null;
