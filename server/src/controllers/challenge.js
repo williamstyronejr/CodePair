@@ -17,6 +17,7 @@ const {
 } = require('../services/challenge');
 const { publishToQueue } = require('../services/amqp');
 const { updateUser } = require('../services/user');
+const logger = require('../services/logger');
 
 const { PRODUCER_QUEUE } = process.env;
 
@@ -286,6 +287,7 @@ exports.receiveSolution = async (channel, msg) => {
     );
     channel.ack(msg);
   } catch (err) {
+    logger.debug(err);
     channel.ack(msg);
   }
 };
