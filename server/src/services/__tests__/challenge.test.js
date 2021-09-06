@@ -1,5 +1,5 @@
 const {
-  findChallenge,
+  findChallengeById,
   getChallengeList,
   createChallenge,
 } = require('../challenge');
@@ -59,7 +59,7 @@ describe('Find challenges', () => {
   }, 20000);
 
   test('Single challenge by id', async () => {
-    const challenge = await findChallenge(challenges[0].id);
+    const challenge = await findChallengeById(challenges[0].id);
     expect(challenge).toBeDefined();
 
     expect(challenge.id).toBe(challenges[0].id);

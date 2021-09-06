@@ -99,8 +99,7 @@ async function main() {
     setupConsumer(CONSUMER_QUEUE, messageHandler);
     logger.info('Code runner connected to AMQP');
 
-    // For PM2 reload
-    process.send('ready');
+    process.send('ready'); // For PM2 reload
   } catch (err) {
     logger.error(err);
   }

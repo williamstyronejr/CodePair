@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const path = require('path');
 const Stream = require('stream');
 const Docker = require('dockerode');
+const logger = require('./logger');
 
 const { IMAGE_NODE } = process.env;
 
@@ -48,7 +49,7 @@ function deleteCodeFile(fileName) {
  *  was written.
  * @param {String} errOutput Error output of a test runner based on coding
  *  language. (May not be valid)
- * @param {String} lang Langauge test results are coming from
+ * @param {String} lang Langauge that test were ran in
  * @return {Object} Returns a object containing information about the test
  *  cases including: name, status, and message.
  */
@@ -153,6 +154,7 @@ async function launchContainer(code, language, challengeId) {
       const outStream = new Stream.Writable();
       const streamErr = new Stream.Writable();
 
+      // Use streams to capture the output from docker container
       streamErr._write = (chunk, encoding, cb) => {
         errChunks.push(chunk);
         cb();
@@ -183,12 +185,12 @@ async function launchContainer(code, language, challengeId) {
       docker
         .run(imageName, commands, [outStream, streamErr], options, () => {})
         .on('container', (container) => {
-          // Set container timer out to prevent hangup
+          // Set timer out to stop container from running too long
           launcherTimeout = setTimeout(() => {
             try {
               container.stop();
             } catch (err) {
-              //
+              logger.info(err);
             }
 
             const err = new Error('Container forced to timeout.');

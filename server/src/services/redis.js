@@ -6,7 +6,7 @@ let redisClient;
 const activeQueue = {};
 
 /**
- * List of queues that have users in them.
+ * List of all active queues that have at least one user in them
  */
 exports.activeQueue = activeQueue;
 
@@ -18,7 +18,7 @@ mProto.EXEC = mProto.exec;
 
 /**
  * Creates and connects client to redis server. Will reject with an error if the
- *  redis client can not connect or is wrong version.
+ *  redis client can not connect or if redis version isn't >= 5 (need ZPOPMIN).
  * @param {String} IP IP/host for redis server
  * @param {Number} PORT Port for redis server
  * @param {String} URL Redis url connection string
@@ -40,7 +40,6 @@ exports.setupRedis = (IP = 'localhost', PORT = 6379, URL = null) => {
       });
     }
 
-    // On ready, determine if redis server is the correct version
     redisClient.on('ready', () => {
       logger.info(`Connected to redis server ${IP}:${PORT}`);
       // Requires redis client to be version 5
@@ -76,19 +75,20 @@ exports.closeRedis = () => {
 };
 
 /**
- * Adds a user to a specific queue.
+ * Adds a user to a specific challenge queue using the current time as the
+ *  score, and adds queueId to active queues.
  * @param {String} queueId Id of queue to add user to
  * @param {String} userId Id of user to add to queue
- * @param {Number} matchCount Number of users required to form a match
- * @return {Promise} A promise to resolve when user has been added into queue.
+ * @param {Number} userCount Number of users required to form a match
+ * @return {Promise<Number|null>} A promise to resolve with number of users
+ *  added or null if no user was added.
  */
-exports.addUserToQueue = (queueId, userId, matchCount = 2) => {
-  // Prevents unneeded calls to redis server
+exports.addUserToQueue = (queueId, userId, userCount = 2) => {
   if (queueId == null || userId == null || queueId === '' || userId === '') {
     return null;
   }
 
-  activeQueue[queueId] = matchCount;
+  activeQueue[queueId] = userCount;
   return redisClient.zadd(queueId, Date.now(), userId);
 };
 
@@ -96,8 +96,8 @@ exports.addUserToQueue = (queueId, userId, matchCount = 2) => {
  * Removes a user from a specific queue.
  * @param {String} queueId Id of queue to remove user from
  * @param {String} userId Id of user to remove
- * @return {Promise<Number>} A promise to resolve with the number of users removed. If
- *  a user is removed, will return 0.
+ * @return {Promise<Number>} A promise to resolve with the number of users
+ *  removed. If no user is removed, will resolve with 0.
  */
 exports.removeUserFromQueue = (queueId, userId) => {
   return redisClient.zrem(queueId, userId);
@@ -120,13 +120,14 @@ exports.getQueueSize = (queueId) => {
  *  were in the queue.
  */
 exports.popUsersFromQueue = async (queueId, numToPop = 2) => {
-  if (numToPop < 1) return []; // Quick check to prevent useless redis calls
+  if (numToPop < 1) return [];
 
   await redisClient.watch(queueId);
   const size = await redisClient.zcard(queueId);
   if (size < numToPop) return [];
 
   return redisClient.zpopmin(queueId, numToPop).then((res) => {
+    // Removes the scores from list and leaves the userIds
     return res.filter((value, index) => index % 2 === 0);
   });
 };
@@ -143,7 +144,6 @@ exports.popUsersFromQueue = async (queueId, numToPop = 2) => {
  *  or null if no queue was created.
  */
 exports.addUsersToPendingQueue = async (queueId, userIds, challengeId) => {
-  // Quick check to prevent unneeded calls
   if (!userIds || !queueId || queueId === '' || userIds.length < 1) {
     return null;
   }
@@ -164,11 +164,11 @@ exports.addUsersToPendingQueue = async (queueId, userIds, challengeId) => {
  *  user ids and challenge id as keys.
  * @param {String} queueId Id of queue to mark user in
  * @param {String} userId Id of user to mark as accepted
- * @return {Promise<Object>} A promise to resolve with an object with userIds
+ * @return {Promise<Object|null>} A promise to resolve with an object with userIds
  *  and challengeId as keys, otherwise with null.
  */
 exports.markUserAsAccepted = async (queueId, userId) => {
-  if (queueId == null || userId == null) return false; // Quick parameter check
+  if (queueId == null || userId == null) return false;
 
   // Only try to mark user if they exist in the queue
   const userExists = await redisClient.hexists(queueId, userId);
@@ -186,7 +186,7 @@ exports.markUserAsAccepted = async (queueId, userId) => {
         .exec();
     }
 
-    // Check if a user is still not ready
+    // If pending queue has a user with false flag, match is not ready
     if (Object.values(results[1]).includes('false')) return null;
 
     return results[1];
@@ -197,8 +197,8 @@ exports.markUserAsAccepted = async (queueId, userId) => {
 
 /**
  * Gets all elements of a pending queue.
- * @param {String} queueId Id of queue to get elements from.
- * @return {Promise<Array>} A promise to resolve with an array of strings
+ * @param {String} queueId Id of queue to get elements from
+ * @return {Promise<Array<String>>} A promise to resolve with an array of strings
  *  from the queue.
  */
 exports.getPendingQueue = (queueId) => {
@@ -206,10 +206,10 @@ exports.getPendingQueue = (queueId) => {
 };
 
 /**
- * Deletes a queue from redis.
+ * Deletes a pending queue from redis.
  * @param {String} queueId Id of queue to delete
  * @return {Promise<Number>} A promise to resolve when the request is complete
- *  and return 1 if the queue was removed or 0 if no queue was found.
+ *  returning 1 if the queue was removed or 0 if no queue was found.
  */
 exports.removePendingQueue = (queueId) => {
   return redisClient.del(queueId);

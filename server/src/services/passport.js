@@ -7,7 +7,6 @@ const User = require('../models/user');
 
 const { JWT_SECRET, GITHUB_ID, GITHUB_SECRET, GITHUB_CALLBACK } = process.env;
 
-// Setup Passport for local sign in with username & password
 const localLogin = new LocalStrategy((username, password, done) => {
   User.findOne({ username }, (err, user) => {
     if (err) return done(err);

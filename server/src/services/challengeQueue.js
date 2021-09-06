@@ -10,7 +10,7 @@ const { emitMessageToUserId } = require('./socket');
 let inProgress = false; // Flag to prevent running queue parallel
 
 /**
- * Notifies users through socket to
+ * Notifies users through socket that a match was found.
  * @param {String} queueId Id of pending queue
  * @param {Array} users Array of user ids to send the queuePop notification to
  */
@@ -30,23 +30,22 @@ function notifyUsers(queueId, users) {
  *  if created, otherwise with null.
  */
 async function createMatch(queueId, numOfUsers) {
-  const challengeId = queueId.split('-')[0];
+  const challengeId = queueId.split('-')[0]; // In form {ChallengeId}-{Language}
 
   const users = await popUsersFromQueue(queueId, numOfUsers);
 
   // Operation was interrupted (Queue may still have enough users)
   if (users == null) return null;
 
-  // Not enough users, remove queue from active list
+  // Not enough users, remove queueId from active list
   if (users.length === 0) {
     delete activeQueue[queueId];
     return null;
   }
 
-  // Unique id for match
+  // Generate unique id for match
   const pendingQueueId = crypto.pseudoRandomBytes(16).toString('hex');
 
-  // Attempt to add users to a pending queue
   return addUsersToPendingQueue(pendingQueueId, users, challengeId).then(
     (result) => {
       if (result == null) return null;
@@ -65,12 +64,12 @@ async function createMatch(queueId, numOfUsers) {
 exports.checkActiveQueues = () => {
   if (inProgress) return false;
 
-  inProgress = true; // To stop queues from running in parallel
+  inProgress = true;
 
   const proms = [];
 
-  Object.entries(activeQueue).forEach(([queueId, value]) => {
-    proms.push(createMatch(queueId, value));
+  Object.entries(activeQueue).forEach(([queueId, numOfUsers]) => {
+    proms.push(createMatch(queueId, numOfUsers));
   });
 
   return Promise.all(proms)

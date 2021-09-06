@@ -12,8 +12,8 @@ const {
 const {
   createChallenge,
   getChallengeList,
-  findChallenge,
   findChallengeById,
+  findChallengeByLanguage,
 } = require('../services/challenge');
 const { publishToQueue } = require('../services/amqp');
 const { updateUser } = require('../services/user');
@@ -102,7 +102,7 @@ exports.createPrivateRoom = async (req, res, next) => {
 
   try {
     // Find challenge and check that the selected language is valid
-    const challenge = await findChallengeById(cId, language);
+    const challenge = await findChallengeByLanguage(cId, language);
 
     if (!challenge) {
       const error = new Error(`Challenge ${cId} does not exists.`);
@@ -131,7 +131,7 @@ exports.getRoomInfo = async (req, res, next) => {
 
   try {
     const [challenge, room] = await Promise.all([
-      findChallenge(cId),
+      findChallengeById(cId),
       findRoom(rId),
     ]);
 
@@ -259,7 +259,7 @@ exports.receiveSolution = async (channel, msg) => {
     // If success, mark room completed, and update solution/users
     if (!error && success && failedTests === 0) {
       const room = await markRoomCompleted(correlationId);
-      const challenge = await findChallenge(room.challenge);
+      const challenge = await findChallengeById(room.challenge);
 
       const proms = [
         createSolution(
@@ -305,7 +305,7 @@ exports.testSolution = async (req, res, next) => {
   const { id: userId } = req.user;
 
   try {
-    const challenge = await findChallenge(cId);
+    const challenge = await findChallengeById(cId);
 
     if (!challenge) {
       const err = new Error(`Non existing challenge, ${cId}, being tested`);

@@ -4,11 +4,11 @@ const ResetToken = require('../models/resetToken');
 
 /**
  * Generates a reset token for a user with using crypto to generate a random
- *  string and then bcrypt to hash it. Hashing used to protect against access
- *  DB.
+ *  string and then bcrypt to hash it. Hashing used to protect against attacker
+ *  having read access of DB.
  * @param {String} userId Id of user to create token for
  * @return {Promise<Object>} A promise to resolve with the id of the token and
- *  the random string.
+ *  token.
  */
 exports.generateToken = (userId) => {
   const token = crypto.pseudoRandomBytes(16).toString('hex');

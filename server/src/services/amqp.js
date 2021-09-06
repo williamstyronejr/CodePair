@@ -4,10 +4,10 @@ let channel;
 let connection;
 
 /**
- * Connect to AMQP and creates a new channel for global uses.
+ * Connect to AMQP and creates a new channel.
  * @param {String} url Amqp url to connect to
- * @return {Promise<Void>} Returns a promise to resolve when a connection is made
- *  and a channel is opened.
+ * @return {Promise<Void>} Returns a promise to resolve when a connection is
+ *  made and a channel is opened.
  */
 exports.connectAMQP = (url) => {
   return new Promise((res, rej) => {
@@ -40,7 +40,7 @@ exports.closeAMQP = () => {
 };
 
 /**
- * Set up a consumer on the connected server
+ * Set up a consumer on the connected server.
  * @param {String} queue Name of queue to consume messages from.
  * @param {Function} messageHandler Callback to handle messages from queue.
  *  To recieve (channel, msg)
@@ -58,8 +58,9 @@ exports.setupConsumer = (queue, messageHandler) => {
 };
 
 /**
- * Publish a message to a given queue. Will throw error if no channel is open.
+ * Publish a message to a given queue.
  * @param {String} queue Name of queue to send message to
+ * @param {Object} data Additional data to be sent along with message
  * @param {Object} options Options to set for message
  * @return {Boolean} Returns a boolean indicating if the message was sent.
  */

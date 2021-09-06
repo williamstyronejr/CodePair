@@ -63,14 +63,14 @@ function leaveRoom(roomId, username) {
 
 /**
  * Emits a message to all sockets in a room, except the sender, and saves the
- *  messages to the room.
+ *  messages to the room. Only works if the client making the request is in
+ *  the room.
  * @param {String} roomId Id of room to send message to
  * @param {String} msg Content of message
  * @param {String} time Time message was sent
  * @param {String} author Id of user sending message
  */
 function sendMessage(roomId, msg, time, author) {
-  // Make sure the client is in the room to send messages
   if (this.rooms.has(roomId)) {
     addMessageById(roomId, { content: msg, time, author });
     this.in(roomId).emit('receiveMessage', msg, time, author);
@@ -78,7 +78,8 @@ function sendMessage(roomId, msg, time, author) {
 }
 
 /**
- * Emits a message to room that a user is typing.
+ * Emits a message to room that a user is typing. Only works if the client
+ *  making the request is in the room.
  * @param {String} roomId Id of room
  * @param {String} author Username of user typing
  */
@@ -89,7 +90,8 @@ function typingMessage(roomId, author) {
 }
 
 /**
- * Emits a message to room that a user has finished typing.
+ * Emits a message to room that a user has finished typing. Only works if the
+ *  client making the request is in the room.
  * @param {String} roomId Id of room
  * @param {String} author Username of user who finished typing
  */
@@ -100,19 +102,18 @@ function typingMessageEnd(roomId, author) {
 }
 
 /**
- * Emits a message sending code to the room. Only works if the socket making
+ * Emits a message sending code to the room. Only works if the client making
  *  the request is in the room.
  * @param {String} roomId Id of room to send code to
  * @param {String} code Code to send
  */
 function sendCode(roomId, code) {
-  // Make sure the client is in the room to send the code
   if (this.rooms.has(roomId)) this.in(roomId).emit('receiveCode', code);
 }
 
 /**
- * Saves code to room if only if the user is in the room. On successful save,
- *  the "codeSaved" event is sent to the room.
+ * Saves code to room and emits an event on successful code saves. Only works if
+ *  the client sending the request is in the room.
  * @param {String} roomId Id of room
  * @param {String} code Code to be save
  */
@@ -149,7 +150,6 @@ function leaveQueue(queueId) {
 async function prepareRoom(challengeId, users) {
   const room = await createRoom(challengeId, users, 'node');
 
-  // Send all users in room a message with room Id
   users.forEach((user) => {
     io.to(userClients[user]).emit('roomCreated', room.id);
   });
@@ -168,10 +168,10 @@ async function acceptQueue(pendingQueueId) {
   try {
     const matchData = await markUserAsAccepted(pendingQueueId, userId);
 
+    // Match data should only be recieved if all user accepted
     if (matchData) {
       const users = Object.keys(matchData).filter((v) => v !== 'challengeId');
 
-      // If all players ready, prepare room for users
       if (users && users.length > 0) {
         removePendingQueue(pendingQueueId);
         prepareRoom(matchData.challengeId, users);
@@ -183,7 +183,8 @@ async function acceptQueue(pendingQueueId) {
 }
 
 /**
- * Emits to all users in room that a test is being ran.
+ * Emits to all users in room that a test run has begun. Only works if
+ *  the client sending the request is in the room.
  * @param {String} roomId Id of room being tested
  */
 function testingCode(roomId) {
@@ -240,7 +241,8 @@ exports.emitMessageToRoom = (event, roomId, ...args) => {
 };
 
 /**
- * Emits a message to a user by searching
+ * Emits a message to a user by searching for their socket id in the userClients
+ *  list.
  * @param {String} event Type of event to emit message on
  * @param {String} userId Id of user to send message to
  * @param {Array} args Other arguments to send the users

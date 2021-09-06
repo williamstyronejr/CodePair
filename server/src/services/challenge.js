@@ -7,6 +7,7 @@ const Challenge = require('../models/challenge');
  * @param {String} tags Tags separated by commas, will be set to lower case
  * @param {Array<Object>} initialCode List of supported languages and initial
  *  code templates for those languages
+ * @param {Boolean} isPublic Flag indicating if challenge should be made public
  * @return {Promise<Object>} A promise to resolve with a challenge object.
  */
 exports.createChallenge = (
@@ -57,7 +58,7 @@ exports.getChallengeList = (
  * @return {Promise<Object>} A promise to resolve with a challenge object if
  *  if found, null otherwise.
  */
-exports.findChallenge = (id, projection = null) => {
+exports.findChallengeById = (id, projection = null) => {
   return Challenge.findById(id, projection).exec();
 };
 
@@ -70,7 +71,7 @@ exports.findChallenge = (id, projection = null) => {
  * @returns {Promise<Object>} Returns a promise to resolve with a challenge
  *  object or null if not found.
  */
-exports.findChallengeById = (id, language, projection = null) => {
+exports.findChallengeByLanguage = (id, language, projection = null) => {
   return Challenge.findOne(
     { _id: id, 'initialCode.language': language },
     projection

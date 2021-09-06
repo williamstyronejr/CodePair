@@ -1,16 +1,13 @@
 const path = require('path');
 const { createLogger, format, transports } = require('winston');
 
-let logger = createLogger({
-  level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
-  defaultMeta: { service: 'web-service' },
-});
-
-const devLogFormat = format.printf(({ level, message, timestamp, stack }) => {
-  return `${timestamp} ${level}: ${stack || message}`;
-});
+let logger;
 
 if (process.env.NODE_ENV === 'development') {
+  const devLogFormat = format.printf(({ level, message, timestamp, stack }) => {
+    return `${timestamp} ${level}: ${stack || message}`;
+  });
+
   logger = createLogger({
     level: 'debug',
     format: format.combine(

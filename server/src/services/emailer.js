@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 
 /**
  * Gets and returns file content.
- * @param {Stirng} fileLoc
+ * @param {String} fileLoc Location of HTML file to be read
  * @param {Function} cb Callback to receive err and file content
  */
 function readHTMLFile(fileLoc, cb) {

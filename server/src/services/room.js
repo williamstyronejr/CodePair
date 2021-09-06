@@ -60,7 +60,7 @@ exports.findRoomByInvite = (inviteKey) => {
 };
 
 /**
- * Finds and updates the room private flag and adds a invite key if the userId
+ * Updates a room's private flag and adds a invite key if the userId
  *  provided belonges to the room.
  * @param {String} id The id of the room to make joinable
  * @param {String} userId The id of the user trying to make the room public
@@ -101,19 +101,20 @@ exports.addUserToRoom = (roomId, userId, options = null) => {
  * @param {String} id Id of a room
  * @param {String} userId Id of user saving (used to ensure user is in room)
  * @param {String} code Code to store
+ * @param {Boolean} getNew Flag indicating if the updated object is returned
  * @return {Promise<Object>} Returns a promise to resolve with an room object
  *  with the updated code.
  */
-exports.saveCodeById = (id, userId, code) => {
+exports.saveCodeById = (id, userId, code, getNew = true) => {
   return Room.findOneAndUpdate(
     { _id: id, users: userId },
     { code },
-    { new: true }
+    { new: getNew }
   ).exec();
 };
 
 /**
- * Appends a message to a room.
+ * Appends a message to a room by the room id.
  * @param {String} id Id of room
  * @param {Object} message Object containing message and meta data
  * @param {Object} options Query options ({new: true} for updated document)
