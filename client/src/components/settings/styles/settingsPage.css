@@ -81,6 +81,7 @@
   height: 600px;
   justify-content: center;
   align-items: center;
+  color: #efefef;
 }
 
 .settings__notification {
