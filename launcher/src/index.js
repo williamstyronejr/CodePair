@@ -1,4 +1,6 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const {
   connectAMQP,
   setupConsumer,
@@ -8,6 +10,17 @@ const { launchContainer } = require('./services/launcher');
 const logger = require('./services/logger');
 
 const { RABBITMQ_URL, CONSUMER_QUEUE, PRODUCER_QUEUE } = process.env;
+
+/**
+ * Creates temporary code folder if it doesn't exist. Needs to be called on
+ *  startup before connection to RabbitMQ to prevent errors.
+ * @return {Promise<Void>} Returns a promise to resolve when folder is created.
+ */
+async function createTempFolder() {
+  const tempCodeLoc = path.join(__dirname, 'temp', 'code');
+
+  await fs.promises.mkdir(tempCodeLoc, { recursive: true });
+}
 
 /**
  * Validates parameters for code launcher to prevent loading docker containers
@@ -93,8 +106,12 @@ async function messageHandler(channel, msg) {
   }
 }
 
+/**
+ * Sets up connect to RabbitMQ and sets
+ */
 async function main() {
   try {
+    await createTempFolder();
     await connectAMQP(RABBITMQ_URL);
     setupConsumer(CONSUMER_QUEUE, messageHandler);
     logger.info('Code runner connected to AMQP');
