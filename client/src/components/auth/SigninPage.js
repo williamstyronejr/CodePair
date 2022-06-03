@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Redirect, Link } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import GithubButton from './GithubButton';
 import { setUserData } from '../../actions/authentication';
 import { ajaxRequest } from '../../utils/utils';
@@ -13,7 +13,7 @@ const SigninPage = (props) => {
   const [requesting, setRequesting] = React.useState(false);
   const [error, setError] = React.useState(false);
 
-  if (props.user.authenticated) return <Redirect to="/challenges" />;
+  if (props.user.authenticated) return <Navigate to="/challenges" />;
 
   function onSubmit(evt) {
     evt.preventDefault();
@@ -96,7 +96,7 @@ const SigninPage = (props) => {
           Signin
         </button>
 
-        <hr />
+        <hr className="separator" />
 
         <Link to="/recovery" className="signin__recovery" data-cy="recovery">
           Forgot your password?

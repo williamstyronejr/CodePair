@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { ajaxRequest } from '../../utils/utils';
 import './styles/settingsPage.css';
 import { updateUser } from '../../actions/user';
@@ -325,7 +325,7 @@ const PasswordForm = () => {
 };
 
 const SettingsPage = (props) => {
-  const { type } = props.match.params;
+  const { type } = useParams();
   let displayedForm;
 
   switch (type) {
@@ -350,7 +350,7 @@ const SettingsPage = (props) => {
       break;
 
     default:
-      displayedForm = <Redirect to="/settings/account" />;
+      displayedForm = <Navigate to="/settings/account" />;
   }
 
   return (
@@ -408,11 +408,6 @@ SettingsPage.propTypes = {
     email: PropTypes.string,
     profileImage: PropTypes.string,
     oauthUser: PropTypes.bool,
-  }).isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      type: PropTypes.string,
-    }),
   }).isRequired,
 };
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { withRouter } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import LoadingScreen from '../shared/LoadingScreen';
@@ -22,15 +22,14 @@ import {
 import { openSocket, closeSocket } from '../../actions/socket';
 import './styles/challenge.css';
 
-const ChallengeErrorPage = ({ message }) => {
-  return (
-    <section className="challenge challenge--error">
-      <p className="challenge__error-msg">{message}</p>
-    </section>
-  );
-};
+const ChallengeErrorPage = ({ message }) => (
+  <section className="challenge challenge--error">
+    <p className="challenge__error-msg">{message}</p>
+  </section>
+);
 
 const ChallengePage = (props) => {
+  const { rId, cId } = useParams();
   // Clean up
   React.useEffect(() => {
     return () => {
@@ -42,18 +41,15 @@ const ChallengePage = (props) => {
 
   // Fetch data for challenge/room initial mount
   React.useEffect(() => {
-    // Grab challenge id and room id from URL
-    const { rId, cId } = props.match.params;
-
     props.getChallenge(cId, rId);
-  }, [props.getChallenge, props.match.params.rId, props.match.params.cId]);
+  }, [props.getChallenge, rId, cId]);
 
   // Open socket and connect to room
   React.useEffect(() => {
     if (!props.socket.connected) {
       props.openSocket();
     } else if (props.socket.ready && !props.socket.inRoom) {
-      props.joinRoom(props.match.params.rId, props.username);
+      props.joinRoom(rId, props.username);
     }
   }, [
     props.socket.connected,
@@ -100,23 +96,14 @@ const ChallengePage = (props) => {
       toggleChatVisibility={props.toggleChatVisibility}
       setMessage={props.setMessage}
       messageIndicator={(typing) =>
-        props.messageIndicator(props.match.params.rId, props.username, typing)
+        props.messageIndicator(rId, props.username, typing)
       }
-      sendMessage={(msg) =>
-        props.sendMessage(props.match.params.rId, msg, props.userId)
-      }
-      setCode={(code) => props.setCode(props.match.params.rId, code)}
-      saveCode={() => props.saveCode(props.match.params.rId, challenge.code)}
-      convertRoomToPublic={() =>
-        props.convertRoomToPublic(props.match.params.rId)
-      }
+      sendMessage={(msg) => props.sendMessage(rId, msg, props.userId)}
+      setCode={(code) => props.setCode(rId, code)}
+      saveCode={() => props.saveCode(rId, challenge.code)}
+      convertRoomToPublic={() => props.convertRoomToPublic(rId)}
       testCode={(code) =>
-        props.testCode(
-          props.match.params.cId,
-          props.match.params.rId,
-          code,
-          props.challenge.language
-        )
+        props.testCode(cId, rId, code, props.challenge.language)
       }
     />
   );
@@ -167,9 +154,6 @@ ChallengePage.propTypes = {
   joinRoom: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
   username: PropTypes.string.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({ rId: PropTypes.string, cId: PropTypes.string }),
-  }).isRequired,
   socket: PropTypes.shape({
     connected: PropTypes.bool,
     ready: PropTypes.bool,
@@ -202,6 +186,4 @@ ChallengeErrorPage.propTypes = {
   message: PropTypes.string.isRequired,
 };
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(ChallengePage)
-);
+export default connect(mapStateToProps, mapDispatchToProps)(ChallengePage);

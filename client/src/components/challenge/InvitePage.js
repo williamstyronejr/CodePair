@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import LoadingScreen from '../shared/LoadingScreen';
 import { ajaxRequest } from '../../utils/utils';
 
@@ -22,7 +22,7 @@ const InvitePage = (props) => {
       });
   }, []);
 
-  if (!loading) return <Redirect to={link} />;
+  if (!loading) return <Navigate to={link} />;
 
   return (
     <main className="page-main">

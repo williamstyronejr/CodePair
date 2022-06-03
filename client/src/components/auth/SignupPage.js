@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ajaxRequest } from '../../utils/utils';
 import { setUserData } from '../../actions/authentication';
@@ -15,7 +15,7 @@ const SignupPage = (props) => {
   const [requesting, setRequesting] = React.useState(false);
   const [error, setError] = React.useState({});
 
-  if (props.user.authenticated) return <Redirect to="/challenges" />;
+  if (props.user.authenticated) return <Navigate to="/challenges" />;
 
   function onSubmit(evt) {
     evt.preventDefault();

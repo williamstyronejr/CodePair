@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import Header from './AppHeader';
 import { signoutUser } from '../actions/authentication';
 
@@ -10,10 +10,10 @@ import { signoutUser } from '../actions/authentication';
  */
 const AppLayout = (props) => {
   if (!props.user.authenticated && !props.user.authenticating) {
-    return <Redirect to="/signin" />;
+    return <Navigate to="/signin" />;
   }
   if (props.user.authenticated && !props.user.username) {
-    return <Redirect to="/account/register" />;
+    return <Navigate to="/account/register" />;
   }
 
   return (

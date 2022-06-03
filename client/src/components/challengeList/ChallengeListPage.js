@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { ajaxRequest } from '../../utils/utils';
 import Loading from '../shared/Loading';
@@ -63,6 +63,7 @@ const ChallengeItem = ({ challenge, createPrivateRoom }) => {
 };
 
 const ChallengeListPage = (props) => {
+  const navigate = useNavigate();
   const [page, setPage] = React.useState(1);
   const [endOfList, setEndOfList] = React.useState(false);
   const [challenges, setChallenge] = React.useState([]);
@@ -131,8 +132,8 @@ const ChallengeListPage = (props) => {
         if (!res.data.room) {
           setRoomError(true);
         }
-        // Redirect user to room page
-        props.history.push(`/c/${cId}/r/${res.data.room}`);
+
+        navigate(`/c/${cId}/r/${res.data.room}`);
       })
       .catch((err) => {
         if (err.response && err.response.status === 404) {
@@ -240,8 +241,4 @@ ChallengeItem.propTypes = {
   }).isRequired,
 };
 
-ChallengeListPage.propTypes = {
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
-};
-
-export default withRouter(ChallengeListPage);
+export default ChallengeListPage;

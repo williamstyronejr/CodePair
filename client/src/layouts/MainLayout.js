@@ -1,12 +1,12 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import Header from './Header';
 
 const MainLayout = (props) => {
   if (props.user.authenticated && props.user.username)
-    return <Redirect to="/challenges" />;
+    return <Navigate replace to="/challenges" />;
 
   return (
     <>

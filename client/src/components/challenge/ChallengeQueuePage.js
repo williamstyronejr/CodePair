@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { openSocket } from '../../actions/socket';
 import { Timer } from '../shared/Timer';
@@ -16,9 +16,9 @@ import {
 import './styles/challengeQueuePage.css';
 
 const ChallengeQueuePage = (props) => {
+  const { cId, lang } = useParams();
   const { leavingQueue, roomId, matchFound, acceptedMatch, declinedMatch } =
     props.queue;
-  const { cId, lang } = props.match.params;
   const [matchTimer, setMatchTimer] = React.useState(10);
   const queueId = `${cId}-${lang}`; // Id of queue the user is joining
   let matchInterval; // Interval for when a match appears
@@ -80,9 +80,8 @@ const ChallengeQueuePage = (props) => {
   if (!props.socket.ready)
     return <LoadingScreen message="Connecting to server" />;
 
-  if (leavingQueue) return <Redirect to="/challenges" />;
-  if (roomId)
-    return <Redirect to={`/c/${props.match.params.cId}/r/${roomId}`} />;
+  if (leavingQueue) return <Navigate to="/challenges" />;
+  if (roomId) return <Navigate to={`/c/${cId}/r/${roomId}`} />;
 
   return (
     <section className="queue">
@@ -165,9 +164,6 @@ ChallengeQueuePage.propTypes = {
   leaveQueue: PropTypes.func.isRequired,
   acceptMatch: PropTypes.func.isRequired,
   matchTimeout: PropTypes.func.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({ cId: PropTypes.string, lang: PropTypes.string }),
-  }).isRequired,
   user: PropTypes.shape({
     id: PropTypes.string,
   }).isRequired,

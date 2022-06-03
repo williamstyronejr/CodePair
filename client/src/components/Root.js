@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import AppLayout from '../layouts/AppLayout';
 
@@ -33,8 +33,13 @@ const appRoutes = [
     path: '/c/:cId/r/:rId',
     component: ChallengePage,
   },
+  // React Router Dom v6 removed optional params, duplicate to catch both
   {
-    path: '/settings/:type?',
+    path: '/settings',
+    component: SettingsPage,
+  },
+  {
+    path: '/settings/:type',
     component: SettingsPage,
   },
   {
@@ -77,17 +82,17 @@ const landingRoutes = [
 
 const Root = () => (
   <Router>
-    <Switch>
+    <Routes>
       {landingRoutes.map(({ path, exact, component: Comp }) => (
         <Route
           path={path}
           exact={exact}
           key={path}
-          render={(props) => (
-            <MainLayout {...props}>
-              <Comp {...props} />
+          element={
+            <MainLayout>
+              <Comp />
             </MainLayout>
-          )}
+          }
         />
       ))}
 
@@ -96,17 +101,17 @@ const Root = () => (
           path={path}
           exact={exact}
           key={path}
-          render={(props) => (
-            <AppLayout {...props}>
-              <Comp {...props} />
+          element={
+            <AppLayout>
+              <Comp />
             </AppLayout>
-          )}
+          }
         />
       ))}
 
       <Route path="/invite/:key" component={InvitePage} />
       <Route component={NotFoundPage} />
-    </Switch>
+    </Routes>
   </Router>
 );
 
