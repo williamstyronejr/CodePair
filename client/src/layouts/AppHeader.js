@@ -1,14 +1,21 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import useDetectOutsideClick from '../components/shared/useDetectOutsideClick';
 import './styles/header.css';
 
 const AppHeader = (props) => {
+  const location = useLocation();
   const userMenuRef = React.useRef(null);
   const navMenuRef = React.useRef(null);
   const [navMenu, setNavMenu] = useDetectOutsideClick(navMenuRef, false);
   const [userMenu, setUserMenu] = useDetectOutsideClick(userMenuRef, false);
+
+  // Close menus on route change
+  React.useEffect(() => {
+    setNavMenu(false);
+    setUserMenu(false);
+  }, [location]);
 
   return (
     <header className="page-header ">
