@@ -35,7 +35,7 @@ async function createMatch(queueId, numOfUsers) {
   const users = await popUsersFromQueue(queueId, numOfUsers);
 
   // Operation was interrupted (Queue may still have enough users)
-  if (users == null) return null;
+  if (users === null) return null;
 
   // Not enough users, remove queueId from active list
   if (users.length === 0) {
