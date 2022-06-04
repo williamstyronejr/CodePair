@@ -1,5 +1,4 @@
-const { promisify } = require('util');
-const redis = require('redis');
+const { createClient } = require('redis');
 const logger = require('./logger');
 
 let redisClient;
@@ -10,12 +9,6 @@ const activeQueue = {};
  */
 exports.activeQueue = activeQueue;
 
-// Promisify multi and Exec
-const mProto = redis.Multi.prototype;
-mProto.exec_transaction = promisify(mProto.exec_transaction);
-mProto.exec = mProto.exec_transaction;
-mProto.EXEC = mProto.exec;
-
 /**
  * Creates and connects client to redis server. Will reject with an error if the
  *  redis client can not connect or if redis version isn't >= 5 (need ZPOPMIN).
@@ -25,46 +18,18 @@ mProto.EXEC = mProto.exec;
  * @return {Promise<Object>} A promise to resolve with teh redis client, or reject with an
  *  error if redis client can not connect.
  */
-exports.setupRedis = (IP = 'localhost', PORT = 6379, URL = null) => {
-  redisClient = URL ? redis.createClient(URL) : redis.createClient(PORT, IP);
+exports.setupRedis = async (IP = 'localhost', PORT = 6379, URL = null) => {
+  redisClient = URL
+    ? createClient({ url: URL })
+    : createClient({ socket: { host: IP, port: PORT } });
 
-  return new Promise((res, rej) => {
-    // Set up event logs for non-production environments
-    if (process.env.NODE_ENV === 'dev') {
-      redisClient.on('error', (err) => {
-        rej(err);
-      });
+  await redisClient.connect();
+  await redisClient.ping();
+  logger.info(`Connected to redis server ${IP}:${PORT}`);
 
-      redisClient.on('disconnect', () => {
-        logger.info('Redis server disconnected.');
-      });
-    }
-
-    redisClient.on('ready', () => {
-      logger.info(`Connected to redis server ${IP}:${PORT}`);
-      // Requires redis client to be version 5
-      if (redisClient.server_info.versions[0] < 5) {
-        return rej(new Error('Requires redis version >= 5.'));
-      }
-
-      return res(redisClient);
-    });
-
-    // Promisify redis client functions
-    // redisClient.watch = promisify(redisClient.watch);
-    redisClient.zcard = promisify(redisClient.zcard);
-    redisClient.zadd = promisify(redisClient.zadd);
-    redisClient.zrem = promisify(redisClient.zrem);
-    redisClient.zrange = promisify(redisClient.zrange);
-    redisClient.zremrangebyrank = promisify(redisClient.zremrangebyrank);
-    redisClient.zpopmin = promisify(redisClient.zpopmin);
-    redisClient.hexists = promisify(redisClient.hexists);
-    redisClient.hmset = promisify(redisClient.hmset);
-    redisClient.hgetall = promisify(redisClient.hgetall);
-    redisClient.del = promisify(redisClient.del);
-    redisClient.expire = promisify(redisClient.expire);
-    redisClient.flushall = promisify(redisClient.flushall);
-  });
+  // if (redisClient.server_info.versions[0] < 5)
+  //   throw new Error('Requires redis verison >= 5');
+  return redisClient;
 };
 
 /**
@@ -89,7 +54,8 @@ exports.addUserToQueue = (queueId, userId, userCount = 2) => {
   }
 
   activeQueue[queueId] = userCount;
-  return redisClient.zadd(queueId, Date.now(), userId);
+
+  return redisClient.zAdd(queueId, { score: Date.now(), value: userId });
 };
 
 /**
@@ -100,7 +66,7 @@ exports.addUserToQueue = (queueId, userId, userCount = 2) => {
  *  removed. If no user is removed, will resolve with 0.
  */
 exports.removeUserFromQueue = (queueId, userId) => {
-  return redisClient.zrem(queueId, userId);
+  return redisClient.zRem(queueId, userId);
 };
 
 /**
@@ -109,27 +75,41 @@ exports.removeUserFromQueue = (queueId, userId) => {
  * @return {Promise<Number>} A promise to resolve with number members in queue.
  */
 exports.getQueueSize = (queueId) => {
-  return redisClient.zcard(queueId);
+  return redisClient.zCard(queueId);
 };
 
 /**
  * Pops users from a specific queue only if there are enough users in that queue.
  * @param {String} queueId Id of queue to pop users from
  * @param {Number} numToPop Number of users to pop
- * @return {Promise<Array>} A promise to resolve with an array of user if any
- *  were in the queue.
+ * @return {Promise<Array|Null>} A promise to resolve with an array of user ids
+ *  or an empty array if not enough users exists. Resolves with null if error
+ *  occurs during redis operations.
  */
 exports.popUsersFromQueue = async (queueId, numToPop = 2) => {
   if (numToPop < 1) return [];
 
-  await redisClient.watch(queueId);
-  const size = await redisClient.zcard(queueId);
-  if (size < numToPop) return [];
+  const res = await redisClient.executeIsolated(async (client) => {
+    try {
+      await client.watch(queueId);
 
-  return redisClient.zpopmin(queueId, numToPop).then((res) => {
-    // Removes the scores from list and leaves the userIds
-    return res.filter((value, index) => index % 2 === 0);
+      const size = await client.zCard(queueId);
+      if (size < numToPop) {
+        client.unwatch();
+        return [];
+      }
+
+      return client.multi().zPopMinCount(queueId, numToPop).exec();
+    } catch (err) {
+      return null;
+    }
   });
+
+  if (!res) return null;
+  if (res.length === 0) return [];
+
+  // Removes the scores from list and leaves the userIds
+  return res[0].map((elem) => elem.value);
 };
 
 /**
@@ -144,18 +124,15 @@ exports.popUsersFromQueue = async (queueId, numToPop = 2) => {
  *  or null if no queue was created.
  */
 exports.addUsersToPendingQueue = async (queueId, userIds, challengeId) => {
-  if (!userIds || !queueId || queueId === '' || userIds.length < 1) {
-    return null;
-  }
+  if (!userIds || !queueId || queueId === '' || userIds.length < 1) return null;
 
   // Adds 'false' after each userId as a ready flag
   const args = userIds.reduce(
     (r, a) => r.concat(a, 'false'),
     ['challengeId', challengeId]
   );
-
-  await redisClient.hset(queueId, ...args);
-  return redisClient.expire(queueId, 12); // Expire key after 12 seconds
+  await redisClient.hSet(queueId, args);
+  return redisClient.expire(queueId, 12);
 };
 
 /**
@@ -171,7 +148,7 @@ exports.markUserAsAccepted = async (queueId, userId) => {
   if (queueId == null || userId == null) return false;
 
   // Only try to mark user if they exist in the queue
-  const userExists = await redisClient.hexists(queueId, userId);
+  const userExists = await redisClient.hExists(queueId, userId);
 
   if (userExists) {
     let results;
@@ -181,8 +158,8 @@ exports.markUserAsAccepted = async (queueId, userId) => {
       // eslint-disable-next-line no-await-in-loop
       results = await redisClient
         .multi()
-        .hmset(queueId, userId, 'true')
-        .hgetall(queueId)
+        .hSet(queueId, userId, 'true')
+        .hGetAll(queueId)
         .exec();
     }
 
@@ -202,7 +179,7 @@ exports.markUserAsAccepted = async (queueId, userId) => {
  *  from the queue.
  */
 exports.getPendingQueue = (queueId) => {
-  return redisClient.hgetall(queueId);
+  return redisClient.hGetAll(queueId);
 };
 
 /**
