@@ -96,7 +96,7 @@ body {
   width: 90%;
   max-width: 600px;
   margin: 1.3em auto 0 auto;
-  padding: 1.4em 1.2em 1.3em 1.2em;
+  padding: 2em 2em;
   border-radius: 5px;
   background-color: rgb(38, 39, 41);
   box-shadow: 2px 2px 3px 0 rgba(117, 124, 129, 0.06);
@@ -110,6 +110,7 @@ body {
 .form__heading {
   text-align: center;
   color: #efefef;
+  margin: 0 0 1em 0;
 }
 
 .form__indent {
@@ -402,7 +403,7 @@ body {
 }
 
 .btn--social {
-  margin: 0 auto;
+  margin: 30px auto;
   max-width: 300px;
   padding: 15px 0;
   border: 1px solid #3f3f46;
@@ -508,7 +509,7 @@ body {
 .separator {
   display: flex;
   flex-flow: row nowrap;
-  margin: 15px 0;
+  margin: 2em 0;
   color: #efefef;
 }
 

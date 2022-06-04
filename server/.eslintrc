@@ -6,7 +6,6 @@
   },
   "extends": ["airbnb-base", "prettier"],
   "plugins": ["import"],
-  "parser": "babel-eslint",
   "rules": {
     "no-unused-vars": "warn",
     "comma-dangle": 0,
