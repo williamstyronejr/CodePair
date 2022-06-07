@@ -82,7 +82,7 @@ beforeEach((done) => {
 // Disconnect all sockets and clear redis
 afterEach((done) => {
   // Disconnect all client sockets
-  redisClient.flushall();
+  redisClient.flushAll();
   if (socket1) socket1.disconnect();
   if (socket2) socket2.disconnect();
   if (socket3) socket3.disconnect();
@@ -180,18 +180,18 @@ describe('Accepting/Declining pending queue', () => {
     }, 100);
   });
 
-  test('All clients accepting queue should removes queue, creates room, and emits to clients', (done) => {
+  test('All clients accepting queue should delete pending queue, creates room, and emits to clients', (done) => {
     socket1.on('roomCreated', async (roomId) => {
       const queue = await getPendingQueue(pendingQueue);
 
-      expect(queue).toBeNull(); // Queue no longer exists
+      expect(Object.keys(queue).length).toBe(0); // Queue no longer exists
       expect(roomId).toBeDefined(); // Room id was provided
       done();
     });
 
     socket1.emit('acceptMatch', pendingQueue);
     socket2.emit('acceptMatch', pendingQueue);
-  });
+  }, 10000);
 });
 
 describe('Joining and leaving room', () => {

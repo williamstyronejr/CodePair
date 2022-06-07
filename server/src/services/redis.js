@@ -4,6 +4,7 @@ const logger = require('./logger');
 let redisClient;
 const activeQueue = {};
 
+const rTest = createClient();
 /**
  * List of all active queues that have at least one user in them
  */
@@ -175,8 +176,9 @@ exports.markUserAsAccepted = async (queueId, userId) => {
 /**
  * Gets all elements of a pending queue.
  * @param {String} queueId Id of queue to get elements from
- * @return {Promise<Array<String>>} A promise to resolve with an array of strings
- *  from the queue.
+ * @return {Promise<Object<string, string>>} A promise to resolve with the
+ *  object for the pending queue. If queue doesn't exist, an empty object is
+ *  returned.
  */
 exports.getPendingQueue = (queueId) => {
   return redisClient.hGetAll(queueId);
