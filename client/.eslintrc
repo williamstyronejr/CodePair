@@ -5,7 +5,6 @@
     "jest": true
   },
   "plugins": ["react", "jsx-a11y", "import"],
-  "parser": "babel-eslint",
   "extends": ["airbnb", "prettier"],
   "rules": {
     "no-unused-vars": "warn",
