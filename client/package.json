@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "codemirror": "^5.65.3",
+    "codemirror": "^5.65.5",
     "normalize.css": "^8.0.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
@@ -18,13 +18,12 @@
     "react-infinite-scroll-hook": "^4.0.3",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.3.0",
-    "react-script": "^2.0.5",
     "react-scripts": "^5.0.1",
     "redux": "^4.2.0",
     "redux-form": "^8.3.8",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
-    "socket.io-client": "^4.5.0"
+    "socket.io-client": "^4.5.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,13 +41,13 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "cypress": "^9.6.1",
+    "cypress": "^10.0.3",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-react": "^7.29.4",
-    "lint-staged": "^12.4.1",
+    "eslint-plugin-react": "^7.30.0",
+    "lint-staged": "^13.0.0",
     "prettier": "^2.6.2"
   },
   "lint-staged": {
