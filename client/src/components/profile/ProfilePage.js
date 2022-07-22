@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
-import { Controlled as CodeMirror } from 'react-codemirror2';
+import { javascript } from '@codemirror/lang-javascript';
+import CodeMirror from 'rodemirror';
 import Loading from '../shared/Loading';
+import basicExts from '../../utils/codemirror';
 import { ajaxRequest, dateToText } from '../../utils/utils';
 import './styles/profilePage.css';
 
@@ -54,6 +56,7 @@ const Solutions = ({ username }) => {
   const [loading, setLoading] = React.useState(false);
   const [endOfList, setEndOfList] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const extensions = React.useMemo(() => [...basicExts, javascript()], []);
 
   const getSolutions = () => {
     if (loading) return;
@@ -93,17 +96,7 @@ const Solutions = ({ username }) => {
         <CodeMirror
           className="solutions__code"
           value={item.code}
-          options={{
-            lineNumbers: true,
-            lineWrapping: true,
-            theme: 'dracula',
-            tabSize: 2,
-            mode: 'javascript',
-          }}
-          onBeforeChange={(editor, data, value) => {
-            // Nothing to prevent data change
-          }}
-          onChange={(editor, data, value) => {}}
+          extensions={extensions}
         />
       </div>
     </li>

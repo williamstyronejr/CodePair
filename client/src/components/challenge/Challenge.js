@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Controlled as CodeMirror } from 'react-codemirror2';
 import PropTypes from 'prop-types';
+import { javascript } from '@codemirror/lang-javascript';
+import CodeMirror from 'rodemirror';
 import ChatRoom from './ChatRoom';
 import useDetectOutsideClick from '../shared/useDetectOutsideClick';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/dracula.css';
-import 'codemirror/mode/javascript/javascript';
+import basicExts from '../../utils/codemirror';
 import './styles/challenge.css';
 
-const Challenge = (props) => {
+function Challenge(props) {
   const {
     title,
     prompt,
@@ -39,6 +38,7 @@ const Challenge = (props) => {
     false
   );
   const [details, setDetails] = React.useState('prompt');
+  const extensions = React.useMemo(() => [...basicExts, javascript()], []);
   let savingInterval;
   let detailsComponent;
 
@@ -178,21 +178,14 @@ const Challenge = (props) => {
           {detailsComponent}
         </div>
 
-        <div className="challenge__tools">
+        <div className="challenge__tools" id="pairs">
           <CodeMirror
             className="challenge__editor"
             value={code}
-            options={{
-              lineNumbers: true,
-              lineWrapping: true,
-              theme: 'dracula',
-              tabSize: 2,
-              mode: 'javascript',
+            extensions={extensions}
+            onUpdate={(val) => {
+              if (val.docChanged) setCode(val.state.doc.toString());
             }}
-            onBeforeChange={(editor, data, value) => {
-              setCode(value);
-            }}
-            onChange={(editor, data, value) => {}}
           />
         </div>
       </div>
@@ -280,7 +273,7 @@ const Challenge = (props) => {
       )}
     </section>
   );
-};
+}
 
 Challenge.propTypes = {
   userId: PropTypes.string.isRequired,
