@@ -154,10 +154,13 @@
 }
 
 .challenge__tools {
-  display: flex;
-  flex-flow: row nowrap;
-  flex: 1 0 auto;
+  height: 200px;
   margin: 10px 0 0 0;
+}
+
+/*  Parent Wrapper for codemirror  */
+.challenge__tools > div {
+  height: 100%;
 }
 
 .challenge__editor {
@@ -213,6 +216,7 @@
   .challenge__content {
     flex-flow: row nowrap;
     flex: 1 0 auto;
+    height: 1px;
   }
 
   .challenge__details {
@@ -224,9 +228,17 @@
   }
 
   .challenge__tools {
-    flex: 1 0 auto;
+    /* flex: 1 0 auto; */
     max-height: 100%;
     margin: 5px 0;
+    width: 100%;
+    height: auto;
+  }
+
+  /*  Parent Wrapper for codemirror  */
+  .challenge__tools > div {
+    height: 100%;
+    width: 100%;
   }
 
   .challenge__editor {
