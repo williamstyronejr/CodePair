@@ -5,7 +5,7 @@
     "jest": true
   },
   "plugins": ["react", "jsx-a11y", "import"],
-  "extends": ["airbnb", "prettier"],
+  "extends": ["airbnb", "plugin:react/jsx-runtime", "prettier"],
   "rules": {
     "no-unused-vars": "warn",
     "comma-dangle": 0,
