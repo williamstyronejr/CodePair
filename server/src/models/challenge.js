@@ -13,6 +13,8 @@ const challengeSchema = new mongoose.Schema({
   isPublic: { type: Boolean, default: false },
   createBy: { type: Date, default: Date.now },
   completed: { type: Number, default: 0 },
+  summary: { type: String, default: '' },
+  difficulty: { type: String, default: 'Easy' },
 });
 
 const Challenge = mongoose.model('challenge', challengeSchema);

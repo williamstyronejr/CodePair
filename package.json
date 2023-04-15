@@ -4,11 +4,10 @@
   "description": "Site containing challenges to be completed through pair programming.",
   "main": "index.js",
   "engines": {
-    "node": "16",
-    "npm": "7"
+    "node": "^18.0.0",
+    "npm": "^8.0.0"
   },
   "scripts": {
-    "prepare": "husky install",
     "start": "npm run server:prod",
     "dev": "concurrently \"npm run server:watch\" \"npm run client:watch\" \"npm run runner:watch\" ",
     "server:watch": "npm run dev --prefix server",
@@ -17,8 +16,6 @@
     "build": "npm run build --prefix client",
     "server:prod": "npm run production --prefix server",
     "launcher:prod": "NODE_ENV=production pm2 startOrReload pm2.prod.json --only launcher",
-    "precommit": "lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
-    "prepush": "lerna run --concurrency 1 --stream test --since HEAD --exclude-dependents",
     "heroku-postbuild": "npm ci --prefix server && npm ci --prefix client --production=false && npm run build"
   },
   "repository": {
@@ -32,12 +29,11 @@
   },
   "homepage": "https://github.com/williamstyronejr/codepair#readme",
   "devDependencies": {
-    "concurrently": "^7.4.0",
-    "husky": "^8.0.1",
-    "lerna": "^5.1.8",
-    "lint-staged": "^13.0.3"
+    "concurrently": "^8.0.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.1"
   },
   "dependencies": {
-    "pm2": "^5.2.0"
+    "pm2": "^5.2.2"
   }
 }

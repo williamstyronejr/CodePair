@@ -3,7 +3,7 @@
   color: #efefef;
 }
 
-.loading__full {
+.loading--full {
   display: flex;
   flex-flow: column wrap;
   justify-content: center;
@@ -18,7 +18,7 @@
   position: relative;
   width: 80px;
   height: 40px;
-  margin: auto;
+  margin: 20px auto;
 }
 
 .loading__full .loading__dots {

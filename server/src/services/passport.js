@@ -8,7 +8,7 @@ const User = require('../models/user');
 const { JWT_SECRET, GITHUB_ID, GITHUB_SECRET, GITHUB_CALLBACK } = process.env;
 
 const localLogin = new LocalStrategy((username, password, done) => {
-  User.findOne({ username }, (err, user) => {
+  User.findOne({ username }).then((err, user) => {
     if (err) return done(err);
     if (!user) return done(null, false);
 
@@ -30,7 +30,7 @@ const jwtOptions = {
 };
 
 const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
-  User.findById(payload.sub, (err, user) => {
+  User.findById(payload.sub).then((err, user) => {
     if (err) return done(err);
     if (user) return done(null, user);
     return done(null, false);

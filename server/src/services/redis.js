@@ -13,21 +13,24 @@ exports.activeQueue = activeQueue;
 /**
  * Creates and connects client to redis server. Will reject with an error if the
  *  redis client can not connect or if redis version isn't >= 5 (need ZPOPMIN).
- * @param {String} IP IP/host for redis server
- * @param {Number} PORT Port for redis server
- * @param {String} URL Redis url connection string
+ * @param {String} url Host or url for redis server.
+ * @param {Number} port Port for redis server
+ * @param {String} password Redis password
  * @return {Promise<Object>} A promise to resolve with teh redis client, or reject with an
  *  error if redis client can not connect.
  */
-exports.setupRedis = async (IP = 'localhost', PORT = 6379, URL = null) => {
-  redisClient = URL
-    ? createClient({ url: URL })
-    : createClient({ socket: { host: IP, port: PORT } });
+exports.setupRedis = async (host, port, url = null) => {
+  redisClient =
+    url === null ? createClient({ host, port }) : createClient({ url });
 
   await redisClient.connect();
   await redisClient.ping();
-  logger.info(`Connected to redis server ${IP}:${PORT}`);
 
+  logger.info(`Connected to redis server ${host}:${port}`);
+
+  redisClient.on('error', (err) => {
+    throw err;
+  });
   // if (redisClient.server_info.versions[0] < 5)
   //   throw new Error('Requires redis verison >= 5');
   return redisClient;

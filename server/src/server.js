@@ -16,8 +16,8 @@ const {
   IP,
   PORT,
   DB_URI,
-  REDIS_HOST,
   REDIS_PORT,
+  REDIS_HOST,
   REDIS_URL,
   RABBITMQ_URL,
   CONSUMER_QUEUE,
@@ -47,6 +47,7 @@ async function startServer() {
       logger.info(`Server is running on ${IP}:${PORT}`);
     });
   } catch (err) {
+    console.log(err);
     logger.log('error', 'Server crashing error: \n', err);
     process.exit(0);
   }

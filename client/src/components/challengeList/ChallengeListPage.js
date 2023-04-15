@@ -4,73 +4,154 @@ import { Link, useNavigate } from 'react-router-dom';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { ajaxRequest } from '../../utils/utils';
 import Loading from '../shared/Loading';
-import Notification from '../shared/Notification';
-import './styles/challengeList.css';
+import LoadingScreen from '../shared/LoadingScreen';
 
-const ChallengeItem = ({ challenge, createPrivateRoom }) => {
+import './styles/challengeList.css';
+import './styles/challengeModal.css';
+
+const ChallengeModal = ({ challenge, onClose }) => {
+  const [creatingRoom, setCreatingRoom] = React.useState(false);
+  const [roomError, setRoomError] = React.useState(null);
+  const navigate = useNavigate();
   const [language, setLanguage] = React.useState(
     challenge.initialCode[0].language
   );
 
+  React.useEffect(() => {
+    const onEsc = (evt) => {
+      if (evt.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onEsc);
+
+    return () => document.removeEventListener('keydown', onEsc);
+  }, []);
+
+  const createPrivateRoom = React.useCallback((challengeId, lang) => {
+    setCreatingRoom(true);
+    setRoomError(false);
+
+    ajaxRequest(`/challenge/${challengeId}/create`, 'POST', { language: lang })
+      .then((res) => {
+        if (!res.data.room) {
+          setRoomError(true);
+        }
+
+        navigate(`/c/${challengeId}/r/${res.data.room}`);
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 404) {
+          setRoomError(
+            'Invalid language, please selected a different language.'
+          );
+        } else if (err.response && err.response.status === 500) {
+          setRoomError('Server error ocurred, please try again.');
+        }
+        setCreatingRoom(false);
+      });
+  }, []);
+
   return (
-    <li className="challenges__item" key={`challenge-item-${challenge._id}`}>
-      <div className="challenges__details">
-        <h3 className="challenges__title">{challenge.title}</h3>
-        <p className="challenges__prompt">{challenge.prompt}</p>
-        <ul className="challenges__tags">
-          {challenge.tags.split(',').map((tag) => (
-            <li className="challenges__tag" key={`tag-${challenge._id}-${tag}`}>
-              {tag.trim()}
-            </li>
-          ))}
-        </ul>
+    <div className="challenge__modal">
+      <div className="challenge__modal-content">
+        {creatingRoom && !roomError ? (
+          <LoadingScreen message="Creating Room" />
+        ) : (
+          <header className="challenge__modal-header">
+            <button
+              className="transition-colors challenge__modal-close"
+              type="button"
+              onClick={() => onClose()}
+            >
+              <i className="fas fa-times" />
+            </button>
+          </header>
+        )}
+
+        {roomError ? (
+          <div className="challenge__modal-error">
+            An error occurred during request, please try again.
+          </div>
+        ) : null}
+
+        {!creatingRoom && !roomError ? (
+          <>
+            <div className="challenge__modal-details">
+              <h3 className="challenge__modal-title">{challenge.title}</h3>
+
+              <p className="challenge__modal-prompt">
+                {challenge.summary || challenge.prompt}
+              </p>
+            </div>
+
+            <hr className="challenge__modal-dividor" />
+
+            <div className="challenge__modal-options">
+              <h4 className="">Select Language</h4>
+              <select
+                className="challenge__modal-languages"
+                value={language}
+                onChange={(evt) => {
+                  setLanguage(evt.target.value);
+                }}
+              >
+                {challenge.initialCode.map((data) => (
+                  <option value={data.language} key={data.language}>
+                    {data.language}
+                  </option>
+                ))}
+              </select>
+
+              <hr className="challenge__modal-dividor" />
+
+              <div className="challenge__modal-wrapper">
+                <Link
+                  className="transition-colors challenge__modal-link"
+                  to={`/c/${challenge._id}/${language}`}
+                >
+                  Join Queue
+                </Link>
+
+                <button
+                  className="transition-colors challenge__modal-link"
+                  data-cy="solo"
+                  type="button"
+                  onClick={() => createPrivateRoom(challenge._id, language)}
+                >
+                  Solo
+                </button>
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
+    </div>
+  );
+};
 
-      <div className="challenges__options">
-        <select
-          className="challenges__languages"
-          value={language}
-          onChange={(evt) => {
-            setLanguage(evt.target.value);
-          }}
-        >
-          {challenge.initialCode.map((data) => (
-            <option value={data.language} key={data.language}>
-              {data.language}
-            </option>
-          ))}
-        </select>
-
-        <Link
-          className="challenges__link"
-          to={`/c/${challenge._id}/${language}`}
-          data-cy="pair"
-        >
-          Pair Up
-        </Link>
-
+const ChallengeItem = ({ challenge, setSelected }) => {
+  return (
+    <div className="challenges__item" key={`challenge-item-${challenge._id}`}>
+      <div className="challenges__details">
         <button
+          className="transition-colors challenges__title"
           type="button"
-          className="challenges__link"
-          onClick={() => createPrivateRoom(challenge._id, language)}
-          data-cy="solo"
+          onClick={() => setSelected(challenge)}
         >
-          Solo
+          {challenge.title}
         </button>
       </div>
-    </li>
+    </div>
   );
 };
 
 const ChallengeListPage = (props) => {
-  const navigate = useNavigate();
   const [page, setPage] = React.useState(1);
   const [endOfList, setEndOfList] = React.useState(false);
   const [challenges, setChallenge] = React.useState([]);
   const [loadingList, setLoadingList] = React.useState(false);
   const [listError, setListError] = React.useState(null);
-  const [creatingRoom, setCreatingRoom] = React.useState(false);
-  const [roomError, setRoomError] = React.useState(null);
+  const [selected, setSelected] = React.useState(null);
+
   const [search, setSearch] = React.useState('');
   const [sortBy, setSortBy] = React.useState('newest');
 
@@ -122,121 +203,137 @@ const ChallengeListPage = (props) => {
     if (page === 1) getChallenges();
   }, [page]);
 
-  const createPrivateRoom = (cId, language) => {
-    if (creatingRoom) return; // Stop user from creating multiple rooms at once
-    setCreatingRoom(true);
-    setRoomError(null);
-
-    ajaxRequest(`/challenge/${cId}/create`, 'POST', { language })
-      .then((res) => {
-        if (!res.data.room) {
-          setRoomError(true);
-        }
-
-        navigate(`/c/${cId}/r/${res.data.room}`);
-      })
-      .catch((err) => {
-        if (err.response && err.response.status === 404) {
-          setRoomError(
-            'Invalid language, please selected a different language.'
-          );
-        } else if (err.response && err.response.status === 500) {
-          setRoomError('Server error ocurred, please try again.');
-        }
-        setCreatingRoom(false);
-      });
-  };
-
-  const listItems = challenges.map((challenge) => (
-    <ChallengeItem
-      key={`challenge-${challenge._id}`}
-      challenge={challenge}
-      createPrivateRoom={createPrivateRoom}
-    />
-  ));
-
   return (
     <section className="challenges">
-      {roomError ? <Notification message={roomError} /> : null}
-
       <header className="challenges__header">
-        <div className="challenges__filter-outer">
-          <div className="challenges__filter">
-            <form
-              className="challenges__option challenges__option--flex"
-              onSubmit={(evt) => {
-                evt.preventDefault();
-                setEndOfList(false);
-                setPage(1);
-              }}
-            >
-              <input
-                className="challenges__search"
-                type="text"
-                placeholder="Search"
-                value={search}
-                onChange={(evt) => setSearch(evt.target.value)}
-              />
-              <button className="challenges__search-btn" type="submit">
-                Search
-              </button>
-            </form>
+        <div className="challenges__filter">
+          <form
+            className="challenges__option challenges__option--flex"
+            onSubmit={(evt) => {
+              evt.preventDefault();
+              setEndOfList(false);
+              setPage(1);
+            }}
+          >
+            <input
+              className="transition-colors challenges__search"
+              type="text"
+              placeholder="Search"
+              value={search}
+              onChange={(evt) => setSearch(evt.target.value)}
+            />
+            <button className="challenges__search-btn" type="submit">
+              Search
+            </button>
+          </form>
 
-            <div className="challenges__option">
-              <label htmlFor="sortBy">
-                <span className="challenges__option-heading">Sort By</span>
-                <select
-                  id="sortBy"
-                  className="challenges__sort"
-                  value={sortBy}
-                  onChange={(evt) => {
-                    setSortBy(evt.target.value);
-                    setEndOfList(false);
-                    setPage(1);
-                  }}
-                >
-                  <option value="newest">Newest</option>
-                  <option value="oldest">Oldest</option>
-                </select>
-              </label>
-            </div>
+          <div className="challenges__option">
+            <label htmlFor="sortBy">
+              <span className="challenges__option-heading">Sort By</span>
+              <select
+                id="sortBy"
+                className="challenges__sort"
+                value={sortBy}
+                onChange={(evt) => {
+                  setSortBy(evt.target.value);
+                  setEndOfList(false);
+                  setPage(1);
+                }}
+              >
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+              </select>
+            </label>
           </div>
         </div>
       </header>
 
       <div className="challenges__content">
-        <ul className="challenges__list">
+        {selected ? (
+          <ChallengeModal
+            challenge={selected}
+            onClose={() => setSelected(null)}
+          />
+        ) : null}
+
+        <div className="challenges__list">
+          <table className="challenges__table">
+            <thead className="challenges__table-header">
+              <tr>
+                <th className="challenges__table-heading">Problem</th>
+                <th className="challenges__table-heading">Difficulty</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {challenges.map((challenge) => (
+                <tr className="challenges__table-row">
+                  <td className="challenges__cell-max">
+                    <button
+                      className="transition-colors challenges__title"
+                      type="button"
+                      onClick={() => setSelected(challenge)}
+                    >
+                      {challenge.title}
+                    </button>
+                  </td>
+
+                  <td
+                    className={`challenges__table-level 
+                  challenges__table-level--${
+                    challenge.difficulty
+                      ? challenge.difficulty.toLowerCase()
+                      : 'easy'
+                  }`}
+                  >
+                    {challenge.difficulty || 'Easy'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
           {endOfList && challenges.length === 0 ? (
-            <li className="challenges__item">
+            <div className="challenges__item">
               <p className="challenges__empty">
                 No challenge matching this search
               </p>
-            </li>
+            </div>
           ) : null}
 
-          {listItems}
-
           {!endOfList ? (
-            <li
+            <div
               ref={infiniteRef}
               className=" challenge__item challenges__item--end"
             >
               <Loading message="Loading ..." />
-            </li>
+            </div>
           ) : null}
-        </ul>
+        </div>
       </div>
     </section>
   );
 };
 
 ChallengeItem.propTypes = {
-  createPrivateRoom: PropTypes.func.isRequired,
+  setSelected: PropTypes.func.isRequired,
   challenge: PropTypes.shape({
     _id: PropTypes.string,
     tags: PropTypes.string,
     title: PropTypes.string,
     prompt: PropTypes.string,
+    initialCode: PropTypes.array,
+  }).isRequired,
+};
+
+ChallengeModal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  challenge: PropTypes.shape({
+    _id: PropTypes.string,
+    tags: PropTypes.string,
+    title: PropTypes.string,
+    prompt: PropTypes.string,
+    summary: PropTypes.string,
     initialCode: PropTypes.array,
   }).isRequired,
 };

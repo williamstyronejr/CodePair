@@ -4,8 +4,8 @@
   "description": "Server used to launcher code runners.",
   "main": "index.js",
   "engines": {
-    "node": "^16.10.0",
-    "npm": "7"
+    "node": "^18.0.0",
+    "npm": "^8.0.0"
   },
   "scripts": {
     "start": "node src/index.js",
@@ -20,7 +20,7 @@
     "amqplib": "^0.10.3",
     "dockerode": "^3.3.4",
     "dotenv": "^16.0.3",
-    "vm2": "^3.9.11",
+    "vm2": "^3.9.13",
     "winston": "^3.8.2"
   },
   "devDependencies": {

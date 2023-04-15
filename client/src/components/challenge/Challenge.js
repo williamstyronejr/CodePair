@@ -129,6 +129,10 @@ function Challenge(props) {
     default:
       detailsComponent = (
         <div className="challenge__info">
+          <header className="challenge__header">
+            <h3 className="challenge__heading">{title}</h3>
+          </header>
+
           <p className="challenge__prompt">{prompt}</p>
         </div>
       );
@@ -136,26 +140,12 @@ function Challenge(props) {
 
   return (
     <section className="challenge">
-      <header className="challenge__header">
-        <h3 className="challenge__heading">{title}</h3>
-        <span
-          className={`challenge__saving ${
-            savingCode
-              ? 'challenge__saving--active'
-              : 'challenge__saving--unactive'
-          }`}
-        >
-          <i className="fas fa-spinner fa-spin" />
-          Saving
-        </span>
-      </header>
-
       <div className="challenge__content">
         <div className="challenge__details">
           <nav className="challenge__nav">
             <button
-              className={`btn btn--nav ${
-                details === 'prompt' ? 'btn--nav-active' : ''
+              className={`challenge__nav-link ${
+                details === 'prompt' ? 'challenge__nav-link--active' : ''
               }`}
               type="button"
               onClick={() => setDetails('prompt')}
@@ -164,8 +154,8 @@ function Challenge(props) {
             </button>
 
             <button
-              className={`btn btn--nav ${
-                details === 'output' ? 'btn--nav-active' : ''
+              className={`challenge__nav-link ${
+                details === 'output' ? 'challenge__nav-link--active' : ''
               }`}
               type="button"
               onClick={() => setDetails('output')}
@@ -175,7 +165,7 @@ function Challenge(props) {
             </button>
           </nav>
 
-          {detailsComponent}
+          <div className="challenge__details-content">{detailsComponent}</div>
         </div>
 
         <div className="challenge__tools" id="pairs">
@@ -192,7 +182,7 @@ function Challenge(props) {
 
       <div className="challenge__options">
         <button
-          className="btn btn--test"
+          className="transition-colors btn btn--test"
           data-cy="runTest"
           type="button"
           disabled={testPassed || testing}
@@ -206,7 +196,7 @@ function Challenge(props) {
 
         {privateRoom ? (
           <button
-            className="btn btn--public"
+            className="transition-colors btn btn--public"
             type="button"
             onClick={convertRoomToPublic}
             data-cy="public"
