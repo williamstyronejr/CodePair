@@ -1,7 +1,7 @@
 # Build command
-# docker build . --no-cache -t launcher0.1
+# docker build . --no-cache -t nodev1
 
-FROM node:14
+FROM node:18
 
 # Create app directory
 RUN mkdir -p /app
