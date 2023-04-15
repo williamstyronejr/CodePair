@@ -8,20 +8,23 @@ const User = require('../models/user');
 const { JWT_SECRET, GITHUB_ID, GITHUB_SECRET, GITHUB_CALLBACK } = process.env;
 
 const localLogin = new LocalStrategy((username, password, done) => {
-  User.findOne({ username }).then((err, user) => {
-    if (err) return done(err);
-    if (!user) return done(null, false);
+  User.findOne({ username })
+    .then((user) => {
+      if (!user) return done(null, false);
 
-    user
-      .comparePassword(password)
-      .then((same) => {
-        if (same) return done(null, user);
-        done(null, false);
-      })
-      .catch((passErr) => {
-        done(passErr);
-      });
-  });
+      user
+        .comparePassword(password)
+        .then((same) => {
+          if (same) return done(null, user);
+          done(null, false);
+        })
+        .catch((passErr) => {
+          done(passErr);
+        });
+    })
+    .catch((err) => {
+      return done(err);
+    });
 });
 
 const jwtOptions = {
@@ -30,11 +33,14 @@ const jwtOptions = {
 };
 
 const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
-  User.findById(payload.sub).then((err, user) => {
-    if (err) return done(err);
-    if (user) return done(null, user);
-    return done(null, false);
-  });
+  User.findById(payload.sub)
+    .then((user) => {
+      if (user) return done(null, user);
+      return done(null, false);
+    })
+    .catch((err) => {
+      return done(err);
+    });
 });
 
 const gitLogin = new GithubStrategy(
