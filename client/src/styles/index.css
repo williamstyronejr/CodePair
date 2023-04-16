@@ -11,7 +11,7 @@ body {
   color: #212529;
   font-family: 'Rubik', 'sans-serif';
   font-family: -apple-system, 'system-ui', 'Rubik', 'sans-serif';
-  background-color: #1a1a1a;
+  background-color: #050c1b;
 }
 
 /* Containers */
@@ -98,7 +98,7 @@ body {
   margin: 1.3em auto 0 auto;
   padding: 2em 2em;
   border-radius: 5px;
-  background-color: rgb(38, 39, 41);
+  background-color: #101827;
   box-shadow: 2px 2px 3px 0 rgba(117, 124, 129, 0.06);
   margin-bottom: 10px;
 }

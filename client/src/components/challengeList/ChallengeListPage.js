@@ -257,41 +257,27 @@ const ChallengeListPage = (props) => {
         ) : null}
 
         <div className="challenges__list">
-          <table className="challenges__table">
-            <thead className="challenges__table-header">
-              <tr>
-                <th className="challenges__table-heading">Problem</th>
-                <th className="challenges__table-heading">Difficulty</th>
-              </tr>
-            </thead>
+          {challenges.map((challenge) => (
+            <div key={challenge.id} className="challenges__item">
+              <div className="challenges__info">
+                <h3 className="challenges__title">{challenge.title}</h3>
 
-            <tbody>
-              {challenges.map((challenge) => (
-                <tr className="challenges__table-row">
-                  <td className="challenges__cell-max">
-                    <button
-                      className="transition-colors challenges__title"
-                      type="button"
-                      onClick={() => setSelected(challenge)}
-                    >
-                      {challenge.title}
-                    </button>
-                  </td>
+                <div className="challenges__summary">
+                  {challenge.summary || challenge.prompt}
+                </div>
+              </div>
 
-                  <td
-                    className={`challenges__table-level 
-                  challenges__table-level--${
-                    challenge.difficulty
-                      ? challenge.difficulty.toLowerCase()
-                      : 'easy'
-                  }`}
-                  >
-                    {challenge.difficulty || 'Easy'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              <div className="challenges__options">
+                <button
+                  className="transition-colors challenges__select"
+                  type="button"
+                  onClick={() => setSelected(challenge)}
+                >
+                  Start Challenge
+                </button>
+              </div>
+            </div>
+          ))}
 
           {endOfList && challenges.length === 0 ? (
             <div className="challenges__item">

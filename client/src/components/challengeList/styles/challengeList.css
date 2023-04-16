@@ -86,55 +86,21 @@
   color: white;
 }
 
-.challenges__table {
-  border-collapse: collapse;
-  width: 100%;
-  max-width: 100%;
+.challenges__item {
+  display: flex;
+  flex-flow: row nowrap;
+  background-color: #101827;
+  padding: 30px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.challenges__table-header {
-  border-bottom: 1px solid rgb(61, 61, 61);
-}
-
-.challenges__table-heading {
-  text-align: left;
-  padding: 10px 0;
-  color: rgba(239, 242, 246, 0.6);
-}
-
-.challenges__cell-max {
-  width: 100%;
-}
-
-.challenges__table-row {
-  border: none;
-}
-
-.challenges__table-row:nth-child(even) {
-  background-color: #ffffff12;
-}
-
-.challenges__table-row td {
-  padding: 10px 0;
-}
-.challenges__table-level {
-  font-weight: 900;
-}
-
-.challenges__table-level--easy {
-  color: rgb(0, 184, 163);
-}
-
-.challenges__table-level--medium {
-  color: rgb(255 192 30);
-}
-
-.challenges__table-level--hard {
-  color: rgb(255 55 95);
+.challenges__info {
+  flex: 1 0 1px;
+  padding-right: 10px;
 }
 
 .challenges__title {
-  margin: 0;
   flex: 1 0 auto;
   color: #efefef;
   background-color: transparent;
@@ -144,6 +110,24 @@
 
 .challenges__title:hover {
   color: #2191fb;
+  cursor: pointer;
+}
+
+.challenges__options {
+  flex: 0 0 auto;
+}
+
+.challenges__select {
+  background-color: transparent;
+  color: #0fc42b;
+  border: 2px solid #0fc42b;
+  padding: 10px 15px;
+}
+
+.challenges__select:hover {
+  border-color: #0fc42b;
+  background-color: #0fc42b;
+  color: #101827;
   cursor: pointer;
 }
 
@@ -166,7 +150,6 @@
   .challenges__header {
     width: 275px;
     margin-right: 20px;
-    background-color: #282828;
     padding: 20px 10px;
     border-radius: 10px;
   }
