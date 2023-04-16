@@ -30,7 +30,7 @@ jobs:
         run: docker build ./launcher --no-cache -t ${{secrets.IMAGE_NODE}}
 
       - name: Test
-        run: npm run prepush
+        run: npm run test --prefix client && npm run test --prefix server
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
