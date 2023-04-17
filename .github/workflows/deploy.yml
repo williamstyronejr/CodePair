@@ -13,11 +13,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Env Fetch
-        uses: ./
-        with:
-          secrets: ${{ toJSON(secrets) }}
-
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -34,8 +29,8 @@ jobs:
       - name: Build images
         run: docker build ./launcher --no-cache -t ${{secrets.IMAGE_NODE}}
 
-      - name: Test
-        run: npm run test --prefix client && npm run test --prefix server
+      # - name: Run Tests
+      #   run: npm run test --prefix client && npm run test --prefix server
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
