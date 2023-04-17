@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -30,9 +32,6 @@ jobs:
         run: docker build ./launcher --no-cache -t ${{secrets.IMAGE_NODE}}
 
       - name: Test
-        uses: ./
-        with:
-          secrets: ${{ toJSON(secrets) }}
         run: npm run test --prefix client && npm run test --prefix server
 
       - name: Install doctl
