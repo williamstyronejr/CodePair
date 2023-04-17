@@ -21,7 +21,14 @@ exports.activeQueue = activeQueue;
  */
 exports.setupRedis = async (host, port, url = null) => {
   redisClient =
-    url === null ? createClient({ host, port }) : createClient({ url });
+    url === null
+      ? createClient({ host, port })
+      : createClient({
+          socket: {
+            tls: false,
+          },
+          url,
+        });
 
   await redisClient.connect();
   await redisClient.ping();
