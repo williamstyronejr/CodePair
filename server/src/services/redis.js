@@ -25,7 +25,8 @@ exports.setupRedis = async (host, port, url = null) => {
       ? createClient({ host, port })
       : createClient({
           socket: {
-            tls: false,
+            tls: true,
+            rejectUnauthorized: false,
           },
           url,
         });
