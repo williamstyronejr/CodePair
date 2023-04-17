@@ -31,6 +31,8 @@ jobs:
 
       - name: Test
         run: npm run test --prefix client && npm run test --prefix server
+        with:
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
