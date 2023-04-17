@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Env Fetch
+        uses: ./
         with:
           secrets: ${{ toJSON(secrets) }}
 
