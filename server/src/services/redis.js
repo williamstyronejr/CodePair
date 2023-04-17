@@ -26,7 +26,9 @@ exports.setupRedis = async (host, port, url = null) => {
   await redisClient.connect();
   await redisClient.ping();
 
-  logger.info(`Connected to redis server ${host}:${port}`);
+  logger.info(
+    `Connected to redis server ${url === null ? `${host}:${port}` : url}`
+  );
 
   redisClient.on('error', (err) => {
     throw err;
