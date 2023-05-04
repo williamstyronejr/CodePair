@@ -25,6 +25,11 @@ exports.setupRedis = async (host, port, url = null) => {
       ? createClient({ host, port })
       : createClient({
           url,
+          socket: {
+            tls: true,
+            requestCert: true,
+            rejectUnauthorized: true,
+          },
         });
 
   await redisClient.connect();
