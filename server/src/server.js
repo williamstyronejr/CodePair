@@ -19,6 +19,7 @@ const {
   REDIS_PORT,
   REDIS_HOST,
   REDIS_URL,
+  REDISCLOUD_URL,
   RABBITMQ_URL,
   CONSUMER_QUEUE,
 } = process.env;
@@ -27,7 +28,7 @@ async function startServer() {
   try {
     // Connect to all external services
     await Promise.all([
-      setupRedis(REDIS_HOST, REDIS_PORT, REDIS_URL),
+      setupRedis(REDIS_HOST, REDIS_PORT, REDISCLOUD_URL || REDIS_URL),
       connectDatabase(DB_URI),
       connectAMQP(RABBITMQ_URL),
     ]);
