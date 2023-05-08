@@ -34,15 +34,15 @@ const { profileUpload } = require('./utils');
 const jsonParser = bodyParser.json();
 
 // Auth routes for signin/signup
-router.post('/signup', jsonParser, validateSignup, localSignup);
+router.post('/api/signup', jsonParser, validateSignup, localSignup);
 
-router.post('/signin', jsonParser, requireLocalSignin, localSignin);
+router.post('/api/signin', jsonParser, requireLocalSignin, localSignin);
 
-router.post('/signout', signout);
+router.post('/api/signout', signout);
 
 // Route for registering a github user
 router.post(
-  '/account/register',
+  '/api/account/register',
   jsonParser,
   requireAuth,
   validateInputs,
@@ -50,25 +50,25 @@ router.post(
 );
 
 // Route for checking if username or email is in use
-router.post('/inputvalidator', jsonParser, validateInputs, verifyInputs);
+router.post('/api/inputvalidator', jsonParser, validateInputs, verifyInputs);
 
 // Routes for github auth
 router.get('/auth/github', requireGitSignin, (req, res) => {});
 router.get('/auth/github/callback', verifyGitSignin);
 
 // Route for getting user data
-router.get('/user/:user/data', getUserData);
-router.get('/user/data', requireAuth, getCurrentUserData);
-router.get('/user/:username/profile/stats', getUserProfileStats);
+router.get('/api/user/:user/data', getUserData);
+router.get('/api/user/data', requireAuth, getCurrentUserData);
+router.get('/api/user/:username/profile/stats', getUserProfileStats);
 router.get(
-  '/user/:username/profile/solutions',
+  '/api/user/:username/profile/solutions',
   validatePagination,
   getUserSolutions
 );
 
 // Routes for updating/reseting user data
 router.post(
-  '/settings/account',
+  '/api/settings/account',
   profileUpload,
   validateSettingsUpdate,
   requireAuth,
@@ -76,17 +76,17 @@ router.post(
 );
 
 router.post(
-  '/settings/password',
+  '/api/settings/password',
   jsonParser,
   validatePasswordUpdate,
   requireAuth,
   updateUserPassword
 );
 
-router.post('/account/recovery/password', jsonParser, sendPasswordEmail);
+router.post('/api/account/recovery/password', jsonParser, sendPasswordEmail);
 
 router.post(
-  '/account/reset/password',
+  '/api/account/reset/password',
   jsonParser,
   validatePasswordReset,
   passwordReset

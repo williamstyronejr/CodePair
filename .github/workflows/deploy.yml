@@ -37,7 +37,7 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Digital Ocean deploy
+      - name: Launcher Deployer
         #  Only deploy main branch on pushes
         if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         uses: appleboy/ssh-action@master
@@ -55,26 +55,23 @@ jobs:
             cd ..
             npm run launcher:prod
 
-      - name: Heroku Deploy
+      - name: Server/Client Deploy
+        #  Only deploy main branch on pushes
         #  Only deploy main branch on pushes
         if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-        uses: akhileshns/heroku-deploy@v3.12.12
-        env:
-          # "HD_" is removed by akhileshns/heroku-deploy
-          HD_DB_URI: ${{secrets.DB_URI}}
-          HD_CONSUMER_QUEUE: ${{secrets.CONSUMER_QUEUE}}
-          HD_PRODUCER_QUEUE: ${{secrets.PRODUCER_QUEUE}}
-          HD_JWT_SECRET: ${{secrets.JWT_SECRET}}
-          HD_RABBITMQ_URL: ${{secrets.RABBITMQ_URL}}
-          HD_GITHUB_ID: ${{secrets.GH_ID}}
-          HD_GITHUB_SECRET: ${{secrets.GH_SECRET}}
-          HD_GITHUB_CALLBACK: ${{secrets.GH_CALLBACK}}
-
-          # Skip husky and cypress install on heroku
-          HD_HUSKY_SKIP_INSTALL: "1"
-          HD_CYPRESS_INSTALL_BINARY: 0
-
+        uses: appleboy/ssh-action@master
         with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "codingpair" # Must be unique in Heroku
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          host: ${{ secrets.SSH_CLIENT_HOST }}
+          username: ${{ secrets.SSH_CLIENT_USERNAME }}
+          key: ${{secrets.SSH_CLIENT_KEY}}
+          passphrase: ${{secrets.SSH_CLIENT_PASSPHRASE}}
+          script: |
+            cd app
+            git pull
+            cd client
+            npm install
+            npm run build
+            cd ..
+            cd server
+            npm install
+            npm run production

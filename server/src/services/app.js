@@ -19,11 +19,18 @@ app.use(passport.initialize());
 // Static route to handle images
 app.use('/img', express.static(path.join(__dirname, '..', 'public', 'images')));
 
-// Handle static files for create-react-app
+// Handle static files for React Client
 app.use(
   '/static',
   express.static(
-    path.join(__dirname, '..', '..', '..', 'client', 'build', '/static')
+    path.join(__dirname, '..', '..', '..', 'client', 'dist', 'static')
+  )
+);
+
+app.use(
+  '/assets',
+  express.static(
+    path.join(__dirname, '..', '..', '..', 'client', 'dist', 'assets')
   )
 );
 
