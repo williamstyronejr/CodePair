@@ -10,7 +10,7 @@ module.exports = function setUpRoutes(app) {
   app.use('/*', (req, res, next) => {
     try {
       res.sendFile(
-        path.join(__dirname, '..', '..', '..', 'client', 'build', 'index.html')
+        path.join(__dirname, '..', '..', '..', 'client', 'dist', 'index.html')
       );
     } catch (err) {
       const error = new Error('Production build missing.');
