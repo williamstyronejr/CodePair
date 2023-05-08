@@ -57,14 +57,12 @@ jobs:
 
       - name: Server/Client Deploy
         #  Only deploy main branch on pushes
-        #  Only deploy main branch on pushes
         if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_CLIENT_HOST }}
           username: ${{ secrets.SSH_CLIENT_USERNAME }}
           key: ${{secrets.SSH_CLIENT_KEY}}
-          passphrase: ${{secrets.SSH_CLIENT_PASSPHRASE}}
           script: |
             cd app
             git pull
