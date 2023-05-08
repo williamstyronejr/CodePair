@@ -64,6 +64,7 @@ jobs:
           username: ${{ secrets.SSH_CLIENT_USERNAME }}
           key: ${{secrets.SSH_CLIENT_KEY}}
           script: |
+            source ~/.bashrc
             cd app
             git pull
             cd client
