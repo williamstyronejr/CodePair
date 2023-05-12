@@ -1,8 +1,8 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { Link, useLocation } from "react-router-dom";
-import useDetectOutsideClick from "../components/shared/useDetectOutsideClick";
-import "./styles/header.css";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { Link, useLocation } from 'react-router-dom';
+import useDetectOutsideClick from '../components/shared/useDetectOutsideClick';
+import './styles/header.css';
 
 const AppHeader = (props: any) => {
   const location = useLocation();
@@ -21,7 +21,7 @@ const AppHeader = (props: any) => {
     <header className="page-header ">
       <div className="header__container">
         <div
-          className={`menu ${navMenu ? "menu--active" : ""}`}
+          className={`menu ${navMenu ? 'menu--active' : ''}`}
           ref={navMenuRef}
         >
           <button
@@ -82,7 +82,7 @@ const AppHeader = (props: any) => {
         <div className="header__right">
           <div
             className={`menu  menu--collasped ${
-              userMenu ? "menu--collasped-active" : ""
+              userMenu ? 'menu--collasped-active' : ''
             }`}
             ref={userMenuRef}
           >

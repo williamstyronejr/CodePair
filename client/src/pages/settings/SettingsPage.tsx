@@ -1,11 +1,12 @@
-import * as React from "react";
-import { SyntheticEvent } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Link, Navigate, useParams } from "react-router-dom";
-import { updateUser } from "../../actions/user";
-import { ajaxRequest } from "../../utils/utils";
-import "./styles/settingsPage.css";
+import * as React from 'react';
+import { SyntheticEvent } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { Link, Navigate, useParams } from 'react-router-dom';
+import { updateUser } from '../../actions/user';
+import { ajaxRequest } from '../../utils/utils';
+import './styles/settingsPage.css';
+import { useAppSelector } from '../../hooks/reactRedux';
 
 const AccountForm = ({
   currentUsername,
@@ -18,8 +19,8 @@ const AccountForm = ({
   currentImage: string;
   updateUserData: Function;
 }) => {
-  const [username, setUsername] = React.useState("");
-  const [email, setEmail] = React.useState("");
+  const [username, setUsername] = React.useState('');
+  const [email, setEmail] = React.useState('');
   const [submitting, setSubmitting] = React.useState(false);
   const [notification, setNotification] = React.useState<string | null>(null);
   const [error, setError] = React.useState<{
@@ -49,19 +50,19 @@ const AccountForm = ({
 
     const formData = new FormData();
 
-    if (username) formData.append("username", username);
-    if (email) formData.append("email", email);
+    if (username) formData.append('username', username);
+    if (email) formData.append('email', email);
 
-    ajaxRequest("/api/settings/account", "POST", formData, {
-      headers: { "content-type": "multipart/form-data" },
+    ajaxRequest('/api/settings/account', 'POST', formData, {
+      headers: { 'content-type': 'multipart/form-data' },
     })
       .then((res) => {
         setSubmitting(false);
         if (res.data.success) {
           updateUserData(res.data.data);
-          return setNotification("Successfully updated user information.");
+          return setNotification('Successfully updated user information.');
         }
-        setNotification("An error has occurred. Please try again.");
+        setNotification('An error has occurred. Please try again.');
       })
       .catch((err) => {
         setSubmitting(false);
@@ -75,19 +76,19 @@ const AccountForm = ({
     setError({});
     const formData = new FormData();
 
-    if (file) formData.append("profileImage", file);
-    if (remove) formData.append("remove", remove ? "true" : "false");
+    if (file) formData.append('profileImage', file);
+    if (remove) formData.append('remove', remove ? 'true' : 'false');
 
-    ajaxRequest("/api/settings/account", "POST", formData, {
-      headers: { "content-type": "multipart/form-data" },
+    ajaxRequest('/api/settings/account', 'POST', formData, {
+      headers: { 'content-type': 'multipart/form-data' },
     })
       .then((res) => {
         setSubmitting(false);
         if (res.data.success) {
           updateUserData(res.data.data);
-          return setNotification("Successfully updated user information.");
+          return setNotification('Successfully updated user information.');
         }
-        setNotification("An error has occurred. Please try again.");
+        setNotification('An error has occurred. Please try again.');
       })
       .catch((err) => {
         setSubmitting(false);
@@ -199,9 +200,9 @@ const AccountForm = ({
 };
 
 const PasswordForm = () => {
-  const [currentPassword, setCurrent] = React.useState("");
-  const [newPassword, setNew] = React.useState("");
-  const [confirmPassword, setConfirm] = React.useState("");
+  const [currentPassword, setCurrent] = React.useState('');
+  const [newPassword, setNew] = React.useState('');
+  const [confirmPassword, setConfirm] = React.useState('');
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState<{
     password?: string;
@@ -229,7 +230,7 @@ const PasswordForm = () => {
     setNotification(null);
     setError({});
 
-    ajaxRequest("/api/settings/password", "POST", {
+    ajaxRequest('/api/settings/password', 'POST', {
       password: currentPassword,
       newPassword,
       confirmPassword,
@@ -237,17 +238,17 @@ const PasswordForm = () => {
       .then((res) => {
         setSubmitting(false);
         if (res.data.success) {
-          setCurrent("");
-          setNew("");
-          setConfirm("");
-          setNotification("Successfully updated password.");
+          setCurrent('');
+          setNew('');
+          setConfirm('');
+          setNotification('Successfully updated password.');
         }
       })
       .catch((err) => {
         setSubmitting(false);
         if (err.response.status === 400)
           return setError(err.response.data.errors);
-        setNotification("An error has occurred. Please try again.");
+        setNotification('An error has occurred. Please try again.');
       });
   };
 
@@ -341,23 +342,24 @@ const PasswordForm = () => {
   );
 };
 
-const SettingsPage = (props: any) => {
+const SettingsPage = () => {
+  const user = useAppSelector((state) => state.user);
   const { type } = useParams();
   let displayedForm;
 
   switch (type) {
-    case "account":
+    case 'account':
       displayedForm = (
         <AccountForm
-          currentUsername={props.user.username}
-          currentEmail={props.user.email}
-          currentImage={props.user.profileImage}
-          updateUserData={props.updateUser}
+          currentUsername={user.username}
+          currentEmail={user.email}
+          currentImage={user.profileImage}
+          updateUserData={updateUser}
         />
       );
       break;
-    case "password":
-      displayedForm = props.user.oauthUser ? (
+    case 'password':
+      displayedForm = user.oauthUser ? (
         <form className="settings__form settings__form--oauth">
           <h2>Unable to update password for Github User</h2>
         </form>
@@ -377,7 +379,7 @@ const SettingsPage = (props: any) => {
           <li className="settings__item">
             <Link
               className={`settings__link ${
-                type === "account" ? "settings__link--active" : ""
+                type === 'account' ? 'settings__link--active' : ''
               }`}
               to="/settings/account"
             >
@@ -388,7 +390,7 @@ const SettingsPage = (props: any) => {
           <li className="settings__item">
             <Link
               className={`settings__link ${
-                type === "password" ? "settings__link--active" : ""
+                type === 'password' ? 'settings__link--active' : ''
               }`}
               to="/settings/password"
             >
@@ -402,10 +404,6 @@ const SettingsPage = (props: any) => {
     </section>
   );
 };
-
-const mapStateToProps = (state: any) => ({
-  user: state.user,
-});
 
 const mapDispatchToProps = (dispatch: any) => ({
   updateUser: (data: any) => dispatch(updateUser(data)),
@@ -428,4 +426,4 @@ SettingsPage.propTypes = {
   }).isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
+export default connect(null, mapDispatchToProps)(SettingsPage);

@@ -1,13 +1,12 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { Link, useNavigate } from "react-router-dom";
-import useInfiniteScroll from "react-infinite-scroll-hook";
-import { ajaxRequest } from "../../utils/utils";
-import Loading from "../../components/shared/Loading";
-import LoadingScreen from "../../components/shared/LoadingScreen";
-
-import "./styles/challengeList.css";
-import "./styles/challengeModal.css";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { Link, useNavigate } from 'react-router-dom';
+import useInfiniteScroll from 'react-infinite-scroll-hook';
+import { ajaxRequest } from '../../utils/utils';
+import Loading from '../../components/shared/Loading';
+import LoadingScreen from '../../components/shared/LoadingScreen';
+import './styles/challengeList.css';
+import './styles/challengeModal.css';
 
 const ChallengeModal = ({
   challenge,
@@ -25,11 +24,11 @@ const ChallengeModal = ({
 
   React.useEffect(() => {
     const onEsc = (evt: KeyboardEvent) => {
-      if (evt.key === "Escape") onClose();
+      if (evt.key === 'Escape') onClose();
     };
-    document.addEventListener("keydown", onEsc);
+    document.addEventListener('keydown', onEsc);
 
-    return () => document.removeEventListener("keydown", onEsc);
+    return () => document.removeEventListener('keydown', onEsc);
   }, []);
 
   const createPrivateRoom = React.useCallback(
@@ -37,7 +36,7 @@ const ChallengeModal = ({
       setCreatingRoom(true);
       setRoomError(false);
 
-      ajaxRequest(`/api/challenge/${challengeId}/create`, "POST", {
+      ajaxRequest(`/api/challenge/${challengeId}/create`, 'POST', {
         language: lang,
       })
         .then((res) => {
@@ -50,10 +49,10 @@ const ChallengeModal = ({
         .catch((err) => {
           if (err.response && err.response.status === 404) {
             setRoomError(
-              "Invalid language, please selected a different language."
+              'Invalid language, please selected a different language.'
             );
           } else if (err.response && err.response.status === 500) {
-            setRoomError("Server error ocurred, please try again.");
+            setRoomError('Server error ocurred, please try again.');
           }
           setCreatingRoom(false);
         });
@@ -169,8 +168,8 @@ const ChallengeListPage = () => {
   const [listError, setListError] = React.useState(false);
   const [selected, setSelected] = React.useState(null);
 
-  const [search, setSearch] = React.useState("");
-  const [sortBy, setSortBy] = React.useState("newest");
+  const [search, setSearch] = React.useState('');
+  const [sortBy, setSortBy] = React.useState('newest');
 
   const getChallenges = () => {
     if (loadingList) return; // Stops from sending multiple request to update
@@ -178,7 +177,7 @@ const ChallengeListPage = () => {
 
     ajaxRequest(
       `/api/challenge/list?page=${page}&orderBy=${sortBy}&search=${search}`,
-      "GET"
+      'GET'
     )
       .then((res) => {
         // Empty list if first page  to clear results from previous filtering
@@ -208,7 +207,7 @@ const ChallengeListPage = () => {
     hasNextPage: !endOfList,
     onLoadMore: getChallenges,
     disabled: !!listError,
-    rootMargin: "0px 0px 200px 0px",
+    rootMargin: '0px 0px 200px 0px',
   });
 
   React.useEffect(() => {

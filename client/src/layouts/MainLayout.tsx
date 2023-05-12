@@ -1,31 +1,27 @@
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Navigate } from "react-router-dom";
-import Header from "./Header";
+import { ReactNode, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from '../hooks/reactRedux';
+import { fetchUserData } from '../reducers/userReducer';
+import Header from './Header';
 
-const MainLayout = (props: any) => {
-  if (props.user.authenticated && props.user.username)
+const MainLayout = ({ children }: { children: ReactNode }) => {
+  const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!user.authenticated) dispatch(fetchUserData());
+  }, []);
+
+  if (user.authenticated && user.username)
     return <Navigate replace to="/challenges" />;
 
   return (
     <>
       <Header />
 
-      <main className="page-main">{props.children}</main>
+      <main className="page-main">{children}</main>
     </>
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  user: state.user,
-});
-
-MainLayout.propTypes = {
-  user: PropTypes.shape({
-    authenticated: PropTypes.bool,
-    username: PropTypes.string,
-  }).isRequired,
-  children: PropTypes.node.isRequired,
-};
-
-export default connect(mapStateToProps, null)(MainLayout);
+export default MainLayout;

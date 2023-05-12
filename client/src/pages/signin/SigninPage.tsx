@@ -1,20 +1,22 @@
-import * as React from "react";
-import { SyntheticEvent } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Navigate, Link } from "react-router-dom";
-import GithubButton from "../auth/GithubButton";
-import { setUserData } from "../../actions/authentication";
-import { ajaxRequest } from "../../utils/utils";
-import "./styles/signinPage.css";
+import * as React from 'react';
+import { SyntheticEvent } from 'react';
+import { Navigate, Link } from 'react-router-dom';
+import GithubButton from '../auth/GithubButton';
+import { setUserData } from '../../reducers/userReducer';
+import { ajaxRequest } from '../../utils/utils';
+import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
+import './styles/signinPage.css';
 
-const SigninPage = (props: any) => {
-  const [username, setUser] = React.useState("");
-  const [password, setPassword] = React.useState("");
+const SigninPage = () => {
+  const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+
+  const [username, setUser] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [requesting, setRequesting] = React.useState(false);
   const [error, setError] = React.useState(false);
 
-  if (props.user.authenticated) return <Navigate to="/challenges" />;
+  if (user.authenticated) return <Navigate to="/challenges" />;
 
   function onSubmit(evt: SyntheticEvent<HTMLFormElement>) {
     evt.preventDefault();
@@ -23,11 +25,11 @@ const SigninPage = (props: any) => {
     setRequesting(true);
     setError(false);
 
-    ajaxRequest("/api/signin", "POST", { username, password })
+    ajaxRequest('/api/signin', 'POST', { username, password })
       .then((res) => {
         setRequesting(false);
         if (res.data.success) {
-          props.setUserData(res.data.user);
+          dispatch(setUserData(res.data.user));
         }
       })
       .catch(() => {
@@ -107,19 +109,4 @@ const SigninPage = (props: any) => {
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  user: state.user,
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  setUserData: (user: any) => dispatch(setUserData(user)),
-});
-
-SigninPage.propTypes = {
-  setUserData: PropTypes.func.isRequired,
-  user: PropTypes.shape({
-    authenticated: PropTypes.bool,
-  }).isRequired,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(SigninPage);
+export default SigninPage;
