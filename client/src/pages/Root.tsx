@@ -1,82 +1,82 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import MainLayout from "../layouts/MainLayout";
-import AppLayout from "../layouts/AppLayout";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import MainLayout from '../layouts/MainLayout';
 
 // Pages
-import HomePage from "./HomePage";
-import ChallengeListPage from "./challengeList/ChallengeListPage";
-import SignupPage from "./signup/SignupPage";
-import SigninPage from "./signin/SigninPage";
-import ChallengeQueuePage from "./challenge/ChallengeQueuePage";
-import ChallengePage from "./challenge/ChallengePage";
-import SettingsPage from "./settings/SettingsPage";
-import InvitePage from "./challenge/InvitePage";
-import RecoveryPage from "./recovery/RecoveryPage";
-import GithubRegisterPage from "./auth/GithubRegisterPage";
-import RoadmapPage from "./roadmap/RoadmapPage";
-import PasswordResetPage from "./auth/PasswordResetPage";
-import ProfilePage from "./profile/ProfilePage";
-import NotFoundPage from "./NotFoundPage";
+import HomePage from './HomePage';
+import ChallengeListPage from './challengeList/ChallengeListPage';
+import SignupPage from './signup/SignupPage';
+import SigninPage from './signin/SigninPage';
+import ChallengeQueuePage from './challenge/ChallengeQueuePage';
+import ChallengePage from './challenge/ChallengePage';
+import SettingsPage from './settings/SettingsPage';
+import InvitePage from './challenge/InvitePage';
+import RecoveryPage from './recovery/RecoveryPage';
+import GithubRegisterPage from './auth/GithubRegisterPage';
+import RoadmapPage from './roadmap/RoadmapPage';
+import PasswordResetPage from './auth/PasswordResetPage';
+import ProfilePage from './profile/ProfilePage';
+import NotFoundPage from './NotFoundPage';
+import ProtectedRoute from '../layouts/ProtectedRoute';
 
 const appRoutes = [
   {
-    path: "/challenges",
+    path: '/challenges',
     element: <ChallengeListPage />,
   },
   {
-    path: "/c/:cId/:lang",
+    path: '/c/:cId/:lang',
     exact: true,
     element: <ChallengeQueuePage />,
   },
   {
-    path: "/c/:cId/r/:rId",
+    path: '/c/:cId/r/:rId',
     element: <ChallengePage />,
   },
   // React Router Dom v6 removed optional params, duplicate to catch both
   {
-    path: "/settings",
+    path: '/settings',
     element: <SettingsPage />,
   },
   {
-    path: "/settings/:type",
+    path: '/settings/:type',
     element: <SettingsPage />,
   },
   {
-    path: "/profile/:username",
+    path: '/profile/:username',
     element: <ProfilePage />,
   },
 ];
 
 const landingRoutes = [
   {
-    path: "signup",
+    path: 'signup',
     element: <SignupPage />,
   },
   {
-    path: "signin",
+    path: 'signin',
     element: <SigninPage />,
   },
   {
-    path: "recovery",
+    path: 'recovery',
     element: <RecoveryPage />,
   },
   {
-    path: "account/reset/password",
+    path: 'account/reset/password',
     element: <PasswordResetPage />,
   },
   {
-    path: "account/register",
+    path: 'account/register',
     element: <GithubRegisterPage />,
   },
   {
-    path: "roadmap",
+    path: 'roadmap',
     element: <RoadmapPage />,
   },
 ];
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: (
       <MainLayout>
         <HomePage />
@@ -85,8 +85,14 @@ const router = createBrowserRouter([
     errorElement: <NotFoundPage />,
   },
   {
-    path: "/invite/:key",
-    element: <InvitePage />,
+    path: '/invite/:key',
+    element: (
+      <MainLayout>
+        <ProtectedRoute>
+          <InvitePage />
+        </ProtectedRoute>
+      </MainLayout>
+    ),
   },
   ...landingRoutes.map((route) => ({
     ...route,
@@ -94,7 +100,11 @@ const router = createBrowserRouter([
   })),
   ...appRoutes.map((route) => ({
     ...route,
-    element: <AppLayout>{route.element}</AppLayout>,
+    element: (
+      <MainLayout>
+        <ProtectedRoute>{route.element}</ProtectedRoute>
+      </MainLayout>
+    ),
   })),
 ]);
 
