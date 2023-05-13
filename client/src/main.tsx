@@ -3,11 +3,12 @@ import { Provider } from 'react-redux';
 import Root from './pages/Root';
 import store from './store/store.prod';
 import { setupSocketHandlers } from './middlewares/socket';
-import 'normalize.css';
+import { fetchUserData } from './reducers/userReducer';
 import './styles/index.css';
+import 'normalize.css';
 
 // TODO: Dispatch only when there's a cookie present
-// store.dispatch(getUserData());
+store.dispatch(fetchUserData());
 
 setupSocketHandlers(store);
 
