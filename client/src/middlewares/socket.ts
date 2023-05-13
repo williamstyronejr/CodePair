@@ -131,7 +131,7 @@ export const socketMiddlware = (params) => (next) => (action) => {
       case sendMessage.type:
         socket.emit(
           'sendMessage',
-          action.payload.room,
+          action.payload.roomId,
           action.payload.msg,
           Date.now(),
           action.payload.userId
