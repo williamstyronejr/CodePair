@@ -70,7 +70,6 @@ const userSlice = createSlice({
       .addCase(fetchUserData.rejected, (state, action) => {
         state.authenticated = false;
         state.authenticating = false;
-        state.authError = 'Server Error';
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.id = action.payload.id;
