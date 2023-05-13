@@ -83,6 +83,12 @@ const AuthHeader = ({
                     Challenges
                   </Link>
                 </li>
+
+                <li className="menu__item">
+                  <Link className="menu__link" to="/roadmap">
+                    Roadmap
+                  </Link>
+                </li>
               </ul>
             </nav>
           </div>
