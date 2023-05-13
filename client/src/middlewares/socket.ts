@@ -32,7 +32,7 @@ import {
   matchFound,
   roomCreated,
 } from '../reducers/queueReducer';
-import { StoreType } from '../store/store.prod';
+import { StoreType } from '../store';
 
 const socket = io('', { autoConnect: false });
 

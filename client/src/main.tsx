@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import Root from './pages/Root';
-import store from './store/store.prod';
+import store from './store';
 import { setupSocketHandlers } from './middlewares/socket';
 import { fetchUserData } from './reducers/userReducer';
 import './styles/index.css';
