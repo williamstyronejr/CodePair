@@ -29,9 +29,6 @@ const userSlice = createSlice({
   name: 'user',
   initialState: initState,
   reducers: {
-    getUserData(state) {
-      state.authenticating = true;
-    },
     unauthUser(state) {
       state.authenticated = false;
     },
@@ -91,13 +88,7 @@ const userSlice = createSlice({
   },
 });
 
-export const {
-  setUserData,
-  updateUser,
-  authError,
-  authUser,
-  unauthUser,
-  getUserData,
-} = userSlice.actions;
+export const { setUserData, updateUser, authError, authUser, unauthUser } =
+  userSlice.actions;
 
 export default userSlice.reducer;
