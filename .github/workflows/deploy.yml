@@ -46,6 +46,8 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{secrets.SSH_KEY}}
           script: |
+            source ~/.bashrc
+            nvm use default
             cd app
             git pull
             cd launcher
@@ -64,6 +66,7 @@ jobs:
           key: ${{secrets.SSH_CLIENT_KEY}}
           script: |
             source ~/.bashrc
+            nvm use default
             cd app
             git pull
             cd client
