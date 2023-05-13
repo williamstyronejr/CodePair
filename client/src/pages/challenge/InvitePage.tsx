@@ -1,22 +1,24 @@
-import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import LoadingScreen from "../../components/shared/LoadingScreen";
-import { ajaxRequest } from "../../utils/utils";
+import { useState, useEffect } from 'react';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
+import LoadingScreen from '../../components/shared/LoadingScreen';
+import { ajaxRequest } from '../../utils/utils';
 
-const InvitePage = (props: any) => {
+const InvitePage = () => {
   const [loading, setLoading] = useState(true);
-  const [link, setLink] = useState("");
+  const [link, setLink] = useState('');
+  const { key } = useParams();
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    ajaxRequest(`/api/${props.location.pathname}`, "POST", {
-      data: { inviteKey: props.match.params.key },
+    ajaxRequest(`/api/${pathname}`, 'POST', {
+      data: { inviteKey: key },
     })
       .then((res) => {
         setLink(res.data.link);
         setLoading(false);
       })
       .catch((err) => {
-        setLink(err.response && err.response.status === 401 ? "/signin" : "/");
+        setLink(err.response && err.response.status === 401 ? '/signin' : '/');
         setLoading(false);
       });
   }, []);
@@ -29,11 +31,5 @@ const InvitePage = (props: any) => {
     </main>
   );
 };
-
-// InvitePage.propTypes = {
-//   location: PropTypes.shape({ pathname: PropTypes.string }).isRequired,
-//   match: PropTypes.shape({ params: PropTypes.shape({ key: PropTypes.string }) })
-//     .isRequired,
-// };
 
 export default InvitePage;
