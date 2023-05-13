@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { updateUser } from '../../actions/user';
-import { ajaxRequest } from '../../utils/utils';
-import './styles/settingsPage.css';
 import { useAppSelector } from '../../hooks/reactRedux';
+import { ajaxRequest } from '../../utils/utils';
+import { updateUser } from '../../reducers/userReducer';
+import './styles/settingsPage.css';
 
 const AccountForm = ({
   currentUsername,
@@ -405,10 +404,6 @@ const SettingsPage = () => {
   );
 };
 
-const mapDispatchToProps = (dispatch: any) => ({
-  updateUser: (data: any) => dispatch(updateUser(data)),
-});
-
 AccountForm.propTypes = {
   currentUsername: PropTypes.string.isRequired,
   currentEmail: PropTypes.string.isRequired,
@@ -416,14 +411,4 @@ AccountForm.propTypes = {
   updateUserData: PropTypes.func.isRequired,
 };
 
-SettingsPage.propTypes = {
-  updateUser: PropTypes.func.isRequired,
-  user: PropTypes.shape({
-    username: PropTypes.string,
-    email: PropTypes.string,
-    profileImage: PropTypes.string,
-    oauthUser: PropTypes.bool,
-  }).isRequired,
-};
-
-export default connect(null, mapDispatchToProps)(SettingsPage);
+export default SettingsPage;
