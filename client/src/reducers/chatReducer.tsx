@@ -38,96 +38,6 @@ function createMessage(
   };
 }
 
-// const ChatReducer = (state = initState, action: any) => {
-//   switch (action.type) {
-//     case JOIN_MESSAGE:
-//       return {
-//         ...state,
-//         messages: insertItem(
-//           state.messages,
-//           createMessage(
-//             'notification',
-//             `${action.payload} has joined.`,
-//             Date.now()
-//           )
-//         ),
-//       };
-
-//     case LEAVE_MESSAGE:
-//       return {
-//         ...state,
-//         messages: insertItem(
-//           state.messages,
-//           createMessage(
-//             'notification',
-//             `${action.payload} has left.`,
-//             Date.now()
-//           )
-//         ),
-//       };
-
-//     case ADD_MESSAGE:
-//       return {
-//         ...state,
-//         messages: insertItem(
-//           state.messages,
-//           createMessage(
-//             action.payload.author,
-//             action.payload.msg,
-//             action.payload.time
-//           )
-//         ),
-//       };
-
-//     case SET_MESSAGE: // Set message in chat input
-//       return {
-//         ...state,
-//         messages: [...state.messages],
-//         chatInput: action.payload,
-//       };
-
-//     case SEND_MESSAGE: // Store sent messages locally
-//       return {
-//         ...state,
-//         messages: insertItem(
-//           state.messages,
-//           createMessage(action.payload.userId, action.payload.msg, Date.now())
-//         ),
-//         chatInput: '',
-//       };
-
-//     case TOGGLE_CHAT_VISIBILITY:
-//       return {
-//         ...state,
-//         visible: !state.visible,
-//       };
-
-//     case SET_INITIAL_MESSAGES:
-//       return {
-//         ...state,
-//         messages: action.payload,
-//       };
-
-//     case USER_TYPE_START:
-//       return {
-//         ...state,
-//         usersTyping: [...state.usersTyping, action.payload],
-//       };
-
-//     case USER_TYPE_END:
-//       return {
-//         ...state,
-//         usersTyping: state.usersTyping.filter((val) => val !== action.payload),
-//       };
-
-//     case RESET_CHAT_DATA:
-//       return initState;
-
-//     default:
-//       return state;
-//   }
-// };
-
 const chatSlice = createSlice({
   name: 'chat',
   initialState: initState,
@@ -139,11 +49,7 @@ const chatSlice = createSlice({
         username: string;
         typing: boolean;
       }>
-    ) {
-      state.usersTyping = action.payload.typing
-        ? [...state.usersTyping, action.payload.username]
-        : state.usersTyping.filter((val) => val !== action.payload.username);
-    },
+    ) {},
     userTypingStart(state, action: PayloadAction<{ username: string }>) {
       state.usersTyping = [...state.usersTyping, action.payload.username];
     },
@@ -157,6 +63,7 @@ const chatSlice = createSlice({
       state,
       action: PayloadAction<{ roomId: string; userId: string; msg: string }>
     ) {
+      state.chatInput = '';
       state.messages = [
         ...state.messages,
         createMessage(action.payload.userId, action.payload.msg, Date.now()),
