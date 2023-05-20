@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const bodyParser = require('body-parser');
 const {
-  createChallenge,
   getChallengeList,
   createPrivateRoom,
   getRoomInfo,
@@ -16,7 +15,7 @@ const {
 const { requireAuth } = require('../controllers/authentication');
 
 const jsonParser = bodyParser.json();
-router.post('/api/challenge/create', jsonParser, createChallenge);
+
 router.get('/api/challenge/list', validatePagination, getChallengeList);
 
 router.post(
