@@ -1,27 +1,27 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { Link, useLocation } from "react-router-dom";
-import useDetectOutsideClick from "../components/shared/useDetectOutsideClick";
-import "./styles/header.css";
+import { useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
+import { Link, useLocation } from 'react-router-dom';
+import useDetectOutsideClick from '../components/shared/useDetectOutsideClick';
+import './styles/header.css';
 
 const AppHeader = (props: any) => {
   const location = useLocation();
-  const userMenuRef = React.useRef(null);
-  const navMenuRef = React.useRef(null);
+  const userMenuRef = useRef(null);
+  const navMenuRef = useRef(null);
   const [navMenu, setNavMenu] = useDetectOutsideClick(navMenuRef, false);
   const [userMenu, setUserMenu] = useDetectOutsideClick(userMenuRef, false);
 
   // Close menus on route change
-  React.useEffect(() => {
+  useEffect(() => {
     setNavMenu(() => false);
     setUserMenu(false);
   }, [location]);
 
   return (
-    <header className="page-header ">
+    <header className="page-header">
       <div className="header__container">
         <div
-          className={`menu ${navMenu ? "menu--active" : ""}`}
+          className={`menu ${navMenu ? 'menu--active' : ''}`}
           ref={navMenuRef}
         >
           <button
@@ -82,7 +82,7 @@ const AppHeader = (props: any) => {
         <div className="header__right">
           <div
             className={`menu  menu--collasped ${
-              userMenu ? "menu--collasped-active" : ""
+              userMenu ? 'menu--collasped-active' : ''
             }`}
             ref={userMenuRef}
           >

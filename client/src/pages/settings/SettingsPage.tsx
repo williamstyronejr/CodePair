@@ -1,11 +1,10 @@
-import * as React from "react";
-import { SyntheticEvent } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Link, Navigate, useParams } from "react-router-dom";
-import { updateUser } from "../../actions/user";
-import { ajaxRequest } from "../../utils/utils";
-import "./styles/settingsPage.css";
+import { useState, useEffect, createRef, SyntheticEvent } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { Link, Navigate, useParams } from 'react-router-dom';
+import { updateUser } from '../../actions/user';
+import { ajaxRequest } from '../../utils/utils';
+import './styles/settingsPage.css';
 
 const AccountForm = ({
   currentUsername,
@@ -18,18 +17,18 @@ const AccountForm = ({
   currentImage: string;
   updateUserData: Function;
 }) => {
-  const [username, setUsername] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [submitting, setSubmitting] = React.useState(false);
-  const [notification, setNotification] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<{
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [error, setError] = useState<{
     username?: string;
     email?: string;
   }>({});
-  const fileRef = React.createRef<HTMLInputElement>();
+  const fileRef = createRef<HTMLInputElement>();
 
   // Timeout for clearing notification message
-  React.useEffect(() => {
+  useEffect(() => {
     let notificationTimer: number;
     if (notification)
       notificationTimer = setTimeout(() => {
@@ -49,19 +48,19 @@ const AccountForm = ({
 
     const formData = new FormData();
 
-    if (username) formData.append("username", username);
-    if (email) formData.append("email", email);
+    if (username) formData.append('username', username);
+    if (email) formData.append('email', email);
 
-    ajaxRequest("/api/settings/account", "POST", formData, {
-      headers: { "content-type": "multipart/form-data" },
+    ajaxRequest('/api/settings/account', 'POST', formData, {
+      headers: { 'content-type': 'multipart/form-data' },
     })
       .then((res) => {
         setSubmitting(false);
         if (res.data.success) {
           updateUserData(res.data.data);
-          return setNotification("Successfully updated user information.");
+          return setNotification('Successfully updated user information.');
         }
-        setNotification("An error has occurred. Please try again.");
+        setNotification('An error has occurred. Please try again.');
       })
       .catch((err) => {
         setSubmitting(false);
@@ -75,19 +74,19 @@ const AccountForm = ({
     setError({});
     const formData = new FormData();
 
-    if (file) formData.append("profileImage", file);
-    if (remove) formData.append("remove", remove ? "true" : "false");
+    if (file) formData.append('profileImage', file);
+    if (remove) formData.append('remove', remove ? 'true' : 'false');
 
-    ajaxRequest("/api/settings/account", "POST", formData, {
-      headers: { "content-type": "multipart/form-data" },
+    ajaxRequest('/api/settings/account', 'POST', formData, {
+      headers: { 'content-type': 'multipart/form-data' },
     })
       .then((res) => {
         setSubmitting(false);
         if (res.data.success) {
           updateUserData(res.data.data);
-          return setNotification("Successfully updated user information.");
+          return setNotification('Successfully updated user information.');
         }
-        setNotification("An error has occurred. Please try again.");
+        setNotification('An error has occurred. Please try again.');
       })
       .catch((err) => {
         setSubmitting(false);
@@ -199,19 +198,19 @@ const AccountForm = ({
 };
 
 const PasswordForm = () => {
-  const [currentPassword, setCurrent] = React.useState("");
-  const [newPassword, setNew] = React.useState("");
-  const [confirmPassword, setConfirm] = React.useState("");
-  const [submitting, setSubmitting] = React.useState(false);
-  const [error, setError] = React.useState<{
+  const [currentPassword, setCurrent] = useState('');
+  const [newPassword, setNew] = useState('');
+  const [confirmPassword, setConfirm] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<{
     password?: string;
     confirmPassword?: string;
     newPassword?: string;
   }>({});
-  const [notification, setNotification] = React.useState<String | null>(null);
+  const [notification, setNotification] = useState<String | null>(null);
 
   // Timeout for clearing notification message
-  React.useEffect(() => {
+  useEffect(() => {
     let notificationTimer: number;
     if (notification)
       notificationTimer = setTimeout(() => {
@@ -229,7 +228,7 @@ const PasswordForm = () => {
     setNotification(null);
     setError({});
 
-    ajaxRequest("/api/settings/password", "POST", {
+    ajaxRequest('/api/settings/password', 'POST', {
       password: currentPassword,
       newPassword,
       confirmPassword,
@@ -237,17 +236,17 @@ const PasswordForm = () => {
       .then((res) => {
         setSubmitting(false);
         if (res.data.success) {
-          setCurrent("");
-          setNew("");
-          setConfirm("");
-          setNotification("Successfully updated password.");
+          setCurrent('');
+          setNew('');
+          setConfirm('');
+          setNotification('Successfully updated password.');
         }
       })
       .catch((err) => {
         setSubmitting(false);
         if (err.response.status === 400)
           return setError(err.response.data.errors);
-        setNotification("An error has occurred. Please try again.");
+        setNotification('An error has occurred. Please try again.');
       });
   };
 
@@ -346,7 +345,7 @@ const SettingsPage = (props: any) => {
   let displayedForm;
 
   switch (type) {
-    case "account":
+    case 'account':
       displayedForm = (
         <AccountForm
           currentUsername={props.user.username}
@@ -356,7 +355,7 @@ const SettingsPage = (props: any) => {
         />
       );
       break;
-    case "password":
+    case 'password':
       displayedForm = props.user.oauthUser ? (
         <form className="settings__form settings__form--oauth">
           <h2>Unable to update password for Github User</h2>
@@ -377,7 +376,7 @@ const SettingsPage = (props: any) => {
           <li className="settings__item">
             <Link
               className={`settings__link ${
-                type === "account" ? "settings__link--active" : ""
+                type === 'account' ? 'settings__link--active' : ''
               }`}
               to="/settings/account"
             >
@@ -388,7 +387,7 @@ const SettingsPage = (props: any) => {
           <li className="settings__item">
             <Link
               className={`settings__link ${
-                type === "password" ? "settings__link--active" : ""
+                type === 'password' ? 'settings__link--active' : ''
               }`}
               to="/settings/password"
             >

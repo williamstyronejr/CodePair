@@ -1,18 +1,17 @@
-import * as React from "react";
-import { SyntheticEvent } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Navigate, Link } from "react-router-dom";
-import GithubButton from "../auth/GithubButton";
-import { setUserData } from "../../actions/authentication";
-import { ajaxRequest } from "../../utils/utils";
-import "./styles/signinPage.css";
+import { SyntheticEvent, useState } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { Navigate, Link } from 'react-router-dom';
+import GithubButton from '../auth/GithubButton';
+import { setUserData } from '../../actions/authentication';
+import { ajaxRequest } from '../../utils/utils';
+import './styles/signinPage.css';
 
 const SigninPage = (props: any) => {
-  const [username, setUser] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [requesting, setRequesting] = React.useState(false);
-  const [error, setError] = React.useState(false);
+  const [username, setUser] = useState('');
+  const [password, setPassword] = useState('');
+  const [requesting, setRequesting] = useState(false);
+  const [error, setError] = useState(false);
 
   if (props.user.authenticated) return <Navigate to="/challenges" />;
 
@@ -23,7 +22,7 @@ const SigninPage = (props: any) => {
     setRequesting(true);
     setError(false);
 
-    ajaxRequest("/api/signin", "POST", { username, password })
+    ajaxRequest('/api/signin', 'POST', { username, password })
       .then((res) => {
         setRequesting(false);
         if (res.data.success) {

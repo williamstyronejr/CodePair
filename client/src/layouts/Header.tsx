@@ -1,16 +1,16 @@
-import * as React from "react";
-import { Link } from "react-router-dom";
-import useDetectOutsideClick from "../components/shared/useDetectOutsideClick";
-import "./styles/header.css";
+import { useRef } from 'react';
+import { Link } from 'react-router-dom';
+import useDetectOutsideClick from '../components/shared/useDetectOutsideClick';
+import './styles/header.css';
 
 const Header = () => {
-  const navMenuRef = React.useRef(null);
+  const navMenuRef = useRef(null);
   const [navMenu, setNavMenu] = useDetectOutsideClick(navMenuRef, false);
 
   return (
     <header className="page-header">
       <div className="header__container">
-        <div className={`menu  ${navMenu ? "menu--active" : ""}`}>
+        <div className={`menu  ${navMenu ? 'menu--active' : ''}`}>
           <button
             className="menu__btn"
             onClick={() => {

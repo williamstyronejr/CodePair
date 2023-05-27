@@ -1,13 +1,12 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { Link, useNavigate } from "react-router-dom";
-import useInfiniteScroll from "react-infinite-scroll-hook";
-import { ajaxRequest } from "../../utils/utils";
-import Loading from "../../components/shared/Loading";
-import LoadingScreen from "../../components/shared/LoadingScreen";
+import { useState, useCallback, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import useInfiniteScroll from 'react-infinite-scroll-hook';
+import { ajaxRequest } from '../../utils/utils';
+import Loading from '../../components/shared/Loading';
+import LoadingScreen from '../../components/shared/LoadingScreen';
 
-import "./styles/challengeList.css";
-import "./styles/challengeModal.css";
+import './styles/challengeList.css';
+import './styles/challengeModal.css';
 
 const ChallengeModal = ({
   challenge,
@@ -17,49 +16,44 @@ const ChallengeModal = ({
   onClose: () => void;
 }) => {
   const navigate = useNavigate();
-  const [creatingRoom, setCreatingRoom] = React.useState(false);
-  const [roomError, setRoomError] = React.useState<boolean | string>(false);
-  const [language, setLanguage] = React.useState(
-    challenge.initialCode[0].language
-  );
+  const [creatingRoom, setCreatingRoom] = useState(false);
+  const [roomError, setRoomError] = useState<boolean | string>(false);
+  const [language, setLanguage] = useState(challenge.initialCode[0].language);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onEsc = (evt: KeyboardEvent) => {
-      if (evt.key === "Escape") onClose();
+      if (evt.key === 'Escape') onClose();
     };
-    document.addEventListener("keydown", onEsc);
+    document.addEventListener('keydown', onEsc);
 
-    return () => document.removeEventListener("keydown", onEsc);
+    return () => document.removeEventListener('keydown', onEsc);
   }, []);
 
-  const createPrivateRoom = React.useCallback(
-    (challengeId: string, lang: string) => {
-      setCreatingRoom(true);
-      setRoomError(false);
+  const createPrivateRoom = useCallback((challengeId: string, lang: string) => {
+    setCreatingRoom(true);
+    setRoomError(false);
 
-      ajaxRequest(`/api/challenge/${challengeId}/create`, "POST", {
-        language: lang,
+    ajaxRequest(`/api/challenge/${challengeId}/create`, 'POST', {
+      language: lang,
+    })
+      .then((res) => {
+        if (!res.data.room) {
+          setRoomError(true);
+        }
+
+        navigate(`/c/${challengeId}/r/${res.data.room}`);
       })
-        .then((res) => {
-          if (!res.data.room) {
-            setRoomError(true);
-          }
-
-          navigate(`/c/${challengeId}/r/${res.data.room}`);
-        })
-        .catch((err) => {
-          if (err.response && err.response.status === 404) {
-            setRoomError(
-              "Invalid language, please selected a different language."
-            );
-          } else if (err.response && err.response.status === 500) {
-            setRoomError("Server error ocurred, please try again.");
-          }
-          setCreatingRoom(false);
-        });
-    },
-    []
-  );
+      .catch((err) => {
+        if (err.response && err.response.status === 404) {
+          setRoomError(
+            'Invalid language, please selected a different language.'
+          );
+        } else if (err.response && err.response.status === 500) {
+          setRoomError('Server error ocurred, please try again.');
+        }
+        setCreatingRoom(false);
+      });
+  }, []);
 
   return (
     <div className="challenge__modal">
@@ -139,38 +133,38 @@ const ChallengeModal = ({
   );
 };
 
-const ChallengeItem = ({
-  challenge,
-  setSelected,
-}: {
-  challenge: any;
-  setSelected: Function;
-}) => {
-  return (
-    <div className="challenges__item" key={`challenge-item-${challenge._id}`}>
-      <div className="challenges__details">
-        <button
-          className="transition-colors challenges__title"
-          type="button"
-          onClick={() => setSelected(challenge)}
-        >
-          {challenge.title}
-        </button>
-      </div>
-    </div>
-  );
-};
+// const ChallengeItem = ({
+//   challenge,
+//   setSelected,
+// }: {
+//   challenge: any;
+//   setSelected: Function;
+// }) => {
+//   return (
+//     <div className="challenges__item" key={`challenge-item-${challenge._id}`}>
+//       <div className="challenges__details">
+//         <button
+//           className="transition-colors challenges__title"
+//           type="button"
+//           onClick={() => setSelected(challenge)}
+//         >
+//           {challenge.title}
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
 
 const ChallengeListPage = () => {
-  const [page, setPage] = React.useState(1);
-  const [endOfList, setEndOfList] = React.useState(false);
-  const [challenges, setChallenge] = React.useState<any[]>([]);
-  const [loadingList, setLoadingList] = React.useState(false);
-  const [listError, setListError] = React.useState(false);
-  const [selected, setSelected] = React.useState(null);
+  const [page, setPage] = useState(1);
+  const [endOfList, setEndOfList] = useState(false);
+  const [challenges, setChallenge] = useState<any[]>([]);
+  const [loadingList, setLoadingList] = useState(false);
+  const [listError, setListError] = useState(false);
+  const [selected, setSelected] = useState(null);
 
-  const [search, setSearch] = React.useState("");
-  const [sortBy, setSortBy] = React.useState("newest");
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
 
   const getChallenges = () => {
     if (loadingList) return; // Stops from sending multiple request to update
@@ -178,7 +172,7 @@ const ChallengeListPage = () => {
 
     ajaxRequest(
       `/api/challenge/list?page=${page}&orderBy=${sortBy}&search=${search}`,
-      "GET"
+      'GET'
     )
       .then((res) => {
         // Empty list if first page  to clear results from previous filtering
@@ -208,14 +202,14 @@ const ChallengeListPage = () => {
     hasNextPage: !endOfList,
     onLoadMore: getChallenges,
     disabled: !!listError,
-    rootMargin: "0px 0px 200px 0px",
+    rootMargin: '0px 0px 200px 0px',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     getChallenges();
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Fetch list whenever page is set to 1 due to filter changes
     if (page === 1) getChallenges();
   }, [page]);
@@ -316,29 +310,6 @@ const ChallengeListPage = () => {
       </div>
     </section>
   );
-};
-
-ChallengeItem.propTypes = {
-  setSelected: PropTypes.func.isRequired,
-  challenge: PropTypes.shape({
-    _id: PropTypes.string,
-    tags: PropTypes.string,
-    title: PropTypes.string,
-    prompt: PropTypes.string,
-    initialCode: PropTypes.array,
-  }).isRequired,
-};
-
-ChallengeModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  challenge: PropTypes.shape({
-    _id: PropTypes.string,
-    tags: PropTypes.string,
-    title: PropTypes.string,
-    prompt: PropTypes.string,
-    summary: PropTypes.string,
-    initialCode: PropTypes.array,
-  }).isRequired,
 };
 
 export default ChallengeListPage;

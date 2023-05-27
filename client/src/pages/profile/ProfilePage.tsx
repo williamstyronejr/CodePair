@@ -1,15 +1,14 @@
-import * as React from "react";
-import { useState, useMemo } from "react";
-import PropTypes from "prop-types";
-import { useParams } from "react-router-dom";
-import { connect } from "react-redux";
-import useInfiniteScroll from "react-infinite-scroll-hook";
-import { javascript } from "@codemirror/lang-javascript";
-import CodeMirror from "rodemirror";
-import Loading from "../../components/shared/Loading";
-import basicExts from "../../utils/codemirror";
-import { ajaxRequest, dateToText } from "../../utils/utils";
-import "./styles/profilePage.css";
+import { useState, useMemo, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
+import { connect } from 'react-redux';
+import useInfiniteScroll from 'react-infinite-scroll-hook';
+import { javascript } from '@codemirror/lang-javascript';
+import CodeMirror from 'rodemirror';
+import Loading from '../../components/shared/Loading';
+import basicExts from '../../utils/codemirror';
+import { ajaxRequest, dateToText } from '../../utils/utils';
+import './styles/profilePage.css';
 
 const UserNotFound = () => (
   <section className="profile profile--missing">
@@ -92,7 +91,7 @@ const Solutions = ({ username }: { username: string }) => {
     hasNextPage: !endOfList,
     disabled: !!error,
     onLoadMore: getSolutions,
-    rootMargin: "0px 0px 200px 0px",
+    rootMargin: '0px 0px 200px 0px',
   });
 
   const solutionList = solutions.map((item) => (
@@ -137,12 +136,12 @@ const Solutions = ({ username }: { username: string }) => {
 
 const ProfilePage = () => {
   const { username } = useParams();
-  const [profileData, setProfileData] = React.useState<any>({});
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(false);
-  const [selected, setSelected] = React.useState("stats");
+  const [profileData, setProfileData] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [selected, setSelected] = useState('stats');
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Grab profile data
     ajaxRequest(`/api/user/${username}/profile/stats`)
       .then((res) => {
@@ -161,7 +160,7 @@ const ProfilePage = () => {
 
   let content = null;
   switch (selected) {
-    case "stats":
+    case 'stats':
       content = (
         <Stats
           challengesCompleted={profileData.completed}
@@ -169,7 +168,7 @@ const ProfilePage = () => {
         />
       );
       break;
-    case "solutions":
+    case 'solutions':
       content = <Solutions username={username as string} />;
       break;
 
@@ -203,11 +202,11 @@ const ProfilePage = () => {
               <li className="profile__nav-item">
                 <button
                   className={`profile__nav-btn ${
-                    selected === "stats" ? "profile__nav-btn--active" : ""
+                    selected === 'stats' ? 'profile__nav-btn--active' : ''
                   }`}
                   type="button"
-                  onClick={() => setSelected("stats")}
-                  disabled={selected === "stats"}
+                  onClick={() => setSelected('stats')}
+                  disabled={selected === 'stats'}
                 >
                   Stats
                 </button>
@@ -216,11 +215,11 @@ const ProfilePage = () => {
               <li className="profile__nav-item">
                 <button
                   className={`profile__nav-btn ${
-                    selected === "solutions" ? "profile__nav-btn--active" : ""
+                    selected === 'solutions' ? 'profile__nav-btn--active' : ''
                   }`}
                   type="button"
-                  onClick={() => setSelected("solutions")}
-                  disabled={selected === "solutions"}
+                  onClick={() => setSelected('solutions')}
+                  disabled={selected === 'solutions'}
                 >
                   Solutions
                 </button>

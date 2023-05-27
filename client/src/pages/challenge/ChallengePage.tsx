@@ -1,10 +1,9 @@
-import * as React from "react";
-import { FC } from "react";
-import { useParams } from "react-router-dom";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
-import LoadingScreen from "../../components/shared/LoadingScreen";
-import Challenge from "./Challenge";
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import LoadingScreen from '../../components/shared/LoadingScreen';
+import Challenge from './Challenge';
 import {
   getChallenge,
   setCode,
@@ -12,18 +11,18 @@ import {
   testCode,
   clearData,
   saveCode,
-} from "../../actions/challenge";
+} from '../../actions/challenge';
 import {
   setMessage,
   sendMessage,
   toggleChatVisibility,
   resetChatData,
   messageIndicator,
-} from "../../actions/chat";
-import { openSocket, closeSocket } from "../../actions/socket";
-import "./styles/challenge.css";
+} from '../../actions/chat';
+import { openSocket, closeSocket } from '../../actions/socket';
+import './styles/challenge.css';
 
-const ChallengeErrorPage: FC<{ message: string }> = ({ message }) => (
+const ChallengeErrorPage = ({ message }: { message: string }) => (
   <section className="challenge challenge--error">
     <p className="challenge__error-msg">{message}</p>
   </section>
@@ -32,7 +31,7 @@ const ChallengeErrorPage: FC<{ message: string }> = ({ message }) => (
 const ChallengePage = (props: any) => {
   const { rId, cId } = useParams();
   // Clean up
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       props.clearData();
       props.resetChatData();
@@ -41,12 +40,12 @@ const ChallengePage = (props: any) => {
   }, []);
 
   // Fetch data for challenge/room initial mount
-  React.useEffect(() => {
+  useEffect(() => {
     props.getChallenge(cId, rId);
   }, [props.getChallenge, rId, cId]);
 
   // Open socket and connect to room
-  React.useEffect(() => {
+  useEffect(() => {
     if (!props.socket.connected) {
       props.openSocket();
     } else if (props.socket.ready && !props.socket.inRoom) {
@@ -125,7 +124,7 @@ const mapDispatchToProps = (dispatch: any) => ({
   messageIndicator: (roomId: string, username: string, typing: boolean) =>
     dispatch(messageIndicator(roomId, username, typing)),
   joinRoom: (id: string, username: string) =>
-    dispatch({ type: "join_room", payload: { room: id, username } }),
+    dispatch({ type: 'join_room', payload: { room: id, username } }),
   setMessage: (text: string) => dispatch(setMessage(text)),
   sendMessage: (room: string, msg: string, userId: string) =>
     dispatch(sendMessage(room, msg, userId)),

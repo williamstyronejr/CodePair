@@ -1,20 +1,19 @@
-import * as React from "react";
-import { SyntheticEvent } from "react";
-import PropTypes from "prop-types";
-import { Navigate } from "react-router-dom";
-import { connect } from "react-redux";
-import { ajaxRequest } from "../../utils/utils";
-import { setUserData } from "../../actions/authentication";
-import GithubButton from "../auth/GithubButton";
-import "./styles/signupPage.css";
+import { SyntheticEvent, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Navigate } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { ajaxRequest } from '../../utils/utils';
+import { setUserData } from '../../actions/authentication';
+import GithubButton from '../auth/GithubButton';
+import './styles/signupPage.css';
 
 const SignupPage = (props: any) => {
-  const [user, setUser] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [confirm, setConfirm] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [requesting, setRequesting] = React.useState(false);
-  const [error, setError] = React.useState<{
+  const [user, setUser] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [email, setEmail] = useState('');
+  const [requesting, setRequesting] = useState(false);
+  const [error, setError] = useState<{
     confirm?: string;
     password?: string;
     email?: string;
@@ -31,7 +30,7 @@ const SignupPage = (props: any) => {
     setRequesting(true);
     setError({});
 
-    ajaxRequest("/api/signup", "POST", {
+    ajaxRequest('/api/signup', 'POST', {
       username: user,
       password,
       confirm,
@@ -45,7 +44,7 @@ const SignupPage = (props: any) => {
         setRequesting(false);
         if (err.response && err.response.data)
           return setError(err.response.data.errors);
-        setError({ general: "Server error occurred, please try again." });
+        setError({ general: 'Server error occurred, please try again.' });
       });
   }
 

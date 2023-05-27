@@ -1,10 +1,10 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import { Navigate, useParams } from "react-router-dom";
-import { connect } from "react-redux";
-import { openSocket } from "../../actions/socket";
-import Timer from "../../components/shared/Timer";
-import LoadingScreen from "../../components/shared/LoadingScreen";
+import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Navigate, useParams } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { openSocket } from '../../actions/socket';
+import Timer from '../../components/shared/Timer';
+import LoadingScreen from '../../components/shared/LoadingScreen';
 import {
   joinQueue,
   leaveQueue,
@@ -12,17 +12,17 @@ import {
   declineMatch,
   clearQueue,
   matchTimeout,
-} from "../../actions/queue";
-import "./styles/challengeQueuePage.css";
+} from '../../actions/queue';
+import './styles/challengeQueuePage.css';
 
 const ChallengeQueuePage = (props: any) => {
   const { cId, lang } = useParams();
   const { leavingQueue, roomId, matchFound, acceptedMatch, declinedMatch } =
     props.queue;
-  const [matchTimer, setMatchTimer] = React.useState(10);
+  const [matchTimer, setMatchTimer] = useState(10);
   const queueId = `${cId}-${lang}`; // Id of queue the user is joining
 
-  React.useEffect(() => {
+  useEffect(() => {
     let matchInterval: number; // Interval for when a match appears
     // Keeps track of match found timer.
     if (matchFound) {
@@ -52,7 +52,7 @@ const ChallengeQueuePage = (props: any) => {
     props.matchTimeout,
   ]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!props.socket.connected && !props.socket.connecting) {
       props.openSocket();
     } else if (
@@ -69,7 +69,7 @@ const ChallengeQueuePage = (props: any) => {
     props.socket.connecting,
   ]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Clean up on unmount
     return () => {
       props.leaveQueue(queueId);
@@ -89,7 +89,7 @@ const ChallengeQueuePage = (props: any) => {
         <div className="queue__notification">
           <div className="queue__box">
             <h2 className="queue__heading">
-              {acceptedMatch ? "Accepted Match" : "Pair Found"}
+              {acceptedMatch ? 'Accepted Match' : 'Pair Found'}
             </h2>
             <span className="queue__match-timer">{matchTimer}</span>
 
