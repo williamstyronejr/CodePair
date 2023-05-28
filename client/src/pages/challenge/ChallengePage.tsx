@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import LoadingScreen from '../../components/shared/LoadingScreen';
 import Challenge from './Challenge';
 import {
@@ -28,7 +27,50 @@ const ChallengeErrorPage = ({ message }: { message: string }) => (
   </section>
 );
 
-const ChallengePage = (props: any) => {
+const ChallengePage = (props: {
+  socket: {
+    connected: boolean;
+    ready: boolean;
+    inRoom: boolean;
+  };
+  challenge: {
+    private: boolean;
+    id: string;
+    challengeError: string;
+    code: string;
+    title: string;
+    prompt: string;
+    testing: boolean;
+    language: string;
+    testPassed: boolean;
+    testResults: any[];
+    testErrors: string;
+    inviteLink: string;
+    savingCode: boolean;
+  };
+  chat: {
+    messages: any[];
+    chatInput: string;
+    visible: boolean;
+    usersTyping: any[];
+  };
+  clearData: () => void;
+  resetChatData: () => void;
+  messageIndicator: (roomId: string, username: string, typing: boolean) => void;
+  getChallenge: (cId: string, rId: string) => void;
+  toggleChatVisibility: () => void;
+  saveCode: (roomId: string, code: string) => void;
+  testCode: (cId: string, rId: string, code: string, language: string) => void;
+  convertRoomToPublic: (rId: string) => void;
+  setCode: (room: string, code: string) => void;
+  sendMessage: (room: string, msg: string, userId: string) => void;
+  setMessage: (text: string) => void;
+  openSocket: () => void;
+  closeSocket: () => void;
+  joinRoom: (id: string, username: string) => void;
+  userId: string;
+  username: string;
+}) => {
   const { rId, cId } = useParams();
   // Clean up
   useEffect(() => {
@@ -137,54 +179,5 @@ const mapDispatchToProps = (dispatch: any) => ({
   resetChatData: () => dispatch(resetChatData()),
   saveCode: (roomId: string, code: string) => dispatch(saveCode(roomId, code)),
 });
-
-ChallengePage.propTypes = {
-  messageIndicator: PropTypes.func.isRequired,
-  clearData: PropTypes.func.isRequired,
-  resetChatData: PropTypes.func.isRequired,
-  closeSocket: PropTypes.func.isRequired,
-  getChallenge: PropTypes.func.isRequired,
-  toggleChatVisibility: PropTypes.func.isRequired,
-  saveCode: PropTypes.func.isRequired,
-  testCode: PropTypes.func.isRequired,
-  convertRoomToPublic: PropTypes.func.isRequired,
-  setCode: PropTypes.func.isRequired,
-  sendMessage: PropTypes.func.isRequired,
-  setMessage: PropTypes.func.isRequired,
-  openSocket: PropTypes.func.isRequired,
-  joinRoom: PropTypes.func.isRequired,
-  userId: PropTypes.string.isRequired,
-  username: PropTypes.string.isRequired,
-  socket: PropTypes.shape({
-    connected: PropTypes.bool,
-    ready: PropTypes.bool,
-    inRoom: PropTypes.bool,
-  }).isRequired,
-  challenge: PropTypes.shape({
-    private: PropTypes.bool,
-    id: PropTypes.string,
-    challengeError: PropTypes.string,
-    code: PropTypes.string,
-    title: PropTypes.string,
-    prompt: PropTypes.string,
-    testing: PropTypes.bool,
-    language: PropTypes.string,
-    testPassed: PropTypes.bool,
-    testResults: PropTypes.array,
-    testErrors: PropTypes.string,
-    inviteLink: PropTypes.string,
-    savingCode: PropTypes.bool,
-  }).isRequired,
-  chat: PropTypes.shape({
-    messages: PropTypes.array,
-    chatInput: PropTypes.string,
-    visible: PropTypes.bool,
-    usersTyping: PropTypes.array,
-  }).isRequired,
-};
-
-ChallengeErrorPage.propTypes = {
-  message: PropTypes.string.isRequired,
-};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChallengePage);

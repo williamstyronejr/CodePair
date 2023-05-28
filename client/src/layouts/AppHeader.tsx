@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import useDetectOutsideClick from '../components/shared/useDetectOutsideClick';
 import './styles/header.css';
 
-const AppHeader = (props: any) => {
+const AppHeader = (props: {
+  username: string;
+  profileImage: string;
+  signout: () => void;
+}) => {
   const location = useLocation();
   const userMenuRef = useRef(null);
   const navMenuRef = useRef(null);
@@ -137,12 +140,6 @@ const AppHeader = (props: any) => {
       </div>
     </header>
   );
-};
-
-AppHeader.propTypes = {
-  username: PropTypes.string.isRequired,
-  signout: PropTypes.func.isRequired,
-  profileImage: PropTypes.string.isRequired,
 };
 
 export default AppHeader;

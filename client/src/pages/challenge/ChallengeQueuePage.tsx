@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Navigate, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { openSocket } from '../../actions/socket';
@@ -15,7 +14,32 @@ import {
 } from '../../actions/queue';
 import './styles/challengeQueuePage.css';
 
-const ChallengeQueuePage = (props: any) => {
+const ChallengeQueuePage = (props: {
+  user: {
+    id: string;
+  };
+  socket: {
+    connected: boolean;
+    ready: boolean;
+    connecting: boolean;
+  };
+  queue: {
+    matchId: string;
+    inQueue: boolean;
+    leavingQueue: boolean;
+    roomId: string;
+    matchFound: boolean;
+    acceptedMatch: boolean;
+    declinedMatch: boolean;
+  };
+  openSocket: () => void;
+  clearQueue: () => void;
+  declineMatch: (id: string) => void;
+  joinQueue: (cId: string, size: number) => void;
+  leaveQueue: (queue: string) => void;
+  acceptMatch: (queueId: string) => void;
+  matchTimeout: () => void;
+}) => {
   const { cId, lang } = useParams();
   const { leavingQueue, roomId, matchFound, acceptedMatch, declinedMatch } =
     props.queue;
@@ -155,32 +179,5 @@ const mapDispatchToProps = (dispatch: any) => ({
   acceptMatch: (queueId: string) => dispatch(acceptMatch(queueId)),
   matchTimeout: () => dispatch(matchTimeout()),
 });
-
-ChallengeQueuePage.propTypes = {
-  openSocket: PropTypes.func.isRequired,
-  clearQueue: PropTypes.func.isRequired,
-  declineMatch: PropTypes.func.isRequired,
-  joinQueue: PropTypes.func.isRequired,
-  leaveQueue: PropTypes.func.isRequired,
-  acceptMatch: PropTypes.func.isRequired,
-  matchTimeout: PropTypes.func.isRequired,
-  user: PropTypes.shape({
-    id: PropTypes.string,
-  }).isRequired,
-  socket: PropTypes.shape({
-    connected: PropTypes.bool,
-    connecting: PropTypes.bool,
-    ready: PropTypes.bool,
-  }).isRequired,
-  queue: PropTypes.shape({
-    matchId: PropTypes.string,
-    inQueue: PropTypes.bool,
-    leavingQueue: PropTypes.bool,
-    roomId: PropTypes.string,
-    matchFound: PropTypes.bool,
-    acceptedMatch: PropTypes.bool,
-    declinedMatch: PropTypes.bool,
-  }).isRequired,
-};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChallengeQueuePage);

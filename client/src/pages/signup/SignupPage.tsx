@@ -1,5 +1,4 @@
 import { SyntheticEvent, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Navigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ajaxRequest } from '../../utils/utils';
@@ -7,7 +6,12 @@ import { setUserData } from '../../actions/authentication';
 import GithubButton from '../auth/GithubButton';
 import './styles/signupPage.css';
 
-const SignupPage = (props: any) => {
+const SignupPage = (props: {
+  setUserData: (user: any) => void;
+  user: {
+    authenticated: boolean;
+  };
+}) => {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -168,12 +172,5 @@ const mapStatesToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
   setUserData: (user: any) => dispatch(setUserData(user)),
 });
-
-SignupPage.propTypes = {
-  setUserData: PropTypes.func.isRequired,
-  user: PropTypes.shape({
-    authenticated: PropTypes.bool,
-  }).isRequired,
-};
 
 export default connect(mapStatesToProps, mapDispatchToProps)(SignupPage);

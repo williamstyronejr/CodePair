@@ -1,5 +1,4 @@
 import { useState, useEffect, createRef, SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { updateUser } from '../../actions/user';
@@ -340,7 +339,15 @@ const PasswordForm = () => {
   );
 };
 
-const SettingsPage = (props: any) => {
+const SettingsPage = (props: {
+  updateUser: (data: any) => void;
+  user: {
+    username: string;
+    email: string;
+    profileImage: string;
+    oauthUser: boolean;
+  };
+}) => {
   const { type } = useParams();
   let displayedForm;
 
@@ -409,22 +416,5 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
   updateUser: (data: any) => dispatch(updateUser(data)),
 });
-
-AccountForm.propTypes = {
-  currentUsername: PropTypes.string.isRequired,
-  currentEmail: PropTypes.string.isRequired,
-  currentImage: PropTypes.string.isRequired,
-  updateUserData: PropTypes.func.isRequired,
-};
-
-SettingsPage.propTypes = {
-  updateUser: PropTypes.func.isRequired,
-  user: PropTypes.shape({
-    username: PropTypes.string,
-    email: PropTypes.string,
-    profileImage: PropTypes.string,
-    oauthUser: PropTypes.bool,
-  }).isRequired,
-};
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);

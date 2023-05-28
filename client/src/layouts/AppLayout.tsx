@@ -1,13 +1,22 @@
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Navigate } from "react-router-dom";
-import Header from "./AppHeader";
-import { signoutUser } from "../actions/authentication";
+import { ReactNode } from 'react';
+import { connect } from 'react-redux';
+import { Navigate } from 'react-router-dom';
+import Header from './AppHeader';
+import { signoutUser } from '../actions/authentication';
 
 /**
  *  General app layout, handles redirecting user if not authenticated.
  */
-const AppLayout = (props: any) => {
+const AppLayout = (props: {
+  user: {
+    profileImage: string;
+    username: string;
+    authenticated: boolean;
+    authenticateing: boolean;
+  };
+  children: ReactNode;
+  signoutUser: () => void;
+}) => {
   if (!props.user.authenticated && !props.user.authenticating) {
     return <Navigate to="/signin" />;
   }
@@ -35,15 +44,5 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
   signoutUser: () => dispatch(signoutUser()),
 });
-AppLayout.propTypes = {
-  user: PropTypes.shape({
-    profileImage: PropTypes.string,
-    username: PropTypes.string,
-    authenticated: PropTypes.bool,
-    authenticating: PropTypes.bool,
-  }).isRequired,
-  children: PropTypes.node.isRequired,
-  signoutUser: PropTypes.func.isRequired,
-};
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppLayout);

@@ -1,5 +1,4 @@
 import { SyntheticEvent, useState } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Navigate, Link } from 'react-router-dom';
 import GithubButton from '../auth/GithubButton';
@@ -7,7 +6,12 @@ import { setUserData } from '../../actions/authentication';
 import { ajaxRequest } from '../../utils/utils';
 import './styles/signinPage.css';
 
-const SigninPage = (props: any) => {
+const SigninPage = (props: {
+  setUserData: (user: any) => void;
+  user: {
+    authenticated: boolean;
+  };
+}) => {
   const [username, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [requesting, setRequesting] = useState(false);
@@ -113,12 +117,5 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
   setUserData: (user: any) => dispatch(setUserData(user)),
 });
-
-SigninPage.propTypes = {
-  setUserData: PropTypes.func.isRequired,
-  user: PropTypes.shape({
-    authenticated: PropTypes.bool,
-  }).isRequired,
-};
 
 export default connect(mapStateToProps, mapDispatchToProps)(SigninPage);

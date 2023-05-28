@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
@@ -10,7 +9,32 @@ import './styles/challenge.css';
 
 const extensions = [javascript({ jsx: false })];
 
-function Challenge(props: any) {
+function Challenge(props: {
+  userId: string;
+  title: string;
+  prompt: string;
+  code: string;
+  testing: boolean;
+  savingCode: boolean;
+  testPassed: boolean;
+  testResults: any[];
+  usersTyping: any[];
+  testCode: () => void;
+  setCode: () => void;
+  saveCode: () => void;
+  setMessage: () => void;
+  sendMessage: () => void;
+  toggleChatVisibility: () => void;
+  convertRoomToPublic: () => void;
+  messageIndicator: () => void;
+  privateRoom: boolean;
+  chatVisible: boolean;
+  inviteLink: string;
+  chatInput: string;
+  messages: any[];
+  language: string;
+  testErrors: string;
+}) {
   const {
     title,
     prompt,
@@ -272,33 +296,6 @@ function Challenge(props: any) {
     </section>
   );
 }
-
-Challenge.propTypes = {
-  userId: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  prompt: PropTypes.string.isRequired,
-  code: PropTypes.string.isRequired,
-  testing: PropTypes.bool.isRequired,
-  savingCode: PropTypes.bool.isRequired,
-  testPassed: PropTypes.bool.isRequired,
-  testResults: PropTypes.array.isRequired,
-  usersTyping: PropTypes.array.isRequired,
-  testCode: PropTypes.func.isRequired,
-  setCode: PropTypes.func.isRequired,
-  saveCode: PropTypes.func.isRequired,
-  chatVisible: PropTypes.bool.isRequired,
-  setMessage: PropTypes.func.isRequired,
-  sendMessage: PropTypes.func.isRequired,
-  toggleChatVisibility: PropTypes.func.isRequired,
-  convertRoomToPublic: PropTypes.func.isRequired,
-  messageIndicator: PropTypes.func.isRequired,
-  privateRoom: PropTypes.bool.isRequired,
-  inviteLink: PropTypes.string,
-  chatInput: PropTypes.string.isRequired,
-  messages: PropTypes.array.isRequired,
-  language: PropTypes.string.isRequired,
-  testErrors: PropTypes.string,
-};
 
 Challenge.defaultProps = {
   testErrors: null,

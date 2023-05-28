@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
@@ -237,20 +236,5 @@ const ProfilePage = () => {
 const mapStateToDispatch = (state: any) => ({
   user: state.user,
 });
-
-Stats.propTypes = {
-  challengesCompleted: PropTypes.number.isRequired,
-  achievements: PropTypes.array.isRequired,
-};
-
-Solutions.propTypes = {
-  username: PropTypes.string.isRequired,
-};
-
-ProfilePage.propTypes = {
-  user: PropTypes.shape({
-    username: PropTypes.string,
-  }).isRequired,
-};
 
 export default connect(mapStateToDispatch, null)(ProfilePage);
