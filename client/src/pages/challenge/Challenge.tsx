@@ -1,12 +1,14 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import CodeMirror from 'rodemirror';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import ChatRoom from './ChatRoom';
-import basicExts from '../../utils/codemirror';
 import useOutsideClick from '../../hooks/useOutsideClick';
 import './styles/challenge.css';
+
+const extensions = [javascript({ jsx: false })];
 
 function Challenge(props: any) {
   const {
@@ -40,7 +42,6 @@ function Challenge(props: any) {
     },
   });
   const [details, setDetails] = useState('prompt');
-  const extensions = useMemo(() => [...basicExts, javascript()], []);
   let detailsComponent;
 
   useEffect(() => {
@@ -172,9 +173,14 @@ function Challenge(props: any) {
 
         <div className="challenge__tools" id="pairs">
           <CodeMirror
-            // className="challenge__editor"
+            width="100%"
+            height="100%"
+            basicSetup={{
+              allowMultipleSelections: true,
+            }}
             value={code}
-            extensions={extensions}
+            theme={vscodeDark}
+            extensions={[...extensions]}
             onUpdate={(val) => {
               if (val.docChanged) setCode(val.state.doc.toString());
             }}

@@ -159,11 +159,7 @@
 /*  Parent Wrapper for codemirror  */
 .challenge__tools > div {
   height: 100%;
-}
-
-.challenge__editor {
   flex: 1 0 auto;
-  width: 100%;
 }
 
 .challenge__options {
@@ -235,34 +231,19 @@
   }
 
   .challenge__tools {
-    /* flex: 1 0 auto; */
+    flex: 1 0 auto;
     max-height: 100%;
     margin: 5px 0;
-    width: 100%;
+    width: 1px;
     height: auto;
   }
 
   /*  Parent Wrapper for codemirror  */
   .challenge__tools > div {
     height: 100%;
-    width: 100%;
-  }
-
-  .challenge__editor {
     flex: 1 1 auto;
-    margin-top: 0;
-    height: 100%;
     position: relative;
-  }
-
-  /* ClassName for react codemirror inner element (needed layout to work) */
-  .CodeMirror {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
+    margin-top: 0;
   }
 
   .challenge__completed {
