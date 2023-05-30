@@ -76,7 +76,7 @@ exports.localSignin = (req, res, next) => {
  */
 exports.signout = (req, res, next) => {
   res.cookie('token', '', { expires: new Date(0) });
-  res.redirect('/');
+  res.json({ success: true });
 };
 
 /**
