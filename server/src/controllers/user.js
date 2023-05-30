@@ -149,9 +149,14 @@ exports.updateUserData = async (req, res, next) => {
 
   let params = {};
 
-  if (username) params = { ...params, username };
-  if (email) params = { ...params, email };
   if (file) params = { ...params, profileImage: file.filename };
+  if (email) params = { ...params, email };
+  if (username)
+    params = {
+      ...params,
+      username: username.toLowerCase(),
+      displayName: username,
+    };
 
   // Update user's settings
   try {
