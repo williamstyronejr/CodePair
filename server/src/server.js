@@ -22,10 +22,15 @@ const {
   REDISCLOUD_URL,
   RABBITMQ_URL,
   CONSUMER_QUEUE,
+  DOMAIN,
+  NODE_ENV,
 } = process.env;
 
 async function startServer() {
   try {
+    if (NODE_ENV === 'production' && !DOMAIN)
+      throw new Error('Domain needs to be set in production');
+
     // Connect to all external services
     await Promise.all([
       setupRedis(REDIS_HOST, REDIS_PORT, REDISCLOUD_URL || REDIS_URL),
