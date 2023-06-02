@@ -7,8 +7,9 @@ const {
 const { publishToQueue } = require('../../services/amqp');
 const { createChallenge } = require('../../services/challenge');
 const { createRandomString } = require('../../utils/utils');
+const { createUserRouter, createUserRoute } = require('./util');
 
-const { DB_TEST_URI } = process.env;
+const { DB_TEST_URI: DB_URI } = process.env;
 
 // Mocked to prevent sending emails during testing
 jest.mock('../../services/amqp');
@@ -31,36 +32,22 @@ let userCookie3; // Authroization token for user
 
 beforeAll(async () => {
   // Connect database, create a challenge and 3 users
-  await connectDatabase(DB_TEST_URI);
+  await connectDatabase(DB_URI);
 
   await Promise.all([
     createChallenge(title, prompt, tags, initialCode, true).then((res) => {
       challenge = res;
     }),
-    request(app)
-      .post('/signup')
-      .send({ username, email, password })
-      .set('Accept', 'application/json')
-      .expect(200)
-      .then((res) => {
-        userCookie = res.headers['set-cookie'][0];
-      }),
-    request(app)
-      .post('/signup')
-      .send({ username: username2, email: email2, password })
-      .set('Accept', 'application/json')
-      .expect(200)
-      .then((res) => {
-        userCookie2 = res.headers['set-cookie'][0];
-      }),
-    request(app)
-      .post('/signup')
-      .send({ username: username3, email: email3, password })
-      .set('Accept', 'application/json')
-      .expect(200)
-      .then((res) => {
-        userCookie3 = res.headers['set-cookie'][0];
-      }),
+    createUserRoute(app, username, email, password).then((res) => {
+      userCookie = res.headers['set-cookie'][0];
+    }),
+
+    createUserRoute(app, username2, email2, password).then((res) => {
+      userCookie2 = res.headers['set-cookie'][0];
+    }),
+    createUserRoute(app, username3, email3, password).then((res) => {
+      userCookie3 = res.headers['set-cookie'][0];
+    }),
   ]);
 }, 12000);
 
@@ -78,7 +65,7 @@ afterAll(async () => {
  */
 function createRoomRoute(challengeId, cookie, language, status = 200) {
   return request(app)
-    .post(`/challenge/${challengeId}/create`)
+    .post(`/api/challenge/${challengeId}/create`)
     .set('Cookie', cookie)
     .send({ language })
     .expect(status)
@@ -94,13 +81,13 @@ function createRoomRoute(challengeId, cookie, language, status = 200) {
  */
 function makeRoomJoinableRoute(roomId, cookie, status = 200) {
   return request(app)
-    .post(`/room/${roomId}/public`)
+    .post(`/api/room/${roomId}/public`)
     .set('Cookie', cookie)
     .expect(status)
     .then((res) => res.body.invite);
 }
 
-describe('/POST /challenge/:id/create', () => {
+describe('/POST /api/challenge/:id/create', () => {
   test('Unauth request should throws 401 error', async () => {
     await createRoomRoute('123', '123', 'node', 401);
   });
@@ -114,9 +101,9 @@ describe('/POST /challenge/:id/create', () => {
   });
 });
 
-describe('/GET /challenge/list', () => {
+describe('/GET /api/challenge/list', () => {
   const routeToTest = (page = '0', sort = '', filter = '') =>
-    `/challenge/list?page=${page}&search=${filter}&orderBy=${sort}`;
+    `/api/challenge/list?page=${page}&search=${filter}&orderBy=${sort}`;
 
   const title1 = createRandomString(8);
   const title2 = createRandomString(8);
@@ -193,37 +180,59 @@ describe('/GET /challenge/list', () => {
   });
 });
 
-describe('/GET /challenge/:cId/room/:rId', () => {
+describe('/GET /api/challenge/:cId/room/:rId', () => {
+  const routeToTest = (roomId, cId) => `/api/challenge/${cId}/room/${roomId}`;
+  let challengeId;
   let roomId;
 
   beforeAll(async () => {
+    challengeId = challenge._id.toString();
+
     // Create a user, challenge, and room
-    roomId = await createRoomRoute(challenge._id, userCookie, 'node');
+    roomId = await createRoomRoute(challengeId, userCookie, 'node');
   });
 
   test('Unauth request should throw 401 error', async () => {
-    await request(app)
-      .get(`/challenge/${challenge._id}/room/${roomId}`)
-      .expect(401);
+    await request(app).get(routeToTest(challengeId, roomId)).expect(401);
   });
 
   test('Invalid challengeId should throw 500 error', async () => {
     await request(app)
-      .get(`/challenge/${challenge._id}1/room/${roomId}`)
+      .get(routeToTest(roomId, `${challengeId}1`))
       .set('Cookie', userCookie)
       .expect(500);
   });
 
   test('Invalid roomId should throw 500 error', async () => {
     await request(app)
-      .get(`/challenge/${challenge._id}/room/${roomId}1`)
+      .get(routeToTest(`${roomId}1`, challengeId))
       .set('Cookie', userCookie)
       .expect(500);
   });
 
+  test('Non-Existing roomId should throw 404 error', async () => {
+    const nonExistingRoomId = `${roomId.substring(0, roomId.length - 1)}1`;
+    await request(app)
+      .get(routeToTest(nonExistingRoomId, challengeId))
+      .set('Cookie', userCookie)
+      .expect(404);
+  });
+
+  test('Non-Existing roomId should throw 404 error', async () => {
+    const nonExistingChallengeId = `${challengeId.substring(
+      0,
+      challengeId.length - 1
+    )}1`;
+
+    await request(app)
+      .get(routeToTest(roomId, nonExistingChallengeId))
+      .set('Cookie', userCookie)
+      .expect(404);
+  });
+
   test('Valid request should response 200 with room and challenge data', async () => {
     await request(app)
-      .get(`/challenge/${challenge._id}/room/${roomId}`)
+      .get(routeToTest(roomId, challengeId))
       .set('Cookie', userCookie)
       .expect(200)
       .then((res) => {
@@ -233,7 +242,7 @@ describe('/GET /challenge/:cId/room/:rId', () => {
   });
 });
 
-describe('/POST /room/:rId/public', () => {
+describe('/POST /api/room/:rId/public', () => {
   let roomId;
 
   beforeAll(async () => {
@@ -254,7 +263,7 @@ describe('/POST /room/:rId/public', () => {
   });
 });
 
-describe('/POST /invite/:invite', () => {
+describe('/POST /api/invite/:invite', () => {
   let roomId;
   let routeToTest; // Should be set in beforeAll
 
@@ -262,7 +271,7 @@ describe('/POST /invite/:invite', () => {
   beforeAll(async () => {
     roomId = await createRoomRoute(challenge._id, userCookie, 'node');
     const link = await makeRoomJoinableRoute(roomId, userCookie);
-    routeToTest = `/invite/${link}`;
+    routeToTest = `/api/invite/${link}`;
   }, 10000);
 
   test('Invalid link should throw 500 error', async () => {
@@ -312,8 +321,8 @@ describe('/POST /invite/:invite', () => {
   });
 });
 
-describe('/POST /challenge/:cId/room/:rId/test', () => {
-  const routeToTest = (cId, rId) => `/challenge/${cId}/room/${rId}/test`;
+describe('/POST /api/challenge/:cId/room/:rId/test', () => {
+  const routeToTest = (cId, rId) => `/api/challenge/${cId}/room/${rId}/test`;
   let roomId;
 
   // Create a new room

@@ -12,8 +12,11 @@ const {
 } = require('../services/resetToken');
 const { sendEmailTemplate } = require('../services/emailer');
 
-const { IP, PORT, DOMAIN } = process.env;
-const siteDomain = DOMAIN || `${IP}:${PORT}`;
+const { IP, PORT, DOMAIN, NODE_ENV } = process.env;
+const siteDomain =
+  NODE_ENV === 'production' || NODE_ENV === 'development'
+    ? DOMAIN || `${IP}:${PORT}`
+    : `${IP}:${PORT}`;
 
 /**
  * Route handler for getting logged in user's data. Current response with
@@ -246,7 +249,7 @@ exports.sendPasswordEmail = async (req, res, next) => {
       'password_recovery.html',
       {
         username: user.username,
-        link: `${siteDomain}/account/reset/password?id=${tokenId}&token=${token}`,
+        link: `${siteDomain}/api/account/reset/password?id=${tokenId}&token=${token}`,
       },
       (mailErr) => {
         if (mailErr) throw new Error('Could not send email');
