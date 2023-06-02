@@ -12,7 +12,7 @@ const AuthHeader = ({
 }: {
   profileImage: string;
   username: string;
-  signout: Function;
+  signout: () => void;
 }) => {
   const location = useLocation();
   const userMenuRef = useRef(null);
