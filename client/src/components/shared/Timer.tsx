@@ -1,6 +1,5 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import "./styles/timer.css";
+import { useState, useEffect } from 'react';
+import './styles/timer.css';
 
 /**
  * Converts a number into a string and adds a zero in front.
@@ -8,14 +7,14 @@ import "./styles/timer.css";
  * @return {String} Returns a string of the number with a zero in front.
  */
 function addLeadingZero(number: number) {
-  return (new Array(3).join("0") + number).slice(-2);
+  return (new Array(3).join('0') + number).slice(-2);
 }
 
 // Not completely accraute
 const Timer = ({ isPaused }: { isPaused: boolean }) => {
-  const [timer, setTimer] = React.useState(0);
+  const [timer, setTimer] = useState(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let timerInterval: number;
     timerInterval = setInterval(() => {
       if (!isPaused) setTimer((time) => time + 1);
@@ -35,10 +34,6 @@ const Timer = ({ isPaused }: { isPaused: boolean }) => {
       :<span className="timer__minute">{addLeadingZero(timer % 60)}</span>
     </div>
   );
-};
-
-Timer.propTypes = {
-  isPaused: PropTypes.bool.isRequired,
 };
 
 export default Timer;

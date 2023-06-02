@@ -1,7 +1,6 @@
-import PropTypes from "prop-types";
-import "./styles/loading.css";
+import './styles/loading.css';
 
-const LoadingComponent = ({ message }: { message: string }) => {
+const LoadingComponent = ({ message }: { message?: string }) => {
   return (
     <div className="loading">
       <div className="loading__dots">
@@ -13,14 +12,6 @@ const LoadingComponent = ({ message }: { message: string }) => {
       {message}
     </div>
   );
-};
-
-LoadingComponent.propTypes = {
-  message: PropTypes.string,
-};
-
-LoadingComponent.defaultProps = {
-  message: "",
 };
 
 export default LoadingComponent;

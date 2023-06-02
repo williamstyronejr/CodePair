@@ -1,8 +1,5 @@
-import * as React from 'react';
 import { useState, useMemo, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
-import { connect } from 'react-redux';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { javascript } from '@codemirror/lang-javascript';
 import CodeMirror from 'rodemirror';
@@ -233,15 +230,6 @@ const ProfilePage = () => {
       </section>
     </div>
   );
-};
-
-Stats.propTypes = {
-  challengesCompleted: PropTypes.number.isRequired,
-  achievements: PropTypes.array.isRequired,
-};
-
-Solutions.propTypes = {
-  username: PropTypes.string.isRequired,
 };
 
 export default ProfilePage;

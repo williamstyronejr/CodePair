@@ -1,21 +1,19 @@
-import { useState, SyntheticEvent } from "react";
-import PropTypes from "prop-types";
-import { Navigate } from "react-router-dom";
-import { connect } from "react-redux";
-import { setUserData } from "../../actions/authentication";
-import { validateUsername, ajaxRequest } from "../../utils/utils";
+import { useState, SyntheticEvent } from 'react';
+import { Navigate } from 'react-router-dom';
+import { setUserData } from '../../reducers/userReducer';
+import { validateUsername, ajaxRequest } from '../../utils/utils';
+import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
 
-const GithubPage = (props: any) => {
-  const [username, setUsername] = useState("");
+const GithubPage = () => {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+  const [username, setUsername] = useState('');
   const [validation, setValidation] = useState<{ username?: string }>({});
   const [requesting, setRequesting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Check if user is logged in with no username
-  if (
-    !props.user.authenticating &&
-    (!props.user.authenticated || props.user.username)
-  ) {
+  if (!user.authenticating && (!user.authenticated || user.username)) {
     return <Navigate to="/challenges" />;
   }
 
@@ -33,10 +31,10 @@ const GithubPage = (props: any) => {
 
     setRequesting(true);
 
-    ajaxRequest("/account/register", "POST", { username })
+    ajaxRequest('/account/register', 'POST', { username })
       .then((res) => {
         setRequesting(false);
-        props.setUserData(res.data.user);
+        dispatch(setUserData(res.data.user));
       })
       .catch((err) => {
         setRequesting(false);
@@ -46,7 +44,7 @@ const GithubPage = (props: any) => {
         }
 
         setError(
-          "An error occurred with setting your username, please try again."
+          'An error occurred with setting your username, please try again.'
         );
       });
   };
@@ -96,21 +94,4 @@ const GithubPage = (props: any) => {
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  user: state.user,
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  setUserData: (data: any) => dispatch(setUserData(data)),
-});
-
-GithubPage.propTypes = {
-  user: PropTypes.shape({
-    username: PropTypes.string,
-    authenticated: PropTypes.bool,
-    authenticating: PropTypes.bool,
-  }).isRequired,
-  setUserData: PropTypes.func.isRequired,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(GithubPage);
+export default GithubPage;

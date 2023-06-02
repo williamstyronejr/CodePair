@@ -1,20 +1,21 @@
-import * as React from "react";
-import { SyntheticEvent } from "react";
-import PropTypes from "prop-types";
-import { Navigate } from "react-router-dom";
-import { connect } from "react-redux";
-import { ajaxRequest } from "../../utils/utils";
-import { setUserData } from "../../actions/authentication";
-import GithubButton from "../auth/GithubButton";
-import "./styles/signupPage.css";
+import { SyntheticEvent, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { ajaxRequest } from '../../utils/utils';
+import { setUserData } from '../../reducers/userReducer';
+import GithubButton from '../auth/GithubButton';
+import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
+import './styles/signupPage.css';
 
-const SignupPage = (props: any) => {
-  const [user, setUser] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [confirm, setConfirm] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [requesting, setRequesting] = React.useState(false);
-  const [error, setError] = React.useState<{
+const SignupPage = () => {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [email, setEmail] = useState('');
+  const [requesting, setRequesting] = useState(false);
+  const [error, setError] = useState<{
     confirm?: string;
     password?: string;
     email?: string;
@@ -22,7 +23,7 @@ const SignupPage = (props: any) => {
     general?: string;
   }>({});
 
-  if (props.user.authenticated) return <Navigate to="/challenges" />;
+  if (user.authenticated) return <Navigate to="/challenges" />;
 
   function onSubmit(evt: SyntheticEvent<HTMLFormElement>) {
     evt.preventDefault();
@@ -31,21 +32,21 @@ const SignupPage = (props: any) => {
     setRequesting(true);
     setError({});
 
-    ajaxRequest("/api/signup", "POST", {
-      username: user,
+    ajaxRequest('/api/signup', 'POST', {
+      username,
       password,
       confirm,
       email,
     })
       .then((res) => {
         setRequesting(false);
-        if (res.data.success) props.setUserData(res.data.user);
+        if (res.data.success) dispatch(setUserData(res.data.user));
       })
       .catch((err) => {
         setRequesting(false);
         if (err.response && err.response.data)
           return setError(err.response.data.errors);
-        setError({ general: "Server error occurred, please try again." });
+        setError({ general: 'Server error occurred, please try again.' });
       });
   }
 
@@ -98,8 +99,8 @@ const SignupPage = (props: any) => {
               className="form__input form__input--text"
               type="text"
               placeholder="Username"
-              value={user}
-              onChange={(evt) => setUser(evt.target.value)}
+              value={username}
+              onChange={(evt) => setUsername(evt.target.value)}
               data-cy="username"
             />
           </label>
@@ -162,19 +163,4 @@ const SignupPage = (props: any) => {
   );
 };
 
-const mapStatesToProps = (state: any) => ({
-  user: state.user,
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  setUserData: (user: any) => dispatch(setUserData(user)),
-});
-
-SignupPage.propTypes = {
-  setUserData: PropTypes.func.isRequired,
-  user: PropTypes.shape({
-    authenticated: PropTypes.bool,
-  }).isRequired,
-};
-
-export default connect(mapStatesToProps, mapDispatchToProps)(SignupPage);
+export default SignupPage;

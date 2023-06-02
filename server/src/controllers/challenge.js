@@ -10,7 +10,6 @@ const {
   saveCodeById,
 } = require('../services/room');
 const {
-  createChallenge,
   getChallengeList,
   findChallengeById,
   findChallengeByLanguage,
@@ -20,30 +19,6 @@ const { updateUser } = require('../services/user');
 const logger = require('../services/logger');
 
 const { PRODUCER_QUEUE } = process.env;
-
-/**
- * Route handler for creating challenges. Only used for
- *  development purposes.
- * @param {object} req Request object
- * @param {Object} res Response object
- * @param {Function} next Next function to be called
- */
-exports.createChallenge = async (req, res, next) => {
-  const { title, prompt, tags, initialCode } = req.body;
-
-  try {
-    const challenge = await createChallenge(
-      title,
-      prompt,
-      tags,
-      initialCode,
-      false
-    );
-    res.json({ challenge });
-  } catch (err) {
-    next(err);
-  }
-};
 
 /**
  * Route handler for getting list of challenges based on a page number.

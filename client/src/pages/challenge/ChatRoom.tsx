@@ -1,6 +1,5 @@
-import { useRef, useEffect } from "react";
-import PropTypes from "prop-types";
-import "./styles/chatRoom.css";
+import { useRef, useEffect } from 'react';
+import './styles/chatRoom.css';
 
 const ChatRoom = ({
   userId,
@@ -32,14 +31,14 @@ const ChatRoom = ({
 
   useEffect(() => {
     let typingTmeout: number;
-    if (chatInput !== "") {
+    if (chatInput !== '') {
       messageIndicator(true);
     } else {
       messageIndicator(false);
     }
 
     typingTmeout = setTimeout(() => {
-      if (chatInput !== "") {
+      if (chatInput !== '') {
         messageIndicator(false);
       }
     }, 5000);
@@ -76,10 +75,10 @@ const ChatRoom = ({
   const messageList = messages.map((msg: any) => {
     const type =
       msg.author === userId
-        ? "client"
-        : msg.author === "notification"
-        ? "notification"
-        : "server";
+        ? 'client'
+        : msg.author === 'notification'
+        ? 'notification'
+        : 'server';
 
     return (
       <li
@@ -133,18 +132,6 @@ const ChatRoom = ({
       </div>
     </div>
   );
-};
-
-ChatRoom.propTypes = {
-  setMessage: PropTypes.func.isRequired,
-  sendMessage: PropTypes.func.isRequired,
-  toggleChat: PropTypes.func.isRequired,
-  userId: PropTypes.string.isRequired,
-  chatInput: PropTypes.string.isRequired,
-  messages: PropTypes.array.isRequired,
-  visible: PropTypes.bool.isRequired,
-  usersTyping: PropTypes.array.isRequired,
-  messageIndicator: PropTypes.func.isRequired,
 };
 
 export default ChatRoom;

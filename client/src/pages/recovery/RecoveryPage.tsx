@@ -1,13 +1,12 @@
-import * as React from "react";
-import { SyntheticEvent } from "react";
-import { ajaxRequest } from "../../utils/utils";
-import "./styles/recoveryPage.css";
+import { SyntheticEvent, useState } from 'react';
+import { ajaxRequest } from '../../utils/utils';
+import './styles/recoveryPage.css';
 
 const RecoveryPage = () => {
-  const [field, setField] = React.useState("");
-  const [requesting, setRequesting] = React.useState(false);
-  const [status, setStatus] = React.useState(false);
-  const [error, setError] = React.useState<string | boolean>(false);
+  const [field, setField] = useState('');
+  const [requesting, setRequesting] = useState(false);
+  const [status, setStatus] = useState(false);
+  const [error, setError] = useState<string | boolean>(false);
 
   const onSubmit = (evt: SyntheticEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -17,16 +16,16 @@ const RecoveryPage = () => {
     setStatus(false);
     setError(false);
 
-    ajaxRequest("/api/account/recovery/password", "POST", { field })
+    ajaxRequest('/api/account/recovery/password', 'POST', { field })
       .then(() => {
         setStatus(true);
         setRequesting(false);
       })
       .catch((err) => {
         if (err.response && err.response.status === 400) {
-          setError("Can not recover password for github user.");
+          setError('Can not recover password for github user.');
         } else {
-          setError("An server error has occurred, please try again.");
+          setError('An server error has occurred, please try again.');
         }
         setRequesting(false);
       });

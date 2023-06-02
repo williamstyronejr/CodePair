@@ -21,9 +21,9 @@ const InvitePage = () => {
         setLink(err.response && err.response.status === 401 ? '/signin' : '/');
         setLoading(false);
       });
-  }, []);
+  }, [key]);
 
-  if (!loading) return <Navigate to={link} />;
+  if (!loading && link !== '') return <Navigate to={link} />;
 
   return (
     <main className="page-main">

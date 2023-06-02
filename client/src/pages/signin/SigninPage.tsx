@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import { SyntheticEvent } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import GithubButton from '../auth/GithubButton';
@@ -11,10 +11,10 @@ const SigninPage = () => {
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
-  const [username, setUser] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [requesting, setRequesting] = React.useState(false);
-  const [error, setError] = React.useState(false);
+  const [username, setUser] = useState('');
+  const [password, setPassword] = useState('');
+  const [requesting, setRequesting] = useState(false);
+  const [error, setError] = useState(false);
 
   if (user.authenticated) return <Navigate to="/challenges" />;
 

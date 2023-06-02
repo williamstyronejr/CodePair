@@ -1,6 +1,4 @@
-import * as React from 'react';
-import { SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
+import { createRef, useState, useEffect, SyntheticEvent } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '../../hooks/reactRedux';
 import { ajaxRequest } from '../../utils/utils';
@@ -16,20 +14,20 @@ const AccountForm = ({
   currentUsername: string;
   currentEmail: string;
   currentImage: string;
-  updateUserData: Function;
+  updateUserData: (data: any) => void;
 }) => {
-  const [username, setUsername] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [submitting, setSubmitting] = React.useState(false);
-  const [notification, setNotification] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<{
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [error, setError] = useState<{
     username?: string;
     email?: string;
   }>({});
-  const fileRef = React.createRef<HTMLInputElement>();
+  const fileRef = createRef<HTMLInputElement>();
 
   // Timeout for clearing notification message
-  React.useEffect(() => {
+  useEffect(() => {
     let notificationTimer: number;
     if (notification)
       notificationTimer = setTimeout(() => {
@@ -199,19 +197,19 @@ const AccountForm = ({
 };
 
 const PasswordForm = () => {
-  const [currentPassword, setCurrent] = React.useState('');
-  const [newPassword, setNew] = React.useState('');
-  const [confirmPassword, setConfirm] = React.useState('');
-  const [submitting, setSubmitting] = React.useState(false);
-  const [error, setError] = React.useState<{
+  const [currentPassword, setCurrent] = useState('');
+  const [newPassword, setNew] = useState('');
+  const [confirmPassword, setConfirm] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<{
     password?: string;
     confirmPassword?: string;
     newPassword?: string;
   }>({});
-  const [notification, setNotification] = React.useState<String | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
 
   // Timeout for clearing notification message
-  React.useEffect(() => {
+  useEffect(() => {
     let notificationTimer: number;
     if (notification)
       notificationTimer = setTimeout(() => {
@@ -402,13 +400,6 @@ const SettingsPage = () => {
       <div className="settings__content">{displayedForm}</div>
     </section>
   );
-};
-
-AccountForm.propTypes = {
-  currentUsername: PropTypes.string.isRequired,
-  currentEmail: PropTypes.string.isRequired,
-  currentImage: PropTypes.string.isRequired,
-  updateUserData: PropTypes.func.isRequired,
 };
 
 export default SettingsPage;

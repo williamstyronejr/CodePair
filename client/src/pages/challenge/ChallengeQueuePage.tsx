@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
+import { openSocket } from '../../reducers/socketReducer';
 import Timer from '../../components/shared/Timer';
 import LoadingScreen from '../../components/shared/LoadingScreen';
-import { openSocket } from '../../reducers/socketReducer';
 import {
   joinQueue,
   leaveQueue,

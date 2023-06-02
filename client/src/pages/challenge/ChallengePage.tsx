@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import LoadingScreen from '../../components/shared/LoadingScreen';
 import Challenge from './Challenge';
@@ -46,7 +46,7 @@ const ChallengePage = () => {
   const dispatch = useAppDispatch();
   const { rId, cId } = useParams();
   // Clean up
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       dispatch(clearChallengeData());
       dispatch(resetChatData());
@@ -55,12 +55,12 @@ const ChallengePage = () => {
   }, []);
 
   // Fetch data for challenge/room initial mount
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(getChallenge({ cId, rId }));
   }, [rId, cId]);
 
   // Open socket and connect to room
-  React.useEffect(() => {
+  useEffect(() => {
     if (!socket.connected) {
       dispatch(openSocket());
     } else if (socket.ready && !socket.inRoom) {
