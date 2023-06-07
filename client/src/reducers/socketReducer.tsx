@@ -16,13 +16,14 @@ const socketSlice = createSlice({
       state.connecting = true;
     },
     closeSocket(state) {
+      state.connected = false; // Needed to unavoid error with TS Complier
       state = initialState;
     },
     socketReady(state) {
       state.ready = true;
     },
     joinRoom(state, action: PayloadAction<{ room: string; username: string }>) {
-      state.inRoom = true;
+      state.inRoom = !!action;
     },
     leaveRoom(state) {
       state.inRoom = false;

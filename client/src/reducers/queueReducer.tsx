@@ -6,8 +6,8 @@ const initialState = {
   matchFound: false, // Flag to indicate if a match was found
   acceptedMatch: false, // Flag indicating a user accepted the match
   declinedMatch: false, // Flag indicating a user declined the match
-  matchId: null, // Id of match from queue
-  roomId: null, // Id of room when/if one is created
+  matchId: '', // Id of match from queue
+  roomId: '', // Id of room when/if one is created
   queueTimer: 0, // Timer for how long user is in queue
   matchTimer: 10, // Countdown timer for when a match is found
 };
@@ -16,13 +16,15 @@ const queueSlice = createSlice({
   name: 'queue',
   initialState,
   reducers: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     joinQueue(state, action: PayloadAction<{ cId: string; size: number }>) {
-      state.inQueue = true;
+      state.inQueue = !!action;
       state.acceptedMatch = false;
       state.declinedMatch = false;
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     leaveQueue(state, action: PayloadAction<string>) {
-      state.leavingQueue = true;
+      state.leavingQueue = !!action;
       state.inQueue = false;
     },
     matchFound(state, action: PayloadAction<string>) {
@@ -30,7 +32,7 @@ const queueSlice = createSlice({
       state.matchId = action.payload;
       state.acceptedMatch = false;
       state.declinedMatch = false;
-      state.roomId = null;
+      state.roomId = '';
     },
     matchTimeout(state) {
       state.inQueue = false;
@@ -38,18 +40,21 @@ const queueSlice = createSlice({
       state.acceptedMatch = false;
       state.declinedMatch = false;
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     acceptQueue(state, action: PayloadAction<string>) {
-      state.acceptedMatch = true;
+      state.acceptedMatch = !!action;
       state.declinedMatch = false;
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     declineQueue(state, action: PayloadAction<string>) {
+      state.inQueue = false;
       state = {
         ...initialState,
         inQueue: false,
         leavingQueue: true,
         matchFound: false,
         acceptedMatch: false,
-        declinedMatch: true,
+        declinedMatch: !!action,
         queueTimer: 0,
       };
     },
@@ -57,6 +62,7 @@ const queueSlice = createSlice({
       state.roomId = action.payload;
     },
     clearQueue(state) {
+      state.inQueue = false;
       state = initialState;
     },
   },

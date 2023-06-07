@@ -1,16 +1,13 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import LoadingScreen from '../../components/shared/LoadingScreen';
 import Challenge from './Challenge';
+import LoadingScreen from '../../components/shared/LoadingScreen';
 import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
 import {
   resetChatData,
   setMessage,
   toggleChatVisibility,
   sendMessage,
-  userTypingEnd,
-  userTypingStart,
-  messageIndicator,
 } from '../../reducers/chatReducer';
 import {
   getChallenge,
@@ -25,6 +22,7 @@ import {
   openSocket,
   joinRoom,
 } from '../../reducers/socketReducer';
+import { chatTypingIndicator } from '../../middlewares/socket';
 import './styles/challenge.css';
 
 const ChallengeErrorPage = ({ message }: { message: string }) => (
@@ -56,20 +54,28 @@ const ChallengePage = () => {
 
   // Fetch data for challenge/room initial mount
   useEffect(() => {
-    dispatch(getChallenge({ cId, rId }));
-  }, [rId, cId]);
+    if (cId && rId) dispatch(getChallenge({ cId, rId }));
+  }, [rId, cId, dispatch]);
 
   // Open socket and connect to room
   useEffect(() => {
     if (!socket.connected) {
       dispatch(openSocket());
-    } else if (socket.ready && !socket.inRoom) {
+    } else if (socket.ready && !socket.inRoom && rId) {
       dispatch(joinRoom({ room: rId, username }));
     }
-  }, [socket.connected, socket.inRoom, socket.ready, challenge.private]);
+  }, [
+    rId,
+    username,
+    dispatch,
+    socket.connected,
+    socket.inRoom,
+    socket.ready,
+    challenge.private,
+  ]);
 
   // If an error occurred during data fetch
-  if (!rId || challenge.challengeError) {
+  if (!cId || !rId || challenge.challengeError !== '') {
     return (
       <ChallengeErrorPage
         message={
@@ -96,12 +102,10 @@ const ChallengePage = () => {
       prompt={challenge.prompt}
       code={challenge.code}
       testing={challenge.testing}
-      language={challenge.language}
       testPassed={challenge.testPassed}
       testResults={challenge.testResults}
       testErrors={challenge.testErrors}
       inviteLink={challenge.inviteLink}
-      savingCode={challenge.savingCode}
       messages={chat.messages}
       chatInput={chat.chatInput}
       chatVisible={chat.visible}
@@ -109,9 +113,7 @@ const ChallengePage = () => {
       userId={userId}
       toggleChatVisibility={() => dispatch(toggleChatVisibility())}
       setMessage={(text) => dispatch(setMessage(text))}
-      messageIndicator={(typing) =>
-        dispatch(messageIndicator({ roomId: rId, typing, username }))
-      }
+      messageIndicator={(typing) => chatTypingIndicator(rId, username, typing)}
       sendMessage={(msg) => dispatch(sendMessage({ roomId: rId, msg, userId }))}
       setCode={(code) => dispatch(setCode({ room: rId, code }))}
       saveCode={() => dispatch(saveCode({ rId, code: challenge.code }))}

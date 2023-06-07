@@ -16,8 +16,7 @@ import './styles/challengeQueuePage.css';
 
 const ChallengeQueuePage = () => {
   const dispatch = useAppDispatch();
-  const { queue, user, socket } = useAppSelector((state) => ({
-    user: state.user,
+  const { queue, socket } = useAppSelector((state) => ({
     socket: state.socket,
     queue: state.queue,
   }));
@@ -33,7 +32,7 @@ const ChallengeQueuePage = () => {
     if (matchFound) {
       matchInterval = setInterval(() => {
         if (matchTimer <= 0) {
-          if (roomId) return;
+          if (roomId !== '') return;
           if (acceptedMatch) {
             setMatchTimer(10); // Reset timer
             return dispatch(clearQueue());
@@ -69,7 +68,7 @@ const ChallengeQueuePage = () => {
   if (!socket.ready) return <LoadingScreen message="Connecting to server" />;
 
   if (leavingQueue) return <Navigate to="/challenges" />;
-  if (roomId) return <Navigate to={`/c/${cId}/r/${roomId}`} />;
+  if (roomId !== '') return <Navigate to={`/c/${cId}/r/${roomId}`} />;
 
   return (
     <section className="queue">

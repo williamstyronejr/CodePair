@@ -45,13 +45,31 @@ const userSlice = createSlice({
         authError: action.payload,
       };
     },
-    updateUser(state, action: PayloadAction<any>) {
+    updateUser(
+      state,
+      action: PayloadAction<{
+        id?: string;
+        username?: string;
+        email?: string;
+        profileImage?: string;
+        oauthUser?: boolean;
+      }>
+    ) {
       state = {
         ...state,
         ...action.payload,
       };
     },
-    setUserData(state, action: PayloadAction<any>) {
+    setUserData(
+      state,
+      action: PayloadAction<{
+        id: string;
+        username: string;
+        profileImage: string;
+        email: string;
+        oauthUser: boolean;
+      }>
+    ) {
       state.id = action.payload.id;
       state.username = action.payload.username;
       state.profileImage = action.payload.profileImage;
@@ -64,10 +82,10 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserData.pending, (state, action) => {
+      .addCase(fetchUserData.pending, (state) => {
         state.authenticating = true;
       })
-      .addCase(fetchUserData.rejected, (state, action) => {
+      .addCase(fetchUserData.rejected, (state) => {
         state.authenticated = false;
         state.authenticating = false;
       })
@@ -82,6 +100,7 @@ const userSlice = createSlice({
         state.authError = '';
       })
       .addCase(signoutUser.fulfilled, (state) => {
+        state.id = '';
         state = initState;
       });
   },

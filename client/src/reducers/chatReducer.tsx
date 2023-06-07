@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type ChatMessage = {
   author: string;
@@ -42,14 +42,6 @@ const chatSlice = createSlice({
   name: 'chat',
   initialState: initState,
   reducers: {
-    messageIndicator(
-      state,
-      action: PayloadAction<{
-        roomId: string;
-        username: string;
-        typing: boolean;
-      }>
-    ) {},
     userTypingStart(state, action: PayloadAction<{ username: string }>) {
       state.usersTyping = [...state.usersTyping, action.payload.username];
     },
@@ -112,6 +104,7 @@ const chatSlice = createSlice({
       state.messages = action.payload;
     },
     resetChatData(state) {
+      state.messages = [];
       state = initState;
     },
   },
@@ -128,7 +121,6 @@ export const {
   leaveMessage,
   userTypingEnd,
   userTypingStart,
-  messageIndicator,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

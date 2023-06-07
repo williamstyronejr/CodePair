@@ -1,21 +1,35 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ajaxRequest } from '../utils/utils';
 
-const initialState = {
+const initialState: {
+  id: string | null;
+  title: string;
+  prompt: string;
+  code: string;
+  language: string;
+  challengeError: string;
+  private: boolean;
+  inviteLink: string | null;
+  savingCode: boolean;
+  testing: boolean;
+  testPassed: boolean;
+  testErrors: any[];
+  testResults: any[];
+} = {
   id: null,
   title: '',
   prompt: '',
   code: '',
   language: '',
 
-  challengeError: null,
+  challengeError: '',
   private: true, // Flag for indicating if a room is private or public
   inviteLink: null,
 
   savingCode: false, // Flag to indicate when code is being saved to server
   testing: false, // Flag for testing
   testPassed: false, // Flag for all test passing
-  testErrors: null, // Contains any errors (server side errors)
+  testErrors: [], // Contains any errors (server side errors)
   testResults: [], // Array to contains data on each test ran
 };
 
@@ -35,8 +49,8 @@ export const testCode = createAsyncThunk(
     code,
     language,
   }: {
-    cId: string;
     rId: string;
+    cId: string;
     code: string;
     language: string;
   }) => {
@@ -61,7 +75,7 @@ const ChallengeSlice = createSlice({
   initialState,
   reducers: {
     saveCode(state, action: PayloadAction<{ rId: string; code: string }>) {
-      state.savingCode = true;
+      state.savingCode = !!action;
     },
     savedCode(state) {
       state.savingCode = false;
@@ -77,17 +91,22 @@ const ChallengeSlice = createSlice({
     },
     testFinish(
       state,
-      action: PayloadAction<{ success: boolean; results: any; errors: any }>
+      action: PayloadAction<{
+        success: boolean;
+        results: any[];
+        errors: any[];
+      }>
     ) {
       state.testPassed = action.payload.success;
       state.testResults = action.payload.results;
       state.testErrors = action.payload.errors;
       state.testing = false;
     },
-    setChallengeError(state, action: PayloadAction<any>) {
+    setChallengeError(state, action: PayloadAction<string>) {
       state.challengeError = action.payload;
     },
     clearChallengeData(state) {
+      state.id = initialState.id; // Needed to unavoid error
       state = initialState;
     },
   },
@@ -109,7 +128,7 @@ const ChallengeSlice = createSlice({
           ? `localhost:3000/invite/${action.payload.room.inviteKey}`
           : '';
       })
-      .addCase(getChallenge.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(getChallenge.rejected, (state) => {
         state.challengeError = 'Server error occurred, please try again.';
       })
       .addCase(testCode.fulfilled, (state) => {
@@ -129,12 +148,9 @@ const ChallengeSlice = createSlice({
           state.inviteLink = action.payload;
         }
       )
-      .addCase(
-        convertRoomToPublic.rejected,
-        (state, action: PayloadAction<any>) => {
-          state.challengeError = 'Server error occured, please try again.';
-        }
-      );
+      .addCase(convertRoomToPublic.rejected, (state) => {
+        state.challengeError = 'Server error occured, please try again.';
+      });
   },
 });
 

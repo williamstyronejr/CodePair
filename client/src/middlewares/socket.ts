@@ -12,7 +12,6 @@ import {
   addMessage,
   joinMessage,
   leaveMessage,
-  messageIndicator,
   sendMessage,
   userTypingEnd,
   userTypingStart,
@@ -33,6 +32,7 @@ import {
   roomCreated,
 } from '../reducers/queueReducer';
 import { StoreType } from '../store';
+import { Middleware } from 'redux';
 
 const socket = io('', { autoConnect: false });
 
@@ -73,7 +73,7 @@ export const setupSocketHandlers = (store: StoreType) => {
   });
 
   // Handles when client socket receives a chat message from server
-  socket.on('receiveMessage', (msg: string, time: string, author: string) => {
+  socket.on('receiveMessage', (msg: string, time: number, author: string) => {
     store.dispatch(addMessage({ msg, time, author }));
   });
 
@@ -85,7 +85,7 @@ export const setupSocketHandlers = (store: StoreType) => {
     }
   });
 
-  // Handles removing user frrom typing list
+  // Handles removing user from typing list
   socket.on('chatTypingFinish', (username: string) => {
     store.dispatch(userTypingEnd({ username }));
   });
@@ -110,78 +110,91 @@ export const setupSocketHandlers = (store: StoreType) => {
   });
 };
 
-export const socketMiddlware = (params) => (next) => (action) => {
-  const { dispatch, getState } = params;
+/**
+ * Emits a user typing event to the given room. This exist outside of redux due
+ *  to the action currently not having any purpose outside of typing.
+ * @param roomId Id of room to send indicator to
+ * @param username Username of user typing
+ * @param typing Flag indicating if user is starting to type or ending
+ */
+export function chatTypingIndicator(
+  roomId: string,
+  username: string,
+  typing: boolean
+) {
+  if (socket.connected) {
+    socket.emit(typing ? 'userTyping' : 'userTypingEnd', roomId, username);
+  }
+}
 
-  if (socket && socket.connected) {
-    switch (action.type) {
-      case closeSocket.type:
-        socket.close();
-        break;
+export const socketMiddlware: Middleware =
+  (/*params*/) => (next) => (action) => {
+    // const { dispatch, getState } = params;
 
-      // Chat cases
-      case joinRoom.type:
-        socket.emit('joinRoom', action.payload.room, action.payload.username);
-        break;
+    if (socket && socket.connected) {
+      switch (action.type) {
+        case closeSocket.type:
+          socket.close();
+          break;
 
-      case leaveRoom.type:
-        socket.emit('leaveRoom', action.payload.room, action.payload.username);
-        break;
+        // Chat cases
+        case joinRoom.type:
+          socket.emit('joinRoom', action.payload.room, action.payload.username);
+          break;
 
-      case sendMessage.type:
-        socket.emit(
-          'sendMessage',
-          action.payload.roomId,
-          action.payload.msg,
-          Date.now(),
-          action.payload.userId
-        );
-        return next(action);
+        case leaveRoom.type:
+          socket.emit(
+            'leaveRoom',
+            action.payload.room,
+            action.payload.username
+          );
+          break;
 
-      case messageIndicator.type:
-        socket.emit(
-          action.payload.typing ? 'userTyping' : 'userTypingEnd',
-          action.payload.roomId,
-          action.payload.username
-        );
-        return next(action);
+        case sendMessage.type:
+          socket.emit(
+            'sendMessage',
+            action.payload.roomId,
+            action.payload.msg,
+            Date.now(),
+            action.payload.userId
+          );
+          return next(action);
 
-      // Challenge cases
-      case setCode.type:
-        socket.emit('sendCode', action.payload.room, action.payload.code);
-        return next(action);
+        // Challenge cases
+        case setCode.type:
+          socket.emit('sendCode', action.payload.room, action.payload.code);
+          return next(action);
 
-      case saveCode.type:
-        socket.emit('saveCode', action.payload.roomId, action.payload.code);
-        return next(action);
+        case saveCode.type:
+          socket.emit('saveCode', action.payload.roomId, action.payload.code);
+          return next(action);
 
-      case testCode.typePrefix:
-        socket.emit('testRequested', action.payload);
-        return next(action);
+        case testCode.typePrefix:
+          socket.emit('testRequested', action.payload);
+          return next(action);
 
-      // Queue handlers
-      case joinQueue.type:
-        socket.emit('joinQueue', action.payload.cId, action.payload.size);
-        return next(action);
+        // Queue handlers
+        case joinQueue.type:
+          socket.emit('joinQueue', action.payload.cId, action.payload.size);
+          return next(action);
 
-      case leaveQueue.type:
-        socket.emit('leaveQueue', action.payload);
-        return next(action);
+        case leaveQueue.type:
+          socket.emit('leaveQueue', action.payload);
+          return next(action);
 
-      case acceptQueue.type:
-        socket.emit('acceptMatch', action.payload);
-        return next(action);
+        case acceptQueue.type:
+          socket.emit('acceptMatch', action.payload);
+          return next(action);
 
-      default:
-        return next(action);
+        default:
+          return next(action);
+      }
     }
-  }
 
-  // Handle connecting the socket to server
-  if (action.type === openSocket.type) {
-    socket.connect;
-    socket.connect();
-  }
+    // Handle connecting the socket to server
+    if (action.type === openSocket.type) {
+      socket.connect();
+    }
 
-  return next(action);
-};
+    return next(action);
+  };
