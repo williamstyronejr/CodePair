@@ -47,7 +47,7 @@ const ChallengeQueuePage = () => {
     return () => {
       clearInterval(matchInterval);
     };
-  }, [matchFound, matchTimer, roomId, acceptedMatch]);
+  }, [matchFound, matchTimer, roomId, acceptedMatch, dispatch]);
 
   useEffect(() => {
     if (!socket.connected && !socket.connecting) {
@@ -55,7 +55,15 @@ const ChallengeQueuePage = () => {
     } else if (socket.ready && !queue.inQueue && !queue.leavingQueue) {
       dispatch(joinQueue({ cId: queueId, size: 2 }));
     }
-  }, [socket.connected, socket.ready, queue.inQueue, socket.connecting]);
+  }, [
+    socket.connected,
+    socket.ready,
+    queue.inQueue,
+    queue.leavingQueue,
+    socket.connecting,
+    queueId,
+    dispatch,
+  ]);
 
   useEffect(() => {
     // Clean up on unmount
@@ -63,7 +71,7 @@ const ChallengeQueuePage = () => {
       dispatch(leaveQueue(queueId));
       dispatch(clearQueue());
     };
-  }, [queueId]);
+  }, [dispatch, queueId]);
 
   if (!socket.ready) return <LoadingScreen message="Connecting to server" />;
 
