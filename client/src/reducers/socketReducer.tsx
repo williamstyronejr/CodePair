@@ -16,8 +16,11 @@ const socketSlice = createSlice({
       state.connecting = true;
     },
     closeSocket(state) {
-      state.connected = false; // Needed to unavoid error with TS Complier
-      state = initialState;
+      state.connected = false;
+      state.connecting = false;
+      state.inRoom = false;
+      state.ready = false;
+      state.error = null;
     },
     socketReady(state) {
       state.ready = true;

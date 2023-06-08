@@ -63,7 +63,14 @@ const queueSlice = createSlice({
     },
     clearQueue(state) {
       state.inQueue = false;
-      state = initialState;
+      state.leavingQueue = false;
+      state.matchFound = false;
+      state.acceptedMatch = false;
+      state.declinedMatch = false;
+      state.matchId = '';
+      state.roomId = '';
+      state.queueTimer = 0;
+      state.matchTimer = 10;
     },
   },
 });

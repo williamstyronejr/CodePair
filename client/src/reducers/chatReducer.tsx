@@ -105,7 +105,9 @@ const chatSlice = createSlice({
     },
     resetChatData(state) {
       state.messages = [];
-      state = initState;
+      state.chatInput = '';
+      state.visible = false;
+      state.usersTyping = [];
     },
   },
 });

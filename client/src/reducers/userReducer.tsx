@@ -100,8 +100,14 @@ const userSlice = createSlice({
         state.authError = '';
       })
       .addCase(signoutUser.fulfilled, (state) => {
+        state.profileImage = '';
         state.id = '';
-        state = initState;
+        state.username = '';
+        state.email = '';
+        state.authenticated = false;
+        state.authenticating = false;
+        state.authError = '';
+        state.oauthUser = false;
       });
   },
 });

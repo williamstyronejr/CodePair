@@ -106,8 +106,19 @@ const ChallengeSlice = createSlice({
       state.challengeError = action.payload;
     },
     clearChallengeData(state) {
-      state.id = initialState.id; // Needed to unavoid error
-      state = initialState;
+      state.id = null;
+      state.title = '';
+      state.prompt = '';
+      state.code = '';
+      state.language = '';
+      state.challengeError = '';
+      state.private = true;
+      state.inviteLink = null;
+      state.savingCode = false;
+      state.testing = false;
+      state.testPassed = false;
+      state.testErrors = [];
+      state.testResults = [];
     },
   },
   extraReducers: (builder) => {
