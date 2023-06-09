@@ -1,19 +1,19 @@
-import {
-  JOIN_MESSAGE,
-  LEAVE_MESSAGE,
-  ADD_MESSAGE,
-  SEND_MESSAGE,
-  SET_MESSAGE,
-  TOGGLE_CHAT_VISIBILITY,
-  RESET_CHAT_DATA,
-  SET_INITIAL_MESSAGES,
-  USER_TYPE_START,
-  USER_TYPE_END,
-} from "../actions/chat";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initState = {
+type ChatMessage = {
+  author: string;
+  time: number;
+  content: string;
+};
+
+const initState: {
+  messages: ChatMessage[];
+  chatInput: string;
+  visible: boolean;
+  usersTyping: string[];
+} = {
   messages: [],
-  chatInput: "",
+  chatInput: '',
   visible: false,
   usersTyping: [],
 };
@@ -26,7 +26,11 @@ const initState = {
  * @param {Number} time Timestamp of when message was sent
  * @return {Object} Returns the message object
  */
-function createMessage(author: string, content: string, time: number) {
+function createMessage(
+  author: string,
+  content: string,
+  time: number
+): ChatMessage {
   return {
     author,
     content,
@@ -34,104 +38,91 @@ function createMessage(author: string, content: string, time: number) {
   };
 }
 
-/**
- * Creates a new array with 'item' inserted appended.
- * @param {Array} array Array to copy.
- * @param {*} item Item to be inserted into array.
- * @returns {Array} Returns a new array with item inserted.
- */
-function insertItem(array: Array<any>, item: any) {
-  return [...array, item];
-}
+const chatSlice = createSlice({
+  name: 'chat',
+  initialState: initState,
+  reducers: {
+    userTypingStart(state, action: PayloadAction<{ username: string }>) {
+      state.usersTyping = [...state.usersTyping, action.payload.username];
+    },
 
-const ChatReducer = (state = initState, action: any) => {
-  switch (action.type) {
-    case JOIN_MESSAGE:
-      return {
-        ...state,
-        messages: insertItem(
-          state.messages,
-          createMessage(
-            "notification",
-            `${action.payload} has joined.`,
-            Date.now()
-          )
+    userTypingEnd(state, action: PayloadAction<{ username: string }>) {
+      state.usersTyping = state.usersTyping.filter(
+        (val) => val !== action.payload.username
+      );
+    },
+    sendMessage(
+      state,
+      action: PayloadAction<{ roomId: string; userId: string; msg: string }>
+    ) {
+      state.chatInput = '';
+      state.messages = [
+        ...state.messages,
+        createMessage(action.payload.userId, action.payload.msg, Date.now()),
+      ];
+    },
+    toggleChatVisibility(state) {
+      state.visible = !state.visible;
+    },
+    addMessage(
+      state,
+      action: PayloadAction<{ msg: string; author: string; time: number }>
+    ) {
+      state.messages = [
+        ...state.messages,
+        createMessage(
+          action.payload.author,
+          action.payload.msg,
+          action.payload.time
         ),
-      };
-
-    case LEAVE_MESSAGE:
-      return {
-        ...state,
-        messages: insertItem(
-          state.messages,
-          createMessage(
-            "notification",
-            `${action.payload} has left.`,
-            Date.now()
-          )
+      ];
+    },
+    leaveMessage(state, action: PayloadAction<string>) {
+      state.messages = [
+        ...state.messages,
+        createMessage(
+          'notification',
+          `${action.payload} has left.`,
+          Date.now()
         ),
-      };
-
-    case ADD_MESSAGE:
-      return {
-        ...state,
-        messages: insertItem(
-          state.messages,
-          createMessage(
-            action.payload.author,
-            action.payload.msg,
-            action.payload.time
-          )
+      ];
+    },
+    joinMessage(state, action: PayloadAction<string>) {
+      state.messages = [
+        ...state.messages,
+        createMessage(
+          'notification',
+          `${action.payload} has joined.`,
+          Date.now()
         ),
-      };
+      ];
+    },
+    setMessage(state, action: PayloadAction<string>) {
+      state.chatInput = action.payload;
+    },
+    setInitialMessages(state, action: PayloadAction<any[]>) {
+      state.messages = action.payload;
+    },
+    resetChatData(state) {
+      state.messages = [];
+      state.chatInput = '';
+      state.visible = false;
+      state.usersTyping = [];
+    },
+  },
+});
 
-    case SET_MESSAGE: // Set message in chat input
-      return {
-        ...state,
-        messages: [...state.messages],
-        chatInput: action.payload,
-      };
+export const {
+  toggleChatVisibility,
+  resetChatData,
+  setInitialMessages,
+  setMessage,
+  sendMessage,
+  addMessage,
+  joinMessage,
+  leaveMessage,
+  userTypingEnd,
+  userTypingStart,
+} = chatSlice.actions;
 
-    case SEND_MESSAGE: // Store sent messages locally
-      return {
-        ...state,
-        messages: insertItem(
-          state.messages,
-          createMessage(action.payload.userId, action.payload.msg, Date.now())
-        ),
-        chatInput: "",
-      };
-
-    case TOGGLE_CHAT_VISIBILITY:
-      return {
-        ...state,
-        visible: !state.visible,
-      };
-
-    case SET_INITIAL_MESSAGES:
-      return {
-        ...state,
-        messages: action.payload,
-      };
-
-    case USER_TYPE_START:
-      return {
-        ...state,
-        usersTyping: [...state.usersTyping, action.payload],
-      };
-
-    case USER_TYPE_END:
-      return {
-        ...state,
-        usersTyping: state.usersTyping.filter((val) => val !== action.payload),
-      };
-
-    case RESET_CHAT_DATA:
-      return initState;
-
-    default:
-      return state;
-  }
-};
-
-export default ChatReducer;
+export default chatSlice.reducer;

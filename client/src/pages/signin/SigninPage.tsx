@@ -1,23 +1,22 @@
-import { SyntheticEvent, useState } from 'react';
-import { connect } from 'react-redux';
+import { useState } from 'react';
+import { SyntheticEvent } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import GithubButton from '../auth/GithubButton';
-import { setUserData } from '../../actions/authentication';
+import { setUserData } from '../../reducers/userReducer';
 import { ajaxRequest } from '../../utils/utils';
+import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
 import './styles/signinPage.css';
 
-const SigninPage = (props: {
-  setUserData: (user: any) => void;
-  user: {
-    authenticated: boolean;
-  };
-}) => {
+const SigninPage = () => {
+  const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+
   const [username, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [requesting, setRequesting] = useState(false);
   const [error, setError] = useState(false);
 
-  if (props.user.authenticated) return <Navigate to="/challenges" />;
+  if (user.authenticated) return <Navigate to="/challenges" />;
 
   function onSubmit(evt: SyntheticEvent<HTMLFormElement>) {
     evt.preventDefault();
@@ -30,7 +29,7 @@ const SigninPage = (props: {
       .then((res) => {
         setRequesting(false);
         if (res.data.success) {
-          props.setUserData(res.data.user);
+          dispatch(setUserData(res.data.user));
         }
       })
       .catch(() => {
@@ -110,12 +109,4 @@ const SigninPage = (props: {
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  user: state.user,
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  setUserData: (user: any) => dispatch(setUserData(user)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(SigninPage);
+export default SigninPage;

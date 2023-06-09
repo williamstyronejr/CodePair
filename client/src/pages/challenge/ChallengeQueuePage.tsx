@@ -1,48 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { openSocket } from '../../actions/socket';
+import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
+import { openSocket } from '../../reducers/socketReducer';
 import Timer from '../../components/shared/Timer';
 import LoadingScreen from '../../components/shared/LoadingScreen';
 import {
   joinQueue,
   leaveQueue,
-  acceptMatch,
-  declineMatch,
   clearQueue,
+  declineQueue,
+  acceptQueue,
   matchTimeout,
-} from '../../actions/queue';
+} from '../../reducers/queueReducer';
 import './styles/challengeQueuePage.css';
 
-const ChallengeQueuePage = (props: {
-  user: {
-    id: string;
-  };
-  socket: {
-    connected: boolean;
-    ready: boolean;
-    connecting: boolean;
-  };
-  queue: {
-    matchId: string;
-    inQueue: boolean;
-    leavingQueue: boolean;
-    roomId: string;
-    matchFound: boolean;
-    acceptedMatch: boolean;
-    declinedMatch: boolean;
-  };
-  openSocket: () => void;
-  clearQueue: () => void;
-  declineMatch: (id: string) => void;
-  joinQueue: (cId: string, size: number) => void;
-  leaveQueue: (queue: string) => void;
-  acceptMatch: (queueId: string) => void;
-  matchTimeout: () => void;
-}) => {
+const ChallengeQueuePage = () => {
+  const dispatch = useAppDispatch();
+  const { queue, socket } = useAppSelector((state) => ({
+    socket: state.socket,
+    queue: state.queue,
+  }));
   const { cId, lang } = useParams();
   const { leavingQueue, roomId, matchFound, acceptedMatch, declinedMatch } =
-    props.queue;
+    queue;
   const [matchTimer, setMatchTimer] = useState(10);
   const queueId = `${cId}-${lang}`; // Id of queue the user is joining
 
@@ -52,12 +32,12 @@ const ChallengeQueuePage = (props: {
     if (matchFound) {
       matchInterval = setInterval(() => {
         if (matchTimer <= 0) {
-          if (roomId) return;
+          if (roomId !== '') return;
           if (acceptedMatch) {
             setMatchTimer(10); // Reset timer
-            return props.clearQueue();
+            return dispatch(clearQueue());
           }
-          return props.matchTimeout();
+          return dispatch(matchTimeout());
         }
 
         setMatchTimer(matchTimer - 1);
@@ -67,45 +47,36 @@ const ChallengeQueuePage = (props: {
     return () => {
       clearInterval(matchInterval);
     };
-  }, [
-    matchFound,
-    matchTimer,
-    roomId,
-    acceptedMatch,
-    props.clearQueue,
-    props.matchTimeout,
-  ]);
+  }, [matchFound, matchTimer, roomId, acceptedMatch, dispatch]);
 
   useEffect(() => {
-    if (!props.socket.connected && !props.socket.connecting) {
-      props.openSocket();
-    } else if (
-      props.socket.ready &&
-      !props.queue.inQueue &&
-      !props.queue.leavingQueue
-    ) {
-      props.joinQueue(queueId, 2);
+    if (!socket.connected && !socket.connecting) {
+      dispatch(openSocket());
+    } else if (socket.ready && !queue.inQueue && !queue.leavingQueue) {
+      dispatch(joinQueue({ cId: queueId, size: 2 }));
     }
   }, [
-    props.socket.connected,
-    props.socket.ready,
-    props.queue.inQueue,
-    props.socket.connecting,
+    socket.connected,
+    socket.ready,
+    queue.inQueue,
+    queue.leavingQueue,
+    socket.connecting,
+    queueId,
+    dispatch,
   ]);
 
   useEffect(() => {
     // Clean up on unmount
     return () => {
-      props.leaveQueue(queueId);
-      props.clearQueue();
+      dispatch(leaveQueue(queueId));
+      dispatch(clearQueue());
     };
-  }, [queueId]);
+  }, [dispatch, queueId]);
 
-  if (!props.socket.ready)
-    return <LoadingScreen message="Connecting to server" />;
+  if (!socket.ready) return <LoadingScreen message="Connecting to server" />;
 
   if (leavingQueue) return <Navigate to="/challenges" />;
-  if (roomId) return <Navigate to={`/c/${cId}/r/${roomId}`} />;
+  if (roomId !== '') return <Navigate to={`/c/${cId}/r/${roomId}`} />;
 
   return (
     <section className="queue">
@@ -122,7 +93,7 @@ const ChallengeQueuePage = (props: {
                 <button
                   type="button"
                   className="btn btn--pair btn--pair-accept"
-                  onClick={() => props.acceptMatch(props.queue.matchId)}
+                  onClick={() => dispatch(acceptQueue(queue.matchId))}
                 >
                   Accept Pair
                 </button>
@@ -130,7 +101,7 @@ const ChallengeQueuePage = (props: {
                 <button
                   type="button"
                   className="btn btn--pair btn--pair-decline"
-                  onClick={props.declineMatch}
+                  onClick={() => dispatch(declineQueue(queue.matchId))}
                 >
                   Decline Pair
                 </button>
@@ -155,7 +126,7 @@ const ChallengeQueuePage = (props: {
           className="btn btn--cancel"
           type="button"
           data-cy="cancel"
-          onClick={() => props.leaveQueue(queueId)}
+          onClick={() => dispatch(leaveQueue(queueId))}
         >
           Cancel
         </button>
@@ -164,20 +135,4 @@ const ChallengeQueuePage = (props: {
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  user: state.user,
-  queue: state.queue,
-  socket: state.socket,
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  openSocket: () => dispatch(openSocket()),
-  clearQueue: () => dispatch(clearQueue()),
-  declineMatch: (id: string) => dispatch(declineMatch(id)),
-  joinQueue: (cId: string, size: number) => dispatch(joinQueue(cId, size)),
-  leaveQueue: (queue: string) => dispatch(leaveQueue(queue)),
-  acceptMatch: (queueId: string) => dispatch(acceptMatch(queueId)),
-  matchTimeout: () => dispatch(matchTimeout()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ChallengeQueuePage);
+export default ChallengeQueuePage;

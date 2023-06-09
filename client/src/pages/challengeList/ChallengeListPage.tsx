@@ -4,7 +4,6 @@ import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { ajaxRequest } from '../../utils/utils';
 import Loading from '../../components/shared/Loading';
 import LoadingScreen from '../../components/shared/LoadingScreen';
-
 import './styles/challengeList.css';
 import './styles/challengeModal.css';
 

@@ -1,93 +1,89 @@
-import {
-  ADD_USER_TO_QUEUE,
-  LEAVE_QUEUE,
-  MATCH_FOUND,
-  MATCH_TIMEOUT,
-  ACCEPT_QUEUE,
-  DECLINE_MATCH,
-  ROOM_CREATED,
-  CLEAR_QUEUE,
-} from "../actions/queue";
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const initState = {
+const initialState = {
   inQueue: false, // Flag indicating user is in queue
   leavingQueue: false, // Flag for when user leaves queue (timeout/decline/leave)
   matchFound: false, // Flag to indicate if a match was found
   acceptedMatch: false, // Flag indicating a user accepted the match
   declinedMatch: false, // Flag indicating a user declined the match
-  matchId: null, // Id of match from queue
-  roomId: null, // Id of room when/if one is created
+  matchId: '', // Id of match from queue
+  roomId: '', // Id of room when/if one is created
   queueTimer: 0, // Timer for how long user is in queue
   matchTimer: 10, // Countdown timer for when a match is found
 };
 
-const queueReducer = (state = initState, action: any) => {
-  switch (action.type) {
-    case ADD_USER_TO_QUEUE:
-      return {
-        ...state,
-        inQueue: true,
-        acceptedMatch: false,
-        declinedMatch: false,
-      };
-
-    case LEAVE_QUEUE:
-      return {
-        ...state,
-        leavingQueue: true,
-        inQueue: false,
-      };
-
-    case MATCH_FOUND:
-      return {
-        ...state,
-        matchFound: true,
-        matchId: action.payload,
-        acceptedMatch: false,
-        declinedMatch: false,
-        roomId: null,
-      };
-
-    case MATCH_TIMEOUT:
-      return {
-        ...state,
-        inQueue: false,
-        leavingQueue: true,
-        matchFound: false,
-        acceptedMatch: false,
-        declinedMatch: false,
-      };
-
-    case ACCEPT_QUEUE:
-      return {
-        ...state,
-        acceptedMatch: true,
-        declinedMatch: false,
-      };
-
-    case DECLINE_MATCH:
-      return {
-        ...initState,
+const queueSlice = createSlice({
+  name: 'queue',
+  initialState,
+  reducers: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    joinQueue(state, action: PayloadAction<{ cId: string; size: number }>) {
+      state.inQueue = !!action;
+      state.acceptedMatch = false;
+      state.declinedMatch = false;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    leaveQueue(state, action: PayloadAction<string>) {
+      state.leavingQueue = !!action;
+      state.inQueue = false;
+    },
+    matchFound(state, action: PayloadAction<string>) {
+      state.matchFound = true;
+      state.matchId = action.payload;
+      state.acceptedMatch = false;
+      state.declinedMatch = false;
+      state.roomId = '';
+    },
+    matchTimeout(state) {
+      state.inQueue = false;
+      (state.leavingQueue = true), (state.matchFound = false);
+      state.acceptedMatch = false;
+      state.declinedMatch = false;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    acceptQueue(state, action: PayloadAction<string>) {
+      state.acceptedMatch = !!action;
+      state.declinedMatch = false;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    declineQueue(state, action: PayloadAction<string>) {
+      state.inQueue = false;
+      state = {
+        ...initialState,
         inQueue: false,
         leavingQueue: true,
         matchFound: false,
         acceptedMatch: false,
-        declinedMatch: true,
+        declinedMatch: !!action,
         queueTimer: 0,
       };
+    },
+    roomCreated(state, action: PayloadAction<string>) {
+      state.roomId = action.payload;
+    },
+    clearQueue(state) {
+      state.inQueue = false;
+      state.leavingQueue = false;
+      state.matchFound = false;
+      state.acceptedMatch = false;
+      state.declinedMatch = false;
+      state.matchId = '';
+      state.roomId = '';
+      state.queueTimer = 0;
+      state.matchTimer = 10;
+    },
+  },
+});
 
-    case ROOM_CREATED:
-      return {
-        ...state,
-        roomId: action.payload,
-      };
+export const {
+  roomCreated,
+  declineQueue,
+  acceptQueue,
+  matchTimeout,
+  matchFound,
+  leaveQueue,
+  joinQueue,
+  clearQueue,
+} = queueSlice.actions;
 
-    case CLEAR_QUEUE:
-      return initState;
-
-    default:
-      return state;
-  }
-};
-
-export default queueReducer;
+export default queueSlice.reducer;

@@ -1,19 +1,18 @@
-import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import Root from "./pages/Root";
-import store from "./store/store";
-import { getUserData } from "./actions/authentication";
-import setupSocket from "./utils/socket";
-import "normalize.css";
-import "./styles/index.css";
+import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import Root from './pages/Root';
+import store from './store';
+import { setupSocketHandlers } from './middlewares/socket';
+import { fetchUserData } from './reducers/userReducer';
+import './styles/index.css';
+import 'normalize.css';
 
 // TODO: Dispatch only when there's a cookie present
-store.dispatch(getUserData());
+store.dispatch(fetchUserData());
 
-// Setup handlers for socket
-setupSocket(store);
+setupSocketHandlers(store);
 
-const container = document.getElementById("root");
+const container = document.getElementById('root');
 const root = createRoot(container as any);
 root.render(
   <Provider store={store}>

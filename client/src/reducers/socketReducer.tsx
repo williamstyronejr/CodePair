@@ -1,13 +1,6 @@
-import {
-  OPEN_SOCKET,
-  CLOSE_SOCKET,
-  SOCKET_CONNECTED,
-  SOCKET_LOGGED,
-  JOIN_ROOM,
-  LEAVE_ROOM,
-} from "../actions/socket";
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const initState = {
+const initialState = {
   connected: false, // Flag indicating socket connection is made
   connecting: false, // Flag indicating socket is connecting
   inRoom: false, // Flag indicating socket has joined a room (chat/challenge)
@@ -15,45 +8,43 @@ const initState = {
   error: null, // Error that occurs during connection for socket
 };
 
-const socketReducer = (state = initState, action: any) => {
-  switch (action.type) {
-    case OPEN_SOCKET:
-      return {
-        ...state,
-        connecting: true,
-      };
+const socketSlice = createSlice({
+  name: 'socket',
+  initialState,
+  reducers: {
+    openSocket(state) {
+      state.connecting = true;
+    },
+    closeSocket(state) {
+      state.connected = false;
+      state.connecting = false;
+      state.inRoom = false;
+      state.ready = false;
+      state.error = null;
+    },
+    socketReady(state) {
+      state.ready = true;
+    },
+    joinRoom(state, action: PayloadAction<{ room: string; username: string }>) {
+      state.inRoom = !!action;
+    },
+    leaveRoom(state) {
+      state.inRoom = false;
+    },
+    socketConnected(state) {
+      state.connected = true;
+      state.connecting = false;
+    },
+  },
+});
 
-    case CLOSE_SOCKET:
-      return initState;
+export const {
+  openSocket,
+  closeSocket,
+  socketReady,
+  joinRoom,
+  leaveRoom,
+  socketConnected,
+} = socketSlice.actions;
 
-    case SOCKET_CONNECTED:
-      return {
-        ...state,
-        connected: true,
-        connecting: false,
-      };
-
-    case SOCKET_LOGGED:
-      return {
-        ...state,
-        ready: true,
-      };
-
-    case JOIN_ROOM:
-      return {
-        ...state,
-        inRoom: true,
-      };
-
-    case LEAVE_ROOM:
-      return {
-        ...state,
-        inRoom: false,
-      };
-
-    default:
-      return state;
-  }
-};
-
-export default socketReducer;
+export default socketSlice.reducer;

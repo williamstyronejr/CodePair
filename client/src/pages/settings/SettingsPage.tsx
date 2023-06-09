@@ -1,8 +1,8 @@
-import { useState, useEffect, createRef, SyntheticEvent } from 'react';
-import { connect } from 'react-redux';
+import { createRef, useState, useEffect, SyntheticEvent } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { updateUser } from '../../actions/user';
+import { useAppSelector } from '../../hooks/reactRedux';
 import { ajaxRequest } from '../../utils/utils';
+import { updateUser } from '../../reducers/userReducer';
 import './styles/settingsPage.css';
 
 const AccountForm = ({
@@ -14,7 +14,7 @@ const AccountForm = ({
   currentUsername: string;
   currentEmail: string;
   currentImage: string;
-  updateUserData: Function;
+  updateUserData: (data: any) => void;
 }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -206,7 +206,7 @@ const PasswordForm = () => {
     confirmPassword?: string;
     newPassword?: string;
   }>({});
-  const [notification, setNotification] = useState<String | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
 
   // Timeout for clearing notification message
   useEffect(() => {
@@ -339,15 +339,8 @@ const PasswordForm = () => {
   );
 };
 
-const SettingsPage = (props: {
-  updateUser: (data: any) => void;
-  user: {
-    username: string;
-    email: string;
-    profileImage: string;
-    oauthUser: boolean;
-  };
-}) => {
+const SettingsPage = () => {
+  const user = useAppSelector((state) => state.user);
   const { type } = useParams();
   let displayedForm;
 
@@ -355,15 +348,15 @@ const SettingsPage = (props: {
     case 'account':
       displayedForm = (
         <AccountForm
-          currentUsername={props.user.username}
-          currentEmail={props.user.email}
-          currentImage={props.user.profileImage}
-          updateUserData={props.updateUser}
+          currentUsername={user.username}
+          currentEmail={user.email}
+          currentImage={user.profileImage}
+          updateUserData={updateUser}
         />
       );
       break;
     case 'password':
-      displayedForm = props.user.oauthUser ? (
+      displayedForm = user.oauthUser ? (
         <form className="settings__form settings__form--oauth">
           <h2>Unable to update password for Github User</h2>
         </form>
@@ -409,12 +402,4 @@ const SettingsPage = (props: {
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  user: state.user,
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  updateUser: (data: any) => dispatch(updateUser(data)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
+export default SettingsPage;

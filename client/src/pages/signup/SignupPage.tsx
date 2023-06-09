@@ -1,18 +1,16 @@
 import { SyntheticEvent, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { connect } from 'react-redux';
 import { ajaxRequest } from '../../utils/utils';
-import { setUserData } from '../../actions/authentication';
+import { setUserData } from '../../reducers/userReducer';
 import GithubButton from '../auth/GithubButton';
+import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
 import './styles/signupPage.css';
 
-const SignupPage = (props: {
-  setUserData: (user: any) => void;
-  user: {
-    authenticated: boolean;
-  };
-}) => {
-  const [user, setUser] = useState('');
+const SignupPage = () => {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [email, setEmail] = useState('');
@@ -25,7 +23,7 @@ const SignupPage = (props: {
     general?: string;
   }>({});
 
-  if (props.user.authenticated) return <Navigate to="/challenges" />;
+  if (user.authenticated) return <Navigate to="/challenges" />;
 
   function onSubmit(evt: SyntheticEvent<HTMLFormElement>) {
     evt.preventDefault();
@@ -35,14 +33,14 @@ const SignupPage = (props: {
     setError({});
 
     ajaxRequest('/api/signup', 'POST', {
-      username: user,
+      username,
       password,
       confirm,
       email,
     })
       .then((res) => {
         setRequesting(false);
-        if (res.data.success) props.setUserData(res.data.user);
+        if (res.data.success) dispatch(setUserData(res.data.user));
       })
       .catch((err) => {
         setRequesting(false);
@@ -101,8 +99,8 @@ const SignupPage = (props: {
               className="form__input form__input--text"
               type="text"
               placeholder="Username"
-              value={user}
-              onChange={(evt) => setUser(evt.target.value)}
+              value={username}
+              onChange={(evt) => setUsername(evt.target.value)}
               data-cy="username"
             />
           </label>
@@ -165,12 +163,4 @@ const SignupPage = (props: {
   );
 };
 
-const mapStatesToProps = (state: any) => ({
-  user: state.user,
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  setUserData: (user: any) => dispatch(setUserData(user)),
-});
-
-export default connect(mapStatesToProps, mapDispatchToProps)(SignupPage);
+export default SignupPage;

@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
 import LoadingScreen from '../../components/shared/LoadingScreen';
 import { ajaxRequest } from '../../utils/utils';
 
 const InvitePage = () => {
-  const { key } = useParams();
   const [loading, setLoading] = useState(true);
   const [link, setLink] = useState('');
+  const { key } = useParams();
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    ajaxRequest(`/api/invite/${key}`, 'POST', {
+    ajaxRequest(`/api/${pathname}`, 'POST', {
       data: { inviteKey: key },
     })
       .then((res) => {

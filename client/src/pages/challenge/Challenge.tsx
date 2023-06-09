@@ -9,53 +9,53 @@ import './styles/challenge.css';
 
 const extensions = [javascript({ jsx: false })];
 
-function Challenge(props: {
+function Challenge({
+  userId,
+  title,
+  prompt,
+  code,
+  testing,
+  testPassed,
+  testResults,
+  testErrors,
+  usersTyping,
+  privateRoom,
+  chatVisible,
+  inviteLink,
+  chatInput,
+  messages,
+  testCode,
+  setCode,
+  saveCode,
+  setMessage,
+  sendMessage,
+  toggleChatVisibility,
+  convertRoomToPublic,
+  messageIndicator,
+}: {
   userId: string;
   title: string;
   prompt: string;
   code: string;
   testing: boolean;
-  savingCode: boolean;
   testPassed: boolean;
   testResults: any[];
+  testErrors: any[];
   usersTyping: any[];
-  testCode: () => void;
-  setCode: () => void;
-  saveCode: () => void;
-  setMessage: () => void;
-  sendMessage: () => void;
-  toggleChatVisibility: () => void;
-  convertRoomToPublic: () => void;
-  messageIndicator: () => void;
   privateRoom: boolean;
   chatVisible: boolean;
-  inviteLink: string;
+  inviteLink: string | null;
   chatInput: string;
   messages: any[];
-  language: string;
-  testErrors: string;
+  testCode: (code: string) => void;
+  setCode: (code: string) => void;
+  saveCode: () => void;
+  setMessage: (text: string) => void;
+  sendMessage: (msg: string) => void;
+  toggleChatVisibility: () => void;
+  convertRoomToPublic: () => void;
+  messageIndicator: (typing: boolean) => void;
 }) {
-  const {
-    title,
-    prompt,
-    testing,
-    code,
-    testPassed,
-    privateRoom,
-    inviteLink,
-    chatInput,
-    messages,
-    setMessage,
-    chatVisible,
-    toggleChatVisibility,
-    convertRoomToPublic,
-    sendMessage,
-    setCode,
-    testCode,
-    testResults,
-    testErrors,
-    usersTyping,
-  } = props;
   const [lastCode, setLastCode] = useState(code);
   const [inviteVisible, setInviteVisibility] = useState(false);
   const inviteRef = useOutsideClick({
@@ -69,11 +69,10 @@ function Challenge(props: {
   let detailsComponent;
 
   useEffect(() => {
-    let savingInterval: number;
     // Every 5 seconds save code if different for last save
-    savingInterval = setInterval(() => {
+    const savingInterval = setInterval(() => {
       if (lastCode !== code) {
-        props.saveCode();
+        saveCode();
         setLastCode(code);
       }
     }, 5000);
@@ -81,53 +80,56 @@ function Challenge(props: {
     return () => {
       if (savingInterval) clearInterval(savingInterval);
     };
-  }, [lastCode, code, props.saveCode]);
+  }, [lastCode, code, saveCode]);
 
   switch (details) {
     case 'output': {
       let testPass = 0;
       let testFail = 0;
 
-      const listItems = testErrors ? (
-        <li
-          className="challenge__item challenge__item--error"
-          data-cy="testError"
-        >
-          {testErrors}
-        </li>
-      ) : (
-        testResults.map((test: any) => {
-          if (test.status) {
-            testPass += 1;
-          } else {
-            testFail += 1;
-          }
+      const listItems =
+        testErrors.length > 0 ? (
+          <li
+            className="challenge__item challenge__item--error"
+            data-cy="testError"
+          >
+            {testErrors}
+          </li>
+        ) : (
+          testResults.map((test: any) => {
+            if (test.status) {
+              testPass += 1;
+            } else {
+              testFail += 1;
+            }
 
-          return (
-            <li
-              className={`challenge__item ${
-                test.status ? 'challenge__item--pass' : 'challenge__item--fail'
-              }`}
-              key={test.name}
-              data-cy="testResult"
-            >
-              <p className="challenge__test-name">{test.name}</p>
-              {test.expects.map((expect: any) => (
-                <span className="challenge__expect" key={expect.name}>
-                  {expect.name}
-                </span>
-              ))}
-            </li>
-          );
-        })
-      );
+            return (
+              <li
+                className={`challenge__item ${
+                  test.status
+                    ? 'challenge__item--pass'
+                    : 'challenge__item--fail'
+                }`}
+                key={test.name}
+                data-cy="testResult"
+              >
+                <p className="challenge__test-name">{test.name}</p>
+                {test.expects.map((expect: any) => (
+                  <span className="challenge__expect" key={expect.name}>
+                    {expect.name}
+                  </span>
+                ))}
+              </li>
+            );
+          })
+        );
 
       detailsComponent = (
         <div className="challenge__output">
           <header className="challenge__results">
             <h5 className="challenge__status">
               {testing ? 'Status: Requesting test from server' : null}
-              {!testing && !testErrors && testResults.length === 0
+              {!testing && testResults.length === 0
                 ? 'Test results will appear below'
                 : ''}
               {testErrors ? 'Error running code' : null}
@@ -272,7 +274,7 @@ function Challenge(props: {
 
         {!privateRoom ? (
           <ChatRoom
-            userId={props.userId}
+            userId={userId}
             chatInput={chatInput}
             messages={messages}
             usersTyping={usersTyping}
@@ -280,7 +282,7 @@ function Challenge(props: {
             sendMessage={sendMessage}
             visible={chatVisible}
             toggleChat={toggleChatVisibility}
-            messageIndicator={props.messageIndicator}
+            messageIndicator={messageIndicator}
           />
         ) : null}
       </div>
@@ -296,10 +298,5 @@ function Challenge(props: {
     </section>
   );
 }
-
-Challenge.defaultProps = {
-  testErrors: null,
-  inviteLink: '',
-};
 
 export default Challenge;

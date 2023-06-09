@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { connect } from 'react-redux';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { javascript } from '@codemirror/lang-javascript';
 import CodeMirror from 'rodemirror';
@@ -233,8 +232,4 @@ const ProfilePage = () => {
   );
 };
 
-const mapStateToDispatch = (state: any) => ({
-  user: state.user,
-});
-
-export default connect(mapStateToDispatch, null)(ProfilePage);
+export default ProfilePage;
