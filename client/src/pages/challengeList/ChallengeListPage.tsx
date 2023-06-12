@@ -111,13 +111,14 @@ const ChallengeModal = ({
                 <Link
                   className="transition-colors challenge__modal-link"
                   to={`/c/${challenge._id}/${language}`}
+                  data-cy="challenge-pair"
                 >
                   Join Queue
                 </Link>
 
                 <button
                   className="transition-colors challenge__modal-link"
-                  data-cy="solo"
+                  data-cy="challenge-solo"
                   type="button"
                   onClick={() => createPrivateRoom(challenge._id, language)}
                 >
@@ -282,6 +283,7 @@ const ChallengeListPage = () => {
                   className="transition-colors challenges__select"
                   type="button"
                   onClick={() => setSelected(challenge)}
+                  data-cy="select-challenge"
                 >
                   Start Challenge
                 </button>

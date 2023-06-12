@@ -125,7 +125,7 @@ function Challenge({
         );
 
       detailsComponent = (
-        <div className="challenge__output">
+        <div className="challenge__output" data-cy="tab-tests">
           <header className="challenge__results">
             <h5 className="challenge__status">
               {testing ? 'Status: Requesting test from server' : null}
@@ -168,7 +168,7 @@ function Challenge({
   }
 
   return (
-    <section className="challenge">
+    <section className="challenge" data-cy="challenge">
       <div className="challenge__content">
         <div className="challenge__details">
           <nav className="challenge__nav">

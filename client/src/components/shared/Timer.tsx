@@ -15,8 +15,7 @@ const Timer = ({ isPaused }: { isPaused: boolean }) => {
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
-    let timerInterval: number;
-    timerInterval = setInterval(() => {
+    const timerInterval = window.setInterval(() => {
       if (!isPaused) setTimer((time) => time + 1);
     }, 1000);
 
@@ -27,7 +26,7 @@ const Timer = ({ isPaused }: { isPaused: boolean }) => {
   }, []);
 
   return (
-    <div className="timer">
+    <div className="timer" data-cy="queue-timer">
       <span className="timer__hour">
         {addLeadingZero(Math.floor(timer / 60))}
       </span>
