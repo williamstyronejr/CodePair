@@ -30,14 +30,13 @@ const ChatRoom = ({
   }, [messages]);
 
   useEffect(() => {
-    let typingTmeout: number;
     if (chatInput !== '') {
       messageIndicator(true);
     } else {
       messageIndicator(false);
     }
 
-    typingTmeout = setTimeout(() => {
+    const typingTmeout = setTimeout(() => {
       if (chatInput !== '') {
         messageIndicator(false);
       }

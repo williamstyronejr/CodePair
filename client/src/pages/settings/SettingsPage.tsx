@@ -30,7 +30,7 @@ const AccountForm = ({
   useEffect(() => {
     let notificationTimer: number;
     if (notification)
-      notificationTimer = setTimeout(() => {
+      notificationTimer = window.setTimeout(() => {
         setNotification(null);
       }, 5000);
 
@@ -147,6 +147,7 @@ const AccountForm = ({
 
           <input
             id="username"
+            name="username"
             type="text"
             className="settings__input settings__input--text"
             data-cy="username"
@@ -169,6 +170,7 @@ const AccountForm = ({
 
           <input
             id="email"
+            name="email"
             type="text"
             className="settings__input settings__input--text"
             data-cy="email"
@@ -180,12 +182,7 @@ const AccountForm = ({
       </fieldset>
 
       <fieldset className="settings__field">
-        <button
-          className="btn btn--submit"
-          type="submit"
-          data-cy="submit"
-          disabled={submitting}
-        >
+        <button className="btn btn--submit" type="submit" disabled={submitting}>
           {submitting ? (
             <i className="fas fa-spinner fa-spin spinner-space" />
           ) : null}
@@ -212,7 +209,7 @@ const PasswordForm = () => {
   useEffect(() => {
     let notificationTimer: number;
     if (notification)
-      notificationTimer = setTimeout(() => {
+      notificationTimer = window.setTimeout(() => {
         setNotification(null);
       }, 5000);
 

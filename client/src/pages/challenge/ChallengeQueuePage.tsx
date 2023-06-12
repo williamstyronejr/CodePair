@@ -30,7 +30,7 @@ const ChallengeQueuePage = () => {
     let matchInterval: number; // Interval for when a match appears
     // Keeps track of match found timer.
     if (matchFound) {
-      matchInterval = setInterval(() => {
+      matchInterval = window.setInterval(() => {
         if (matchTimer <= 0) {
           if (roomId !== '') return;
           if (acceptedMatch) {
@@ -79,7 +79,7 @@ const ChallengeQueuePage = () => {
   if (roomId !== '') return <Navigate to={`/c/${cId}/r/${roomId}`} />;
 
   return (
-    <section className="queue">
+    <section className="queue" data-cy="challenge-queue">
       {matchFound ? (
         <div className="queue__notification">
           <div className="queue__box">
