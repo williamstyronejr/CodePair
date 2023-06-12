@@ -1,9 +1,9 @@
-import { SyntheticEvent, useState } from "react";
-import { ajaxRequest } from "../../utils/utils";
+import { SyntheticEvent, useState } from 'react';
+import { ajaxRequest } from '../../utils/utils';
 
 const PasswordResetPage = () => {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [requesting, setRequesting] = useState(false);
   const [error, setError] = useState<{
     msg?: string;
@@ -12,8 +12,8 @@ const PasswordResetPage = () => {
   }>({});
   const [status, setStatus] = useState(false);
   const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get("id");
-  const token = urlParams.get("token");
+  const id = urlParams.get('id');
+  const token = urlParams.get('token');
 
   const onSubmit = (evt: SyntheticEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -22,7 +22,7 @@ const PasswordResetPage = () => {
     setRequesting(true);
     setError({});
 
-    ajaxRequest(`/api/account/reset/password?id=${id}&token=${token}`, "POST", {
+    ajaxRequest(`/api/account/reset/password?id=${id}&token=${token}`, 'POST', {
       password,
       passwordC: confirm,
     })
@@ -33,11 +33,11 @@ const PasswordResetPage = () => {
       .catch((err) => {
         if (err.response && err.response.status === 400) {
           setError(
-            err.response.data ? err.response.data.errors : { msg: "ser" }
+            err.response.data ? err.response.data.errors : { msg: 'ser' }
           );
         } else {
           setError({
-            msg: "Error occurred trying to reset, please check the link provided in email.",
+            msg: 'Error occurred trying to reset, please check the link provided in email.',
           });
         }
 
@@ -75,6 +75,7 @@ const PasswordResetPage = () => {
 
             <input
               id="password"
+              name="password"
               className="form__input form__input--text"
               type="password"
               value={password}
@@ -97,6 +98,7 @@ const PasswordResetPage = () => {
 
             <input
               id="passwordC"
+              name="passwordC"
               className="form__input form__input--text"
               type="password"
               value={confirm}
