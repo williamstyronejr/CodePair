@@ -75,6 +75,7 @@ const SignupPage = () => {
 
             <input
               id="email"
+              name="email"
               className="form__input form__input--text"
               type="text"
               placeholder="Email"
@@ -96,6 +97,7 @@ const SignupPage = () => {
             )}
             <input
               id="username"
+              name="username"
               className="form__input form__input--text"
               type="text"
               placeholder="Username"
@@ -117,6 +119,7 @@ const SignupPage = () => {
             )}
             <input
               id="password"
+              name="password"
               className="form__input form__input--text"
               type="password"
               placeholder="Password"
@@ -137,6 +140,7 @@ const SignupPage = () => {
             )}
             <input
               id="confirm"
+              name="confirmPassword"
               className="form__input form__input--text"
               type="password"
               placeholder="Confirm Password"
