@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "cypress": "cypress open",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -17,32 +18,33 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.11.0",
     "@reduxjs/toolkit": "^1.9.5",
-    "@uiw/codemirror-theme-vscode": "^4.20.2",
-    "@uiw/react-codemirror": "^4.20.2",
+    "@uiw/codemirror-theme-vscode": "^4.21.3",
+    "@uiw/react-codemirror": "^4.21.3",
     "axios": "^1.4.0",
     "codemirror": "^6.0.1",
     "normalize.css": "^8.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-infinite-scroll-hook": "^4.1.1",
-    "react-redux": "^8.0.5",
-    "react-router-dom": "^6.11.2",
+    "react-redux": "^8.0.7",
+    "react-router-dom": "^6.12.1",
     "redux": "^4.2.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.2",
     "rodemirror": "^2.0.0",
-    "socket.io-client": "^4.6.1"
+    "socket.io-client": "^4.6.2"
   },
   "devDependencies": {
-    "@types/react": "^18.2.7",
-    "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.59.7",
-    "@typescript-eslint/parser": "^5.59.7",
+    "@types/react": "^18.2.12",
+    "@types/react-dom": "^18.2.5",
+    "@typescript-eslint/eslint-plugin": "^5.59.11",
+    "@typescript-eslint/parser": "^5.59.11",
     "@vitejs/plugin-react": "^4.0.0",
-    "eslint": "^8.41.0",
+    "cypress": "^12.14.0",
+    "eslint": "^8.42.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.1",
-    "typescript": "^5.0.2",
+    "typescript": "^5.1.3",
     "vite": "^4.3.9"
   }
 }
