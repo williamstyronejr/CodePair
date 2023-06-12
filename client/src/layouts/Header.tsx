@@ -27,7 +27,7 @@ const AuthHeader = ({
   }, [location]);
 
   return (
-    <header className="page-header ">
+    <header className="page-header" data-cy="auth-header">
       <div className="header__container">
         <div
           className={`menu ${navMenu ? 'menu--active' : ''}`}
@@ -156,7 +156,7 @@ const UnAuthHeader = () => {
   const [navMenu, setNavMenu] = useDetectOutsideClick(navMenuRef, false);
 
   return (
-    <header className="page-header">
+    <header className="page-header" data-cy="unauth-header">
       <div className="header__container">
         <div className={`menu  ${navMenu ? 'menu--active' : ''}`}>
           <button
