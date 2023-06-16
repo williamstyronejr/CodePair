@@ -62,6 +62,7 @@ const SigninPage = () => {
             <span className="form__labeling">Username</span>
             <input
               id="username"
+              name="username"
               className="form__input form__input--text"
               type="text"
               placeholder="Username"
@@ -77,6 +78,7 @@ const SigninPage = () => {
             <span className="form__labeling">Password</span>
             <input
               id="password"
+              name="password"
               className="form__input form__input--text"
               type="password"
               placeholder="Password"
