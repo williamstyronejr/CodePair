@@ -265,7 +265,7 @@ function Challenge({
                 <p>Share link to invite another user</p>
 
                 <p className="challenge__invite-link" data-cy="invite">
-                  {inviteLink}
+                  {`${window.location.origin}/invite/${inviteLink}`}
                 </p>
               </div>
             </div>
