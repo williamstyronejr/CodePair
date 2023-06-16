@@ -12,14 +12,14 @@ const ChatRoom = ({
   usersTyping,
   messageIndicator,
 }: {
-  userId: any;
+  userId: string;
   setMessage: any;
   sendMessage: any;
   visible: any;
   toggleChat: any;
   chatInput: any;
   messages: any;
-  usersTyping: any;
+  usersTyping: string[];
   messageIndicator: any;
 }) => {
   const chatRef = useRef<HTMLUListElement>(null);
@@ -83,7 +83,7 @@ const ChatRoom = ({
     return (
       <li
         className={`message message-${type}`}
-        key={`${msg.author}-${msg.time}`}
+        key={`${msg.author}-${msg.time}-${type}`}
         data-cy="message"
       >
         <div className={`message-${type}__content`}>
@@ -106,8 +106,11 @@ const ChatRoom = ({
       <ul className="chat__messages" ref={chatRef}>
         {messageList}
 
-        {usersTyping.map((username: string) => (
-          <li className="message message--typing">
+        {usersTyping.map((username, index) => (
+          <li
+            key={`typing-${username}-${index}`}
+            className="message message--typing"
+          >
             <div className="chat__content--typing">
               <div className="chat__dots">
                 <div className="chat__dot chat__dot--first" />
