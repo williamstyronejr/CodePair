@@ -3,7 +3,8 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 
-const { EMAIL_USER, EMAIL_PASS, EMAIL_HOST, EMAIL_PORT } = process.env;
+const { EMAIL_USER, EMAIL_PASS, EMAIL_HOST, EMAIL_PORT, EMAIL_FROM } =
+  process.env;
 
 const transporter = nodemailer.createTransport({
   host: EMAIL_HOST,
@@ -45,6 +46,7 @@ exports.sendEmailTemplate = (to, subject, fileName, params, cb) => {
       {
         to,
         subject,
+        from: EMAIL_FROM,
         html: htmlSend,
       },
       (mailErr) => {
