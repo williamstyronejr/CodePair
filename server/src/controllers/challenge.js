@@ -134,7 +134,7 @@ exports.getRoomInfo = async (req, res, next) => {
 
 /**
  * Route handler for changing room to a public room that someone can be invited
- * to. Responses with an url for users to invite.
+ * to and responses with an invite key.
  * @param {Object} req Request object
  * @param {Object} res Response object
  * @param {Function} next Next function to be called
