@@ -249,7 +249,7 @@ exports.sendPasswordEmail = async (req, res, next) => {
       'password_recovery.html',
       {
         username: user.username,
-        link: `${siteDomain}/api/account/reset/password?id=${tokenId}&token=${token}`,
+        link: `http://${siteDomain}/account/reset/password?id=${tokenId}&token=${token}`,
       },
       (mailErr) => {
         if (mailErr) throw new Error('Could not send email');
