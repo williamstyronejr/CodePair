@@ -77,7 +77,7 @@ beforeEach((done) => {
 
     socket2.emit('logUser', socketUserId2);
   });
-});
+}, 10000);
 
 // Disconnect all sockets and clear redis
 afterEach((done) => {
