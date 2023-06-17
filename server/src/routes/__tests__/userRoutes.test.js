@@ -363,9 +363,9 @@ describe('/POST /api/account/reset/password?id&token', () => {
     // Create a new user and send a password reset email
     await createUserRoute(app, username, email, password);
     await emailRecoveryRoute(username).then((res) => {
-      resetRoute = sendEmailTemplate.mock.calls[0][3].link.split(
-        `${IP}:${PORT}`
-      )[1];
+      resetRoute = `/api${
+        sendEmailTemplate.mock.calls[0][3].link.split(`${IP}:${PORT}`)[1]
+      }`;
     });
   }, 20000);
 
@@ -374,11 +374,10 @@ describe('/POST /api/account/reset/password?id&token', () => {
 
     await request(app)
       .post(resetRoute)
-      .send({ password: invalidPassword, passwordC: invalidPassword })
+      .send({ password: invalidPassword, passwordC: 'invalidPassword' })
       .set('Accpet', 'application/json')
       .expect(400)
       .catch((err) => {
-        // console.log(err);
         expect(err.body.errors.newPassword).toBeDefined();
       });
   }, 20000);

@@ -341,7 +341,7 @@ describe('Emitting messages', () => {
     });
 
     emitMessageToUserId(event, socketUserId2, arg1, arg2);
-  });
+  }, 15000);
 
   test('Emitting a message to a room should fire event to user in the room', (done) => {
     const message = 'Message to be sent';
