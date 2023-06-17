@@ -21,6 +21,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
 
     steps:
       - name: Checkout repo
@@ -47,11 +50,11 @@ jobs:
 
       - name: Run Server Tests
         run: npm run test --prefix server
-        env: |
-          DB_TEST_URI= ${{secrets.DB_TEST_URI}}
-          JWT_SECRET= ${{secrets.JWT_SECRET}}
-          REDIS_HOST= redis
-          REDIS_PORT= 6379
+        env:
+          DB_TEST_URI: ${{secrets.DB_TEST_URI}}
+          JWT_SECRET: ${{secrets.JWT_SECRET}}
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
 
       - name: Server/Client Deploy
         #  Only deploy main branch on pushes
