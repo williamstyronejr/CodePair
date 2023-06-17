@@ -37,27 +37,27 @@ jobs:
       #   with:
       #     token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      # - name: Server/Client Deploy
-      #   #  Only deploy main branch on pushes
-      #   if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{secrets.SSH_CLIENT_HOST}}
-      #     username: ${{secrets.SSH_CLIENT_USERNAME}}
-      #     key: ${{secrets.SSH_KEY}}
-      #     password: ${{secrets.SSH_PASSPHRASE}}
-      #     script: |
-      #       source ~/.bashrc
-      #       nvm use default
-      #       cd app
-      #       git pull
-      #       cd client
-      #       npm install
-      #       npm run build
-      #       cd ..
-      #       cd server
-      #       npm install
-      #       npm run production
+      - name: Server/Client Deploy
+        #  Only deploy main branch on pushes
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.SSH_CLIENT_HOST}}
+          username: ${{secrets.SSH_CLIENT_USERNAME}}
+          key: ${{secrets.SSH_KEY}}
+          passphrase: ${{secrets.SSH_PASSPHRASE}}
+          script: |
+            source ~/.bashrc
+            nvm use default
+            cd app
+            git pull
+            cd client
+            npm install
+            npm run build
+            cd ..
+            cd server
+            npm install
+            npm run production
 
       - name: Launcher Deployer
         #  Only deploy main branch on pushes
@@ -67,7 +67,7 @@ jobs:
           host: ${{secrets.SSH_HOST}}
           username: ${{secrets.SSH_USERNAME}}
           key: ${{secrets.SSH_KEY}}
-          password: ${{secrets.SSH_PASSPHRASE}}
+          passphrase: ${{secrets.SSH_PASSPHRASE}}
           script: |
             source ~/.bashrc
             nvm use default
