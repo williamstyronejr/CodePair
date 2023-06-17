@@ -51,6 +51,9 @@ jobs:
       - name: Run Server Tests
         run: npm run test --prefix server
         env:
+          GITHUB_ID: ${{secrets.GH_ID}}
+          GITHUB_SECRET: ${{secrets.GH_SECRET}}
+          GITHUB_CALLBACK: ${{secrets.GH_CALLBACK}}
           DB_TEST_URI: ${{secrets.DB_TEST_URI}}
           JWT_SECRET: ${{secrets.JWT_SECRET}}
           REDIS_HOST: redis
