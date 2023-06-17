@@ -42,9 +42,10 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_CLIENT_HOST }}
-          username: ${{ secrets.SSH_CLIENT_USERNAME }}
-          key: ${{secrets.SSH_CLIENT_KEY}}
+          host: ${{secrets.SSH_CLIENT_HOST}}
+          username: ${{secrets.SSH_CLIENT_USERNAME}}
+          key: ${{secrets.SSH_KEY}}
+          password: ${{secrets.SSH_PASSPHRASE}}
           script: |
             source ~/.bashrc
             nvm use default
@@ -63,8 +64,8 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
+          host: ${{secrets.SSH_HOST}}
+          username: ${{secrets.SSH_USERNAME}}
           key: ${{secrets.SSH_KEY}}
           password: ${{secrets.SSH_PASSPHRASE}}
           script: |
