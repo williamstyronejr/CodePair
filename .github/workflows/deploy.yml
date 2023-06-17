@@ -18,24 +18,22 @@ jobs:
         with:
           node-version: 18
 
-      # - name: Install dep
-      #   uses: bahmutov/npm-install@v1
-      #   with:
-      #     working-directory: |
-      #       server
-      #       client
-      #       launcher
+      - name: Install dep
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: |
+            server
+            client
+            launcher
 
-      # - name: Build images
-      #   run: docker build ./launcher --no-cache -t ${{secrets.IMAGE_NODE}}
+      - name: Build images
+        run: docker build ./launcher --no-cache -t ${{secrets.IMAGE_NODE}}
 
-      # - name: Run Tests
-      #   run: npm run test --prefix client && npm run test --prefix server
+      - name: Run Client Tests
+        run: npm run test --prefix client
 
-      # - name: Install doctl
-      #   uses: digitalocean/action-doctl@v2
-      #   with:
-      #     token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Run Server Tests
+        run: npm run test --prefix server
 
       - name: Server/Client Deploy
         #  Only deploy main branch on pushes
