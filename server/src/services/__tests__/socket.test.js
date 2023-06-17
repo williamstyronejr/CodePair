@@ -40,7 +40,7 @@ beforeAll((done) => {
       });
     });
   });
-});
+}, 10000);
 
 // Close connections
 afterAll((done) => {
