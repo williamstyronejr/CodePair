@@ -73,6 +73,7 @@ jobs:
             nvm use default
             cd app
             git pull
+            npm install
             cd launcher
             npm install
             docker build . --no-cache -t ${{secrets.IMAGE_NODE}}
