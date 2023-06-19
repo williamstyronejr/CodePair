@@ -12,7 +12,7 @@
     "dev": "nodemon src/index.js --ignore temp/",
     "precommit": "lint-staged",
     "production": "NODE_ENV=production node src/index.js",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "author": "",
   "license": "ISC",
