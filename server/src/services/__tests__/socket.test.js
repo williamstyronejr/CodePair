@@ -36,14 +36,40 @@ beforeAll((done) => {
 
     connectDatabase(DB_TEST_URI).then(() => {
       server.listen(PORT, IP, () => {
-        done();
+        // Brackets need for IPv6
+        socket1 = io.connect(`http://${IP}:${PORT}`, {
+          transports: ['websocket'],
+        });
+        socket2 = io.connect(`http://${IP}:${PORT}`, {
+          transports: ['websocket'],
+        });
+
+        // Connect sockets and emit message for logging user ids with sockets
+        socket1.on('connect', () => {
+          socket1.on('userLogged', () => {
+            if (socket2.connected) done();
+          });
+
+          socket1.emit('logUser', socketUserId1);
+        });
+
+        socket2.on('connect', () => {
+          socket2.on('userLogged', () => {
+            if (socket1.connected) done();
+          });
+
+          socket2.emit('logUser', socketUserId2);
+        });
       });
     });
   });
-}, 10000);
+}, 20000);
 
 // Close connections
 afterAll((done) => {
+  if (socket1) socket1.disconnect();
+  if (socket2) socket2.disconnect();
+  if (socket3) socket3.disconnect();
   closeSocket();
   closeRedis();
   disconnectDatabase().then(() => {
@@ -51,41 +77,13 @@ afterAll((done) => {
   });
 });
 
-// Connect client sockets to server
-beforeEach((done) => {
-  // Brackets need for IPv6
-  socket1 = io.connect(`http://${IP}:${PORT}`, {
-    transports: ['websocket'],
-  });
-  socket2 = io.connect(`http://${IP}:${PORT}`, {
-    transports: ['websocket'],
-  });
-
-  // Connect sockets and emit message for logging user ids with sockets
-  socket1.on('connect', () => {
-    socket1.on('userLogged', () => {
-      if (socket2.connected) done();
-    });
-
-    socket1.emit('logUser', socketUserId1);
-  });
-
-  socket2.on('connect', () => {
-    socket2.on('userLogged', () => {
-      if (socket1.connected) done();
-    });
-
-    socket2.emit('logUser', socketUserId2);
-  });
-}, 20000);
-
 // Disconnect all sockets and clear redis
 afterEach((done) => {
   // Disconnect all client sockets
   redisClient.flushAll();
-  if (socket1) socket1.disconnect();
-  if (socket2) socket2.disconnect();
-  if (socket3) socket3.disconnect();
+  // if (socket1) socket1.disconnect();
+  // if (socket2) socket2.disconnect();
+  // if (socket3) socket3.disconnect();
   done();
 });
 
@@ -199,7 +197,7 @@ describe('Joining and leaving room', () => {
   const challengeId = createRandomString(9);
   let roomId;
 
-  beforeEach((done) => {
+  beforeAll((done) => {
     // Event handler for room creation
     socket1.on('roomCreated', (rId) => {
       roomId = rId;
@@ -262,7 +260,7 @@ describe('Sending message in room', () => {
   const challengeId = createRandomString(8);
   let roomId;
 
-  beforeEach((done) => {
+  beforeAll((done) => {
     // Event handler for room creation
     socket1.on('roomCreated', (rId) => {
       roomId = rId;
@@ -318,7 +316,7 @@ describe('Sending message in room', () => {
 describe('Emitting messages', () => {
   test('Emitting message to user should fire event', (done) => {
     const message = 'Message being sent';
-    const event = 'test';
+    const event = createRandomString(8);
 
     socket2.on(event, (msg) => {
       expect(msg).toBe(message);
@@ -331,7 +329,7 @@ describe('Emitting messages', () => {
   test('Emitting multi-argument messages to user should fire event with all agruments received', (done) => {
     const arg1 = 123;
     const arg2 = 'testing';
-    const event = 'event';
+    const event = createRandomString(8);
 
     socket2.on(event, (d1, d2) => {
       expect(d1).toBe(arg1);
@@ -341,12 +339,12 @@ describe('Emitting messages', () => {
     });
 
     emitMessageToUserId(event, socketUserId2, arg1, arg2);
-  }, 15000);
+  });
 
   test('Emitting a message to a room should fire event to user in the room', (done) => {
     const message = 'Message to be sent';
-    const roomId = 'roomId';
-    const event = 'test';
+    const roomId = createRandomString(8);
+    const event = createRandomString(8);
     const username = 'username';
 
     // Join room
@@ -366,22 +364,22 @@ describe('Emitting messages', () => {
   test('Emitting multi-arguments messages to room should fire event with all arguments', (done) => {
     const arg1 = 123;
     const arg2 = 'test';
-    const roomId = 'roomId';
-    const event = 'test';
+    const roomId = createRandomString(6);
+    const event = createRandomString(8);
     const username = 'username';
 
-    // Join room
-    socket1.emit('joinRoom', roomId, username);
-
-    socket1.on(event, (d1, d2) => {
+    socket2.on(event, (d1, d2) => {
       expect(arg1).toBe(d1);
       expect(arg2).toBe(d2);
       done();
     });
 
+    // Join room
+    socket2.emit('joinRoom', roomId, username);
+
     // Give time for socket to handshake
     setTimeout(() => {
       emitMessageToRoom(event, roomId, arg1, arg2);
-    }, 100);
-  });
+    }, 300);
+  }, 10000);
 });
