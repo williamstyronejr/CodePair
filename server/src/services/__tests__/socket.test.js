@@ -16,7 +16,10 @@ const {
 const { connectDatabase, disconnectDatabase } = require('../database');
 const { createRandomString } = require('../../utils/utils');
 
-const { DB_TEST_URI, IP, PORT } = process.env;
+const { DB_TEST_URI, IP: ip, PORT: port } = process.env;
+
+const PORT = port || 3000;
+const IP = ip || 'localhost';
 
 const server = http.createServer();
 let redisClient;
@@ -63,7 +66,7 @@ beforeAll((done) => {
       });
     });
   });
-}, 20000);
+}, 30000);
 
 // Close connections
 afterAll((done) => {
