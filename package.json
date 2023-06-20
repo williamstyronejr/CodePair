@@ -4,8 +4,8 @@
   "description": "Site containing challenges to be completed through pair programming.",
   "main": "index.js",
   "engines": {
-    "node": "^18.0.0",
-    "npm": "^8.0.0"
+    "node": "v18.*.*",
+    "npm": "v8.*.*"
   },
   "scripts": {
     "start": "npm run server:prod",
@@ -14,7 +14,7 @@
     "client:watch": "npm start --prefix client",
     "runner:watch": "npm run dev --prefix launcher",
     "build": "npm run build --prefix client",
-    "server:prod": "npm run production --prefix server",
+    "server:prod": "NODE_ENV=production pm2 startOrReload pm2.prod.json --only server",
     "launcher:prod": "NODE_ENV=production pm2 startOrReload pm2.prod.json --only launcher",
     "heroku-postbuild": "npm ci --prefix server && npm ci --prefix client --production=false && npm run build"
   },
