@@ -80,7 +80,8 @@ jobs:
             cd ..
             cd server
             npm install
-            npm run production
+            cd ..
+            npm run server:prod
 
       - name: Launcher Deployer
         #  Only deploy main branch on pushes
