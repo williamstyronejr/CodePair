@@ -2,12 +2,43 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import * as themes from '@uiw/codemirror-themes-all';
 import ChatRoom from './ChatRoom';
 import useOutsideClick from '../../hooks/useOutsideClick';
+import { Extension } from '@codemirror/state';
+import DropDown from '../../components/shared/DropDown';
 import './styles/challenge.css';
 
 const extensions = [javascript({ jsx: false })];
+
+const EditorThemes: Record<string, Extension> = {
+  abcdef: themes.abcdef,
+  'Android Studio': themes.androidstudio,
+  AtomOne: themes.atomone,
+  Aura: themes.aura,
+  BBedit: themes.bbedit,
+  Bespin: themes.bespin,
+  Darcula: themes.darcula,
+  'Duotone Light': themes.duotoneLight,
+  'Duotone Dark': themes.duotoneDark,
+  Eclipse: themes.eclipse,
+  'Github Light': themes.githubLight,
+  'Github Dark': themes.githubDark,
+  'Gruvbox Dark': themes.gruvboxDark,
+  Material: themes.material,
+  'Noctis Lilac': themes.noctisLilac,
+  Nord: themes.nord,
+  Okaidia: themes.okaidia,
+  'Solarized Light': themes.solarizedLight,
+  'Solarized Dark': themes.solarizedDark,
+  Sublime: themes.sublime,
+  'Tokyo Night': themes.tokyoNight,
+  'Tokyo Night Storm': themes.tokyoNightStorm,
+  'Tokyo Night Day': themes.tokyoNightDay,
+  'VSCode Dark': themes.vscodeDark,
+  'XCode Light': themes.xcodeLight,
+  'XCode Dark': themes.xcodeDark,
+};
 
 function Challenge({
   userId,
@@ -57,6 +88,7 @@ function Challenge({
   messageIndicator: (typing: boolean) => void;
 }) {
   const [lastCode, setLastCode] = useState(code);
+  const [theme, setTheme] = useState('VSCode Dark');
   const [inviteVisible, setInviteVisibility] = useState(false);
   const inviteRef = useOutsideClick({
     active: inviteVisible,
@@ -198,19 +230,30 @@ function Challenge({
         </div>
 
         <div className="challenge__tools" id="pairs">
-          <CodeMirror
-            width="100%"
-            height="100%"
-            basicSetup={{
-              allowMultipleSelections: true,
-            }}
-            value={code}
-            theme={vscodeDark}
-            extensions={[...extensions]}
-            onUpdate={(val) => {
-              if (val.docChanged) setCode(val.state.doc.toString());
-            }}
-          />
+          <div className="challenge__themes">
+            <DropDown
+              options={Object.keys(EditorThemes)}
+              value={theme}
+              title="Theme"
+              changeValue={(option) => setTheme(option)}
+            />
+          </div>
+
+          <div className="challenge__editor-wrapper">
+            <CodeMirror
+              width="100%"
+              height="100%"
+              basicSetup={{
+                allowMultipleSelections: true,
+              }}
+              value={code}
+              theme={EditorThemes[theme]}
+              extensions={[...extensions]}
+              onUpdate={(val) => {
+                if (val.docChanged) setCode(val.state.doc.toString());
+              }}
+            />
+          </div>
         </div>
       </div>
 
