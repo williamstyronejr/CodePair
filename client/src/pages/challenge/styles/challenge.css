@@ -156,12 +156,6 @@
   margin: 10px 0 0 0;
 }
 
-/*  Parent Wrapper for codemirror  */
-.challenge__tools > div {
-  height: 100%;
-  flex: 1 0 auto;
-}
-
 .challenge__options {
   position: relative;
   width: 100%;
@@ -231,6 +225,8 @@
   }
 
   .challenge__tools {
+    display: flex;
+    flex-flow: column nowrap;
     flex: 1 0 auto;
     max-height: 100%;
     margin: 5px 0;
@@ -238,10 +234,19 @@
     height: auto;
   }
 
-  /*  Parent Wrapper for codemirror  */
-  .challenge__tools > div {
+  .challenge__themes {
+    flex: 0 1 auto;
+  }
+
+  .challenge__editor-wrapper {
+    height: 0;
+    flex: 1 0 auto;
+    position: relative;
+    margin-top: 0;
+  }
+
+  .challenge__editor-wrapper > div {
     height: 100%;
-    flex: 1 1 auto;
     position: relative;
     margin-top: 0;
   }
