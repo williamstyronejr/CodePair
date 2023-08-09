@@ -13,7 +13,7 @@ const initialState: {
   savingCode: boolean;
   testing: boolean;
   testPassed: boolean;
-  testErrors: any[];
+  testErrors: string | null;
   testResults: any[];
 } = {
   id: null,
@@ -29,7 +29,7 @@ const initialState: {
   savingCode: false, // Flag to indicate when code is being saved to server
   testing: false, // Flag for testing
   testPassed: false, // Flag for all test passing
-  testErrors: [], // Contains any errors (server side errors)
+  testErrors: null, // Contains any errors (server side errors)
   testResults: [], // Array to contains data on each test ran
 };
 
@@ -94,12 +94,12 @@ const ChallengeSlice = createSlice({
       action: PayloadAction<{
         success: boolean;
         results: any[];
-        errors: any[];
+        errors: string | null;
       }>
     ) {
       state.testPassed = action.payload.success;
       state.testResults = action.payload.results;
-      state.testErrors = action.payload.errors;
+      state.testErrors = action.payload.errors || '';
       state.testing = false;
     },
     setChallengeError(state, action: PayloadAction<string>) {
@@ -117,7 +117,7 @@ const ChallengeSlice = createSlice({
       state.savingCode = false;
       state.testing = false;
       state.testPassed = false;
-      state.testErrors = [];
+      state.testErrors = null;
       state.testResults = [];
     },
   },
@@ -144,12 +144,15 @@ const ChallengeSlice = createSlice({
       })
       .addCase(testCode.fulfilled, (state) => {
         state.testing = true;
+        state.testResults = [];
+        state.testPassed = false;
+        state.testErrors = null;
       })
       .addCase(testCode.rejected, (state) => {
         state.testing = false;
         state.testResults = [];
         state.testPassed = false;
-        state.testErrors = [];
+        state.testErrors = null;
         state.challengeError = 'Error testing code, please try again.';
       })
       .addCase(
