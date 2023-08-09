@@ -73,10 +73,16 @@
   word-wrap: break-word;
 }
 
-.challenge__status {
+.chalelnge__status {
   font-weight: 300;
   font-size: 16px;
   margin-left: 7px;
+}
+
+.challenge__status-error {
+  color: #da3434;
+  font-size: 1.75rem;
+  margin-top: 0.5rem;
 }
 
 .challenge__test--stats {
