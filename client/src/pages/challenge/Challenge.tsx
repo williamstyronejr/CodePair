@@ -49,6 +49,7 @@ function Challenge({
   testPassed,
   testResults,
   testErrors,
+  challengeError,
   usersTyping,
   privateRoom,
   chatVisible,
@@ -71,8 +72,9 @@ function Challenge({
   testing: boolean;
   testPassed: boolean;
   testResults: any[];
-  testErrors: any[];
+  testErrors: string;
   usersTyping: any[];
+  challengeError: string | null;
   privateRoom: boolean;
   chatVisible: boolean;
   inviteLink: string | null;
@@ -87,9 +89,12 @@ function Challenge({
   convertRoomToPublic: () => void;
   messageIndicator: (typing: boolean) => void;
 }) {
-  const [lastCode, setLastCode] = useState(code);
-  const [theme, setTheme] = useState('VSCode Dark');
+  const defaultTheme = localStorage.getItem('editor-theme') || '';
   const [inviteVisible, setInviteVisibility] = useState(false);
+  const [lastCode, setLastCode] = useState(code);
+  const [theme, setTheme] = useState(
+    EditorThemes[defaultTheme] ? defaultTheme : 'VSCode Dark'
+  );
   const inviteRef = useOutsideClick({
     active: inviteVisible,
     ignoreButton: true,
@@ -119,42 +124,41 @@ function Challenge({
       let testPass = 0;
       let testFail = 0;
 
-      const listItems =
-        testErrors.length > 0 ? (
-          <li
-            className="challenge__item challenge__item--error"
-            data-cy="testError"
-          >
-            {testErrors}
-          </li>
-        ) : (
-          testResults.map((test: any) => {
-            if (test.status) {
-              testPass += 1;
-            } else {
-              testFail += 1;
-            }
+      console.log(testErrors);
 
-            return (
-              <li
-                className={`challenge__item ${
-                  test.status
-                    ? 'challenge__item--pass'
-                    : 'challenge__item--fail'
-                }`}
-                key={test.name}
-                data-cy="testResult"
-              >
-                <p className="challenge__test-name">{test.name}</p>
-                {test.expects.map((expect: any) => (
-                  <span className="challenge__expect" key={expect.name}>
-                    {expect.name}
-                  </span>
-                ))}
-              </li>
-            );
-          })
-        );
+      const listItems = testErrors ? (
+        <li
+          className="challenge__item challenge__item--error"
+          data-cy="testError"
+        >
+          {testErrors}
+        </li>
+      ) : (
+        testResults.map((test: any) => {
+          if (test.status) {
+            testPass += 1;
+          } else {
+            testFail += 1;
+          }
+
+          return (
+            <li
+              className={`challenge__item ${
+                test.status ? 'challenge__item--pass' : 'challenge__item--fail'
+              }`}
+              key={test.name}
+              data-cy="testResult"
+            >
+              <p className="challenge__test-name">{test.name}</p>
+              {test.expects.map((expect: any) => (
+                <span className="challenge__expect" key={expect.name}>
+                  {expect.name}
+                </span>
+              ))}
+            </li>
+          );
+        })
+      );
 
       detailsComponent = (
         <div className="challenge__output" data-cy="tab-tests">
@@ -164,8 +168,13 @@ function Challenge({
               {!testing && testResults.length === 0
                 ? 'Test results will appear below'
                 : ''}
-              {testErrors ? 'Error running code' : null}
             </h5>
+
+            {challengeError ? (
+              <h6 className="chalelnge__status challenge__status-error">
+                Error running code
+              </h6>
+            ) : null}
 
             <div className="challenge__test-stats">
               {testResults && testResults.length > 0 ? (
@@ -235,7 +244,10 @@ function Challenge({
               options={Object.keys(EditorThemes)}
               value={theme}
               title="Theme"
-              changeValue={(option) => setTheme(option)}
+              changeValue={(option) => {
+                setTheme(option);
+                localStorage.setItem('editor-theme', option);
+              }}
             />
           </div>
 
