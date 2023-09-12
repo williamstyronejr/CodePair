@@ -1,0 +1,50 @@
+.demo__container {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.demo__prompt {
+  flex: 0 0 auto;
+  width: 400px;
+  padding: 0 10px;
+}
+
+.demo__content {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 300px;
+  flex: 1 0 auto;
+
+  border-radius: 10px;
+  background-color: #ecf0f1;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.demo__options {
+  text-align: right;
+  padding: 5px 10px;
+}
+
+.demo__test {
+  background-color: #00baf2;
+  border: 1px solid #11a1cd;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.demo__test:hover {
+  background-color: #07a6d6;
+  cursor: pointer;
+}
+
+.demo__editor {
+  flex: 1 0 auto;
+  font-size: 1rem;
+}
+
+.cm-content {
+  font-family: Menlo, Monaco, Consolas, 'Andale Mono', 'Ubuntu Mono',
+    'Courier New', monospace;
+}
