@@ -29,10 +29,14 @@
   height: 200px;
   max-height: 200px;
   color: white;
+  border-radius: 5px;
+  flex: 0 0 auto;
+  background-color: #303030;
 }
 
 .challenge__nav {
   width: 100%;
+  padding-top: 5px;
 }
 
 .challenge__nav-link {
@@ -41,6 +45,7 @@
   border-top-right-radius: 8px;
   border-top-left-radius: 8px;
   padding: 8px;
+  font-size: 0.8rem;
   width: auto;
   font-weight: normal;
   color: white;
@@ -57,6 +62,7 @@
 
 .challenge__details-content {
   background-color: #262729;
+  overflow-y: auto;
 }
 
 .challenge__heading {
@@ -101,6 +107,7 @@
   display: flex;
   flex-flow: column nowrap;
   margin: 5px 5px;
+  height: 100%;
 }
 
 .challenge__item {
@@ -158,16 +165,76 @@
 }
 
 .challenge__tools {
-  height: 200px;
+  min-height: 200px;
+  flex: 1 0 auto;
   margin: 10px 0 0 0;
+  border-radius: 5px;
+}
+
+.challenge__themes {
+  flex: 0 1 auto;
+  padding: 5px 10px;
+  background-color: #303030;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.challenge__theme-dropdown {
+  font-size: 0.8rem;
+}
+
+.challenge__editor-wrapper {
+  height: 300px;
+}
+
+.challenge__editor {
+  height: 100%;
 }
 
 .challenge__options {
   position: relative;
   width: 100%;
   flex: 0 1 auto;
-  margin: 5px 0;
-  min-height: 40px;
+  margin-top: 5px;
+  padding: 8px 10px;
+  background-color: #303030;
+  border-radius: 5px;
+}
+
+.challenge__btn-public {
+  font-size: 0.9rem;
+  border: none;
+  background-color: #ffffff1a;
+  color: white;
+  padding: 0.3rem 1rem;
+  margin: 0 5px 0 5px;
+  border-radius: 5px;
+}
+
+.challenge__btn-public:hover {
+  background-color: #ffffff23;
+  cursor: pointer;
+}
+
+.challenge__btn-test {
+  background-color: rgb(44 187 93);
+  box-shadow: 0px 9px 32px 0px rgb(0 0 0 / 20%);
+  color: white;
+  width: auto;
+  padding: 0.3rem 1rem;
+  margin: 0 5px 0 5px;
+  border-radius: 5px;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.challenge__btn-test:hover {
+  background-color: rgb(54, 215, 110);
+  cursor: pointer;
+}
+
+.challenge__btn-test:disabled {
+  background-image: linear-gradient(122deg, #545454 0%, #252525 100%);
 }
 
 .challenge__invite {
@@ -238,10 +305,6 @@
     margin: 5px 0;
     width: 1px;
     height: auto;
-  }
-
-  .challenge__themes {
-    flex: 0 1 auto;
   }
 
   .challenge__editor-wrapper {

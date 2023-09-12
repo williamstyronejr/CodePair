@@ -241,6 +241,7 @@ function Challenge({
         <div className="challenge__tools" id="pairs">
           <div className="challenge__themes">
             <DropDown
+              className="challenge__theme-dropdown"
               options={Object.keys(EditorThemes)}
               value={theme}
               title="Theme"
@@ -253,6 +254,7 @@ function Challenge({
 
           <div className="challenge__editor-wrapper">
             <CodeMirror
+              className="challenge__editor"
               width="100%"
               height="100%"
               basicSetup={{
@@ -266,80 +268,80 @@ function Challenge({
               }}
             />
           </div>
-        </div>
-      </div>
 
-      <div className="challenge__options">
-        <button
-          className="transition-colors btn btn--test"
-          data-cy="runTest"
-          type="button"
-          disabled={testPassed || testing}
-          onClick={() => {
-            setDetails('output');
-            testCode(code);
-          }}
-        >
-          Run Tests
-        </button>
-
-        {privateRoom ? (
-          <button
-            className="transition-colors btn btn--public"
-            type="button"
-            onClick={convertRoomToPublic}
-            data-cy="public"
-          >
-            Invite Link
-          </button>
-        ) : (
-          <>
+          <div className="challenge__options">
             <button
-              className="transition-colors btn btn--public"
+              className="transition-colors challenge__btn-test"
+              data-cy="runTest"
               type="button"
-              data-cy="showInvite"
-              onClick={() => setInviteVisibility((old) => !old)}
+              disabled={testPassed || testing}
+              onClick={() => {
+                setDetails('output');
+                testCode(code);
+              }}
             >
-              Invite Link
+              Run Tests
             </button>
 
-            <div
-              className={`challenge__invite ${
-                inviteVisible ? '' : 'box--hidden'
-              }`}
-            >
-              <div className="challenge__invite-wrapper" ref={inviteRef}>
+            {privateRoom ? (
+              <button
+                className="transition-colors challenge__btn-public "
+                type="button"
+                onClick={convertRoomToPublic}
+                data-cy="public"
+              >
+                Invite
+              </button>
+            ) : (
+              <>
                 <button
-                  className="btn btn--close btn--right"
+                  className="transition-colors challenge__btn-public"
                   type="button"
-                  onClick={() => setInviteVisibility(!inviteVisible)}
+                  data-cy="showInvite"
+                  onClick={() => setInviteVisibility((old) => !old)}
                 >
-                  X
+                  Invite
                 </button>
 
-                <p>Share link to invite another user</p>
+                <div
+                  className={`challenge__invite ${
+                    inviteVisible ? '' : 'box--hidden'
+                  }`}
+                >
+                  <div className="challenge__invite-wrapper" ref={inviteRef}>
+                    <button
+                      className="btn btn--close btn--right"
+                      type="button"
+                      onClick={() => setInviteVisibility(!inviteVisible)}
+                    >
+                      X
+                    </button>
 
-                <p className="challenge__invite-link" data-cy="invite">
-                  {`${window.location.origin}/invite/${inviteLink}`}
-                </p>
-              </div>
-            </div>
-          </>
-        )}
+                    <p>Share link to invite another user</p>
 
-        {!privateRoom ? (
-          <ChatRoom
-            userId={userId}
-            chatInput={chatInput}
-            messages={messages}
-            usersTyping={usersTyping}
-            setMessage={setMessage}
-            sendMessage={sendMessage}
-            visible={chatVisible}
-            toggleChat={toggleChatVisibility}
-            messageIndicator={messageIndicator}
-          />
-        ) : null}
+                    <p className="challenge__invite-link" data-cy="invite">
+                      {`${window.location.origin}/invite/${inviteLink}`}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {!privateRoom ? (
+              <ChatRoom
+                userId={userId}
+                chatInput={chatInput}
+                messages={messages}
+                usersTyping={usersTyping}
+                setMessage={setMessage}
+                sendMessage={sendMessage}
+                visible={chatVisible}
+                toggleChat={toggleChatVisibility}
+                messageIndicator={messageIndicator}
+              />
+            ) : null}
+          </div>
+        </div>
       </div>
 
       {testPassed && (
