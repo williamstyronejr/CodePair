@@ -7,15 +7,16 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
-  color: rgba(0, 0, 0, 0.65);
+  color: #efefef;
   font-family: 'Rubik', 'sans-serif';
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial,
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI'; */
   font-variant: tabular-nums;
-  background-color: #1a1a1a;
+  background-color: #151c29;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Containers */
@@ -72,29 +73,6 @@ body {
   display: none;
 }
 
-.bg-grad {
-  background-image: -moz-linear-gradient(
-    135deg,
-    rgba(60, 8, 118, 0.8) 0%,
-    rgba(250, 0, 118, 0.8) 100%
-  );
-  background-image: -webkit-linear-gradient(
-    135deg,
-    rgba(60, 8, 118, 0.8) 0%,
-    rgba(250, 0, 118, 0.8) 100%
-  );
-  background-image: -ms-linear-gradient(
-    135deg,
-    rgba(60, 8, 118, 0.8) 0%,
-    rgba(250, 0, 118, 0.8) 100%
-  );
-  background-image: linear-gradient(
-    135deg,
-    rgba(60, 8, 118, 0.8) 0%,
-    rgba(250, 0, 118, 0.8) 100%
-  );
-}
-
 /* Form */
 .form {
   width: 90%;
@@ -102,9 +80,9 @@ body {
   margin: 1.3em auto 0 auto;
   padding: 2em 2em;
   border-radius: 5px;
-  background-color: #101827;
-  box-shadow: 2px 2px 3px 0 rgba(117, 124, 129, 0.06);
-  margin-bottom: 10px;
+  background-color: #202c46;
+  border: 1px solid rgb(51, 70, 112);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 24px 0px;
 }
 
 .form__drag-child {
@@ -276,7 +254,7 @@ body {
 }
 .form__input--text:focus,
 .form__input--textarea:focus {
-  box-shadow: 0 0 0 4px #2191fb;
+  box-shadow: 0 0 0 2px #14a4ff;
   outline: none;
 }
 
@@ -325,11 +303,13 @@ body {
   font-family: 'Rubik', 'sans-serif';
   font-weight: 500;
   border-radius: 3px;
-  background-color: #2191fb;
+  background-color: #0093ff;
 }
 
 .btn--submit:hover {
-  background-color: #1474ce;
+  background-color: #14a4ff;
+  border-color: #14a4ff;
+  color: rgb(255, 255, 255);
 }
 
 .btn--submit:disabled {
@@ -376,8 +356,18 @@ body {
   margin: 30px auto;
   max-width: 300px;
   padding: 15px 0;
-  border: 1px solid #3f3f46;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.12);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 1px 1px;
+
+  background-color: rgb(29, 39, 63);
+  color: rgb(235, 241, 247);
+  border: 1px solid rgb(51, 70, 112);
+}
+
+.btn--social:hover {
+  outline: 0px;
+  background-color: rgb(32, 44, 70);
+  color: rgb(255, 255, 255);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 1px 2px;
 }
 
 .btn--pair-decline:hover {
