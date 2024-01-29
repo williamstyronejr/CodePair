@@ -9,8 +9,9 @@
   display: flex;
   border-radius: 5px;
   padding: 5px;
-  background-color: #303030;
-  border: none;
+  background-color: #1d273f;
+  border: 1px solid #334670;
+  padding: 0.5rem;
 }
 
 .dropdown__current {
@@ -39,7 +40,7 @@
   z-index: 10;
   padding: 0 10px;
   transform-origin: top center;
-  background-color: #303030;
+  background-color: #1d273f;
 }
 
 .dropdown__list--active {
@@ -56,12 +57,12 @@
 }
 
 .dropdown__option:hover {
-  background-color: #434343;
+  background-color: #26365d;
   cursor: pointer;
 }
 
 .dropdown__option:disabled {
-  background-color: #424242;
+  background-color: #26365d;
   color: #dad9d9;
   cursor: default;
 }

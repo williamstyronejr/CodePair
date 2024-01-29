@@ -31,7 +31,7 @@
   color: white;
   border-radius: 5px;
   flex: 0 0 auto;
-  background-color: #303030;
+  background-color: #1e2b48;
 }
 
 .challenge__nav {
@@ -53,7 +53,7 @@
 
 .challenge__nav-link--active {
   color: white;
-  background-color: #262729;
+  background-color: #26385f;
 }
 
 .challenge__nav-link:hover {
@@ -61,7 +61,7 @@
 }
 
 .challenge__details-content {
-  background-color: #262729;
+  background-color: #1d273f;
   overflow-y: auto;
 }
 
@@ -174,13 +174,14 @@
 .challenge__themes {
   flex: 0 1 auto;
   padding: 5px 10px;
-  background-color: #303030;
+  background-color: #1e2b48;
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
 }
 
 .challenge__theme-dropdown {
   font-size: 0.8rem;
+  background-color: #1e2c44;
 }
 
 .challenge__editor-wrapper {
@@ -197,27 +198,28 @@
   flex: 0 1 auto;
   margin-top: 5px;
   padding: 8px 10px;
-  background-color: #303030;
+  background-color: #1e2b48;
   border-radius: 5px;
 }
 
 .challenge__btn-public {
   font-size: 0.9rem;
-  border: none;
-  background-color: #ffffff1a;
+  background-color: #1d273f;
   color: white;
   padding: 0.3rem 1rem;
   margin: 0 5px 0 5px;
   border-radius: 5px;
+  border: 1px solid rgb(51, 70, 112);
 }
 
 .challenge__btn-public:hover {
-  background-color: #ffffff23;
+  background-color: #202c46;
   cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 1px 2px;
 }
 
 .challenge__btn-test {
-  background-color: rgb(44 187 93);
+  background-color: #0093ff;
   box-shadow: 0px 9px 32px 0px rgb(0 0 0 / 20%);
   color: white;
   width: auto;
@@ -229,7 +231,7 @@
 }
 
 .challenge__btn-test:hover {
-  background-color: rgb(54, 215, 110);
+  background-color: #14a4ff;
   cursor: pointer;
 }
 

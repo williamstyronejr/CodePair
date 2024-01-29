@@ -80,8 +80,9 @@ body {
   margin: 1.3em auto 0 auto;
   padding: 2em 2em;
   border-radius: 5px;
-  background-color: #202c46;
-  border: 1px solid rgb(51, 70, 112);
+  background-color: #1d273f;
+  border: 1px solid #202e50;
+
   box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 24px 0px;
 }
 
@@ -226,11 +227,18 @@ body {
   margin: 10px auto;
   padding: 10px;
   width: 80%;
-  border: 1px solid grey;
   border-radius: 5px;
 }
 
+.form__input:hover {
+  border-color: #57637a;
+}
+
 .form__input--text {
+  border: 1px solid #334670;
+  background-color: #202e50;
+  color: #ebf1f7;
+  outline: 0px;
 }
 
 .form__input--file {
@@ -254,8 +262,7 @@ body {
 }
 .form__input--text:focus,
 .form__input--textarea:focus {
-  box-shadow: 0 0 0 2px #14a4ff;
-  outline: none;
+  border-color: rgb(0, 147, 255);
 }
 
 .form__input--error {
@@ -458,15 +465,16 @@ body {
   display: flex;
   flex-flow: row nowrap;
   margin: 2em 0;
-  color: #efefef;
 }
 
 .separator > hr {
-  width: 80%;
+  width: 100%;
+  border-color: #334670;
 }
 
 .separator > span {
   margin: 0 10px;
+  color: #7a89a1;
 }
 
 .transition-colors {
