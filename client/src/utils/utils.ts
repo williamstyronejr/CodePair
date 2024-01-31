@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 /**
  * Sends an Ajax request using axios and returns a promise to resolve or reject
@@ -12,7 +12,7 @@ import axios from "axios";
  */
 export function ajaxRequest(
   url: string,
-  method = "GET",
+  method = 'GET',
   data = {},
   options = {}
 ) {
@@ -33,11 +33,11 @@ export function ajaxRequest(
  *   returns null.
  */
 export function validateUsername(username: string) {
-  if (username === "") return "Must provide username";
+  if (username === '') return 'Must provide username';
   if (username.length < 4 || username.length > 16)
-    return "Username must be between 4 and 16 characters";
+    return 'Username must be between 4 and 16 characters';
   if (/^[A-Za-z0-9_]$/.test(username))
-    return "Username must only contain letters, numbers, and _";
+    return 'Username must only contain letters, numbers, and _';
   return null;
 }
 
@@ -51,8 +51,8 @@ export function dateToText(date: string) {
 
   // eslint-disable-next-line no-restricted-globals
   return !isNaN(createdDate as any)
-    ? `${createdDate.toLocaleDateString("default", {
-        month: "short",
+    ? `${createdDate.toLocaleDateString('default', {
+        month: 'short',
       })} ${createdDate.getDate()}, ${createdDate.getFullYear()}`
-    : "";
+    : '';
 }
