@@ -352,9 +352,9 @@ body {
   right: 10px;
 }
 
-.btn--small {
+.btn--auth {
   display: block;
-  padding: 10px;
+  padding: 0.75rem 3rem;
   width: auto;
   margin: 0 auto;
 }
