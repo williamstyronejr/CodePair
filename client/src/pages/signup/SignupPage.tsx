@@ -152,7 +152,7 @@ const SignupPage = () => {
         </fieldset>
 
         <button
-          className="btn btn--submit btn--small"
+          className="btn btn--submit btn--auth"
           type="submit"
           data-cy="submit"
           disabled={requesting}

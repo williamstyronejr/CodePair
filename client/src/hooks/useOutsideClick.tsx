@@ -1,15 +1,15 @@
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect } from 'react';
 
 const useOutsideClick = ({
   active,
   closeEvent,
   ignoreButton = false,
-  triggerKeys = ["Escape"],
+  triggerKeys = ['Escape'],
 }: {
   active: boolean;
   closeEvent: () => void;
   ignoreButton?: boolean;
-  triggerKeys?: String[];
+  triggerKeys?: string[];
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -18,7 +18,7 @@ const useOutsideClick = ({
       if (ref && ref.current) {
         if (!ref.current.contains(evt.target as HTMLElement)) {
           if (ignoreButton) {
-            if ((evt.target as HTMLElement).tagName !== "BUTTON") closeEvent();
+            if ((evt.target as HTMLElement).tagName !== 'BUTTON') closeEvent();
           } else {
             closeEvent();
           }
@@ -39,12 +39,12 @@ const useOutsideClick = ({
 
   useEffect(() => {
     if (active || active === undefined) {
-      window.addEventListener("click", onClickEvent);
-      window.addEventListener("keyup", onKeyEvent);
+      window.addEventListener('click', onClickEvent);
+      window.addEventListener('keyup', onKeyEvent);
 
       return () => {
-        window.removeEventListener("click", onClickEvent);
-        window.removeEventListener("keyup", onKeyEvent);
+        window.removeEventListener('click', onClickEvent);
+        window.removeEventListener('keyup', onKeyEvent);
       };
     }
   }, [onClickEvent, onKeyEvent, active]);

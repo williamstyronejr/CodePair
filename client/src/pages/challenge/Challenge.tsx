@@ -2,12 +2,43 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import * as themes from '@uiw/codemirror-themes-all';
 import ChatRoom from './ChatRoom';
 import useOutsideClick from '../../hooks/useOutsideClick';
+import { Extension } from '@codemirror/state';
+import DropDown from '../../components/shared/DropDown';
 import './styles/challenge.css';
 
 const extensions = [javascript({ jsx: false })];
+
+const EditorThemes: Record<string, Extension> = {
+  abcdef: themes.abcdef,
+  'Android Studio': themes.androidstudio,
+  AtomOne: themes.atomone,
+  Aura: themes.aura,
+  BBedit: themes.bbedit,
+  Bespin: themes.bespin,
+  Darcula: themes.darcula,
+  'Duotone Light': themes.duotoneLight,
+  'Duotone Dark': themes.duotoneDark,
+  Eclipse: themes.eclipse,
+  'Github Light': themes.githubLight,
+  'Github Dark': themes.githubDark,
+  'Gruvbox Dark': themes.gruvboxDark,
+  Material: themes.material,
+  'Noctis Lilac': themes.noctisLilac,
+  Nord: themes.nord,
+  Okaidia: themes.okaidia,
+  'Solarized Light': themes.solarizedLight,
+  'Solarized Dark': themes.solarizedDark,
+  Sublime: themes.sublime,
+  'Tokyo Night': themes.tokyoNight,
+  'Tokyo Night Storm': themes.tokyoNightStorm,
+  'Tokyo Night Day': themes.tokyoNightDay,
+  'VSCode Dark': themes.vscodeDark,
+  'XCode Light': themes.xcodeLight,
+  'XCode Dark': themes.xcodeDark,
+};
 
 function Challenge({
   userId,
@@ -18,6 +49,7 @@ function Challenge({
   testPassed,
   testResults,
   testErrors,
+  challengeError,
   usersTyping,
   privateRoom,
   chatVisible,
@@ -40,8 +72,9 @@ function Challenge({
   testing: boolean;
   testPassed: boolean;
   testResults: any[];
-  testErrors: any[];
+  testErrors: string;
   usersTyping: any[];
+  challengeError: string | null;
   privateRoom: boolean;
   chatVisible: boolean;
   inviteLink: string | null;
@@ -56,8 +89,12 @@ function Challenge({
   convertRoomToPublic: () => void;
   messageIndicator: (typing: boolean) => void;
 }) {
-  const [lastCode, setLastCode] = useState(code);
+  const defaultTheme = localStorage.getItem('editor-theme') || '';
   const [inviteVisible, setInviteVisibility] = useState(false);
+  const [lastCode, setLastCode] = useState(code);
+  const [theme, setTheme] = useState(
+    EditorThemes[defaultTheme] ? defaultTheme : 'VSCode Dark'
+  );
   const inviteRef = useOutsideClick({
     active: inviteVisible,
     ignoreButton: true,
@@ -87,42 +124,41 @@ function Challenge({
       let testPass = 0;
       let testFail = 0;
 
-      const listItems =
-        testErrors.length > 0 ? (
-          <li
-            className="challenge__item challenge__item--error"
-            data-cy="testError"
-          >
-            {testErrors}
-          </li>
-        ) : (
-          testResults.map((test: any) => {
-            if (test.status) {
-              testPass += 1;
-            } else {
-              testFail += 1;
-            }
+      console.log(testErrors);
 
-            return (
-              <li
-                className={`challenge__item ${
-                  test.status
-                    ? 'challenge__item--pass'
-                    : 'challenge__item--fail'
-                }`}
-                key={test.name}
-                data-cy="testResult"
-              >
-                <p className="challenge__test-name">{test.name}</p>
-                {test.expects.map((expect: any) => (
-                  <span className="challenge__expect" key={expect.name}>
-                    {expect.name}
-                  </span>
-                ))}
-              </li>
-            );
-          })
-        );
+      const listItems = testErrors ? (
+        <li
+          className="challenge__item challenge__item--error"
+          data-cy="testError"
+        >
+          {testErrors}
+        </li>
+      ) : (
+        testResults.map((test: any) => {
+          if (test.status) {
+            testPass += 1;
+          } else {
+            testFail += 1;
+          }
+
+          return (
+            <li
+              className={`challenge__item ${
+                test.status ? 'challenge__item--pass' : 'challenge__item--fail'
+              }`}
+              key={test.name}
+              data-cy="testResult"
+            >
+              <p className="challenge__test-name">{test.name}</p>
+              {test.expects.map((expect: any) => (
+                <span className="challenge__expect" key={expect.name}>
+                  {expect.name}
+                </span>
+              ))}
+            </li>
+          );
+        })
+      );
 
       detailsComponent = (
         <div className="challenge__output" data-cy="tab-tests">
@@ -132,8 +168,13 @@ function Challenge({
               {!testing && testResults.length === 0
                 ? 'Test results will appear below'
                 : ''}
-              {testErrors ? 'Error running code' : null}
             </h5>
+
+            {challengeError ? (
+              <h6 className="chalelnge__status challenge__status-error">
+                Error running code
+              </h6>
+            ) : null}
 
             <div className="challenge__test-stats">
               {testResults && testResults.length > 0 ? (
@@ -198,93 +239,109 @@ function Challenge({
         </div>
 
         <div className="challenge__tools" id="pairs">
-          <CodeMirror
-            width="100%"
-            height="100%"
-            basicSetup={{
-              allowMultipleSelections: true,
-            }}
-            value={code}
-            theme={vscodeDark}
-            extensions={[...extensions]}
-            onUpdate={(val) => {
-              if (val.docChanged) setCode(val.state.doc.toString());
-            }}
-          />
-        </div>
-      </div>
+          <div className="challenge__themes">
+            <DropDown
+              className="challenge__theme-dropdown"
+              options={Object.keys(EditorThemes)}
+              value={theme}
+              title="Theme"
+              changeValue={(option) => {
+                setTheme(option);
+                localStorage.setItem('editor-theme', option);
+              }}
+            />
+          </div>
 
-      <div className="challenge__options">
-        <button
-          className="transition-colors btn btn--test"
-          data-cy="runTest"
-          type="button"
-          disabled={testPassed || testing}
-          onClick={() => {
-            setDetails('output');
-            testCode(code);
-          }}
-        >
-          Run Tests
-        </button>
+          <div className="challenge__editor-wrapper">
+            <CodeMirror
+              className="challenge__editor"
+              width="100%"
+              height="100%"
+              basicSetup={{
+                allowMultipleSelections: true,
+              }}
+              value={code}
+              theme={EditorThemes[theme]}
+              extensions={[...extensions]}
+              onUpdate={(val) => {
+                if (val.docChanged) setCode(val.state.doc.toString());
+              }}
+            />
+          </div>
 
-        {privateRoom ? (
-          <button
-            className="transition-colors btn btn--public"
-            type="button"
-            onClick={convertRoomToPublic}
-            data-cy="public"
-          >
-            Invite Link
-          </button>
-        ) : (
-          <>
+          <div className="challenge__options">
             <button
-              className="transition-colors btn btn--public"
+              className="transition-colors challenge__btn-test"
+              data-cy="runTest"
               type="button"
-              data-cy="showInvite"
-              onClick={() => setInviteVisibility((old) => !old)}
+              disabled={testPassed || testing}
+              onClick={() => {
+                setDetails('output');
+                testCode(code);
+              }}
             >
-              Invite Link
+              Run Tests
             </button>
 
-            <div
-              className={`challenge__invite ${
-                inviteVisible ? '' : 'box--hidden'
-              }`}
-            >
-              <div className="challenge__invite-wrapper" ref={inviteRef}>
+            {privateRoom ? (
+              <button
+                className="transition-colors challenge__btn-public "
+                type="button"
+                onClick={convertRoomToPublic}
+                data-cy="public"
+              >
+                Invite
+              </button>
+            ) : (
+              <>
                 <button
-                  className="btn btn--close btn--right"
+                  className="transition-colors challenge__btn-public"
                   type="button"
-                  onClick={() => setInviteVisibility(!inviteVisible)}
+                  data-cy="showInvite"
+                  onClick={() => setInviteVisibility((old) => !old)}
                 >
-                  X
+                  Invite
                 </button>
 
-                <p>Share link to invite another user</p>
+                <div
+                  className={`challenge__invite ${
+                    inviteVisible ? '' : 'box--hidden'
+                  }`}
+                >
+                  <div className="challenge__invite-wrapper" ref={inviteRef}>
+                    <button
+                      className="btn btn--close btn--right"
+                      type="button"
+                      onClick={() => setInviteVisibility(!inviteVisible)}
+                    >
+                      X
+                    </button>
 
-                <p className="challenge__invite-link" data-cy="invite">
-                  {`${window.location.origin}/invite/${inviteLink}`}
-                </p>
-              </div>
-            </div>
-          </>
-        )}
+                    <p>Share link to invite another user</p>
 
-        {!privateRoom ? (
-          <ChatRoom
-            userId={userId}
-            chatInput={chatInput}
-            messages={messages}
-            usersTyping={usersTyping}
-            setMessage={setMessage}
-            sendMessage={sendMessage}
-            visible={chatVisible}
-            toggleChat={toggleChatVisibility}
-            messageIndicator={messageIndicator}
-          />
-        ) : null}
+                    <p className="challenge__invite-link" data-cy="invite">
+                      {`${window.location.origin}/invite/${inviteLink}`}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {!privateRoom ? (
+              <ChatRoom
+                userId={userId}
+                chatInput={chatInput}
+                messages={messages}
+                usersTyping={usersTyping}
+                setMessage={setMessage}
+                sendMessage={sendMessage}
+                visible={chatVisible}
+                toggleChat={toggleChatVisibility}
+                messageIndicator={messageIndicator}
+              />
+            ) : null}
+          </div>
+        </div>
       </div>
 
       {testPassed && (

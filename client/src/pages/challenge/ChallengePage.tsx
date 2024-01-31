@@ -110,6 +110,7 @@ const ChallengePage = () => {
       chatInput={chat.chatInput}
       chatVisible={chat.visible}
       usersTyping={chat.usersTyping}
+      challengeError={challenge.challengeError}
       userId={userId}
       toggleChatVisibility={() => dispatch(toggleChatVisibility())}
       setMessage={(text) => dispatch(setMessage(text))}

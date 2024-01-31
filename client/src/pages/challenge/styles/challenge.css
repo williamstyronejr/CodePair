@@ -29,10 +29,14 @@
   height: 200px;
   max-height: 200px;
   color: white;
+  border-radius: 5px;
+  flex: 0 0 auto;
+  background-color: #1e2b48;
 }
 
 .challenge__nav {
   width: 100%;
+  padding-top: 5px;
 }
 
 .challenge__nav-link {
@@ -41,6 +45,7 @@
   border-top-right-radius: 8px;
   border-top-left-radius: 8px;
   padding: 8px;
+  font-size: 0.8rem;
   width: auto;
   font-weight: normal;
   color: white;
@@ -48,7 +53,7 @@
 
 .challenge__nav-link--active {
   color: white;
-  background-color: #262729;
+  background-color: #26385f;
 }
 
 .challenge__nav-link:hover {
@@ -56,7 +61,8 @@
 }
 
 .challenge__details-content {
-  background-color: #262729;
+  background-color: #1d273f;
+  overflow-y: auto;
 }
 
 .challenge__heading {
@@ -73,10 +79,16 @@
   word-wrap: break-word;
 }
 
-.challenge__status {
+.chalelnge__status {
   font-weight: 300;
   font-size: 16px;
   margin-left: 7px;
+}
+
+.challenge__status-error {
+  color: #da3434;
+  font-size: 1.75rem;
+  margin-top: 0.5rem;
 }
 
 .challenge__test--stats {
@@ -95,6 +107,7 @@
   display: flex;
   flex-flow: column nowrap;
   margin: 5px 5px;
+  height: 100%;
 }
 
 .challenge__item {
@@ -152,22 +165,78 @@
 }
 
 .challenge__tools {
-  height: 200px;
+  min-height: 200px;
+  flex: 1 0 auto;
   margin: 10px 0 0 0;
+  border-radius: 5px;
 }
 
-/*  Parent Wrapper for codemirror  */
-.challenge__tools > div {
+.challenge__themes {
+  flex: 0 1 auto;
+  padding: 5px 10px;
+  background-color: #1e2b48;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.challenge__theme-dropdown {
+  font-size: 0.8rem;
+  background-color: #1e2c44;
+}
+
+.challenge__editor-wrapper {
+  height: 300px;
+}
+
+.challenge__editor {
   height: 100%;
-  flex: 1 0 auto;
 }
 
 .challenge__options {
   position: relative;
   width: 100%;
   flex: 0 1 auto;
-  margin: 5px 0;
-  min-height: 40px;
+  margin-top: 5px;
+  padding: 8px 10px;
+  background-color: #1e2b48;
+  border-radius: 5px;
+}
+
+.challenge__btn-public {
+  font-size: 0.9rem;
+  background-color: #1d273f;
+  color: white;
+  padding: 0.3rem 1rem;
+  margin: 0 5px 0 5px;
+  border-radius: 5px;
+  border: 1px solid rgb(51, 70, 112);
+}
+
+.challenge__btn-public:hover {
+  background-color: #202c46;
+  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 1px 2px;
+}
+
+.challenge__btn-test {
+  background-color: #0093ff;
+  box-shadow: 0px 9px 32px 0px rgb(0 0 0 / 20%);
+  color: white;
+  width: auto;
+  padding: 0.3rem 1rem;
+  margin: 0 5px 0 5px;
+  border-radius: 5px;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.challenge__btn-test:hover {
+  background-color: #14a4ff;
+  cursor: pointer;
+}
+
+.challenge__btn-test:disabled {
+  background-image: linear-gradient(122deg, #545454 0%, #252525 100%);
 }
 
 .challenge__invite {
@@ -231,6 +300,8 @@
   }
 
   .challenge__tools {
+    display: flex;
+    flex-flow: column nowrap;
     flex: 1 0 auto;
     max-height: 100%;
     margin: 5px 0;
@@ -238,10 +309,15 @@
     height: auto;
   }
 
-  /*  Parent Wrapper for codemirror  */
-  .challenge__tools > div {
+  .challenge__editor-wrapper {
+    height: 0;
+    flex: 1 0 auto;
+    position: relative;
+    margin-top: 0;
+  }
+
+  .challenge__editor-wrapper > div {
     height: 100%;
-    flex: 1 1 auto;
     position: relative;
     margin-top: 0;
   }

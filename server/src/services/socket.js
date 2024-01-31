@@ -194,36 +194,6 @@ function testingCode(roomId) {
 }
 
 /**
- * Initialize event handlers for sockets.
- * @param {Object} server HTTP Server to attach socket to
- */
-exports.setupSocket = (server) => {
-  io = socket(server);
-
-  io.on('connection', (client) => {
-    client.on('logUser', logSocket);
-    client.on('disconnecting', disconnecting);
-
-    // Handlers for Challenge
-    client.on('joinRoom', joinRoom);
-    client.on('leaveRoom', leaveRoom);
-    client.on('sendCode', sendCode);
-    client.on('saveCode', saveCode);
-    client.on('testRequested', testingCode);
-
-    // Handlers for Chat
-    client.on('sendMessage', sendMessage);
-    client.on('userTyping', typingMessage);
-    client.on('userTypingEnd', typingMessageEnd);
-
-    // Handlers for Challenge Queue
-    client.on('joinQueue', joinQueue);
-    client.on('leaveQueue', leaveQueue);
-    client.on('acceptMatch', acceptQueue);
-  });
-};
-
-/**
  * Closes the socket.io server.
  */
 exports.closeSocket = () => {
@@ -251,4 +221,34 @@ exports.emitMessageToUserId = (event, userId, ...args) => {
   if (io) {
     io.to(userClients[userId]).emit(event, ...args);
   }
+};
+
+/**
+ * Initialize event handlers for sockets.
+ * @param {Object} server HTTP Server to attach socket to
+ */
+exports.setupSocket = (server) => {
+  io = socket(server);
+
+  io.on('connection', (client) => {
+    client.on('logUser', logSocket);
+    client.on('disconnecting', disconnecting);
+
+    // Handlers for Challenge
+    client.on('joinRoom', joinRoom);
+    client.on('leaveRoom', leaveRoom);
+    client.on('sendCode', sendCode);
+    client.on('saveCode', saveCode);
+    client.on('testRequested', testingCode);
+
+    // Handlers for Chat
+    client.on('sendMessage', sendMessage);
+    client.on('userTyping', typingMessage);
+    client.on('userTypingEnd', typingMessageEnd);
+
+    // Handlers for Challenge Queue
+    client.on('joinQueue', joinQueue);
+    client.on('leaveQueue', leaveQueue);
+    client.on('acceptMatch', acceptQueue);
+  });
 };

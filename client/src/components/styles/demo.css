@@ -1,0 +1,75 @@
+.demo__container {
+  display: flex;
+  flex-flow: column nowrap;
+  padding: 0 1rem;
+}
+
+.demo__prompt {
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.demo__title {
+  font-size: 1.3rem;
+  margin: 1rem 0;
+  color: #fff;
+  font-weight: 500;
+}
+
+.demo__description {
+  color: #c6d3e2;
+  line-height: 1.4;
+}
+
+.demo__content {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 300px;
+  flex: 1 0 auto;
+
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.demo__options {
+  text-align: right;
+  padding: 5px 10px;
+  background-color: #192338;
+}
+
+.demo__test {
+  background-color: #0093ff;
+  border: 1px solid #0093ff;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.demo__test:hover {
+  background-color: #1a99f3;
+  cursor: pointer;
+}
+
+.demo__editor {
+  flex: 1 0 auto;
+  font-size: 1rem;
+}
+
+.cm-content {
+  font-family: Menlo, Monaco, Consolas, 'Andale Mono', 'Ubuntu Mono',
+    'Courier New', monospace;
+}
+
+@media only screen and (min-width: 600px) {
+  .demo__container {
+    flex-flow: row nowrap;
+  }
+
+  .demo__prompt {
+    padding: 0 10px;
+    text-align: left;
+    max-width: 300px;
+    flex: 1 1 auto;
+  }
+}
