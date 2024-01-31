@@ -35,7 +35,9 @@ const RecoveryPage = () => {
     <section className="recovery">
       <form className="form" onSubmit={onSubmit}>
         <h2 className="form__heading">Reset Password</h2>
-        <p className="form__heading">Please provide your username</p>
+        <p className="form__heading">
+          Enter your username below to receive a link to reset your password.
+        </p>
 
         {error ? (
           <div className="form__error">
@@ -67,7 +69,7 @@ const RecoveryPage = () => {
         </fieldset>
 
         <button
-          className="btn btn--submit"
+          className="btn btn--submit btn--auth"
           type="submit"
           disabled={requesting}
           data-cy="submit"

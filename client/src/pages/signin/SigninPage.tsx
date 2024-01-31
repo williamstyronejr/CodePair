@@ -41,7 +41,7 @@ const SigninPage = () => {
   return (
     <section className="signin">
       <form className="form" onSubmit={onSubmit}>
-        <h1 className="form__heading">Sign in to your account</h1>
+        <h1 className="form__heading">Log in to your account</h1>
 
         <GithubButton signIn />
 
@@ -90,7 +90,7 @@ const SigninPage = () => {
         </div>
 
         <button
-          className="btn btn--submit btn--small"
+          className="btn btn--submit btn--auth"
           type="submit"
           disabled={requesting}
           data-cy="submit"
@@ -98,10 +98,12 @@ const SigninPage = () => {
           {requesting ? (
             <i className="fas fa-spinner fa-spin spinner-space" />
           ) : null}
-          Signin
+          Log in
         </button>
 
-        <hr className="separator" />
+        <div className="separator">
+          <hr />
+        </div>
 
         <Link to="/recovery" className="signin__recovery" data-cy="recovery">
           Forgot your password?
