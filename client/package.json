@@ -19,6 +19,7 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.14.1",
     "@reduxjs/toolkit": "^1.9.5",
+    "@tanstack/react-query": "^5.18.0",
     "@uiw/codemirror-theme-vscode": "^4.21.3",
     "@uiw/codemirror-themes-all": "^4.21.7",
     "@uiw/react-codemirror": "^4.21.7",
