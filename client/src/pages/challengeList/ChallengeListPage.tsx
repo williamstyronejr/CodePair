@@ -4,6 +4,7 @@ import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { ajaxRequest } from '../../utils/utils';
 import Loading from '../../components/shared/Loading';
 import LoadingScreen from '../../components/shared/LoadingScreen';
+import useGetChallenges from '../../hooks/api/useGetChallenges';
 import './styles/challengeList.css';
 import './styles/challengeModal.css';
 
@@ -26,7 +27,7 @@ const ChallengeModal = ({
     document.addEventListener('keydown', onEsc);
 
     return () => document.removeEventListener('keydown', onEsc);
-  }, []);
+  }, [onClose]);
 
   const createPrivateRoom = useCallback((challengeId: string, lang: string) => {
     setCreatingRoom(true);
@@ -45,7 +46,7 @@ const ChallengeModal = ({
       .catch((err) => {
         if (err.response && err.response.status === 404) {
           setRoomError(
-            'Invalid language, please selected a different language.'
+            'Invalid language, please selected a different language.',
           );
         } else if (err.response && err.response.status === 500) {
           setRoomError('Server error ocurred, please try again.');
@@ -62,7 +63,7 @@ const ChallengeModal = ({
         ) : (
           <header className="challenge__modal-header">
             <button
-              className="transition-colors challenge__modal-close"
+              className="challenge__modal-close transition-colors"
               type="button"
               onClick={() => onClose()}
             >
@@ -109,7 +110,7 @@ const ChallengeModal = ({
 
               <div className="challenge__modal-wrapper">
                 <Link
-                  className="transition-colors challenge__modal-link"
+                  className="challenge__modal-link transition-colors"
                   to={`/c/${challenge._id}/${language}`}
                   data-cy="challenge-pair"
                 >
@@ -117,7 +118,7 @@ const ChallengeModal = ({
                 </Link>
 
                 <button
-                  className="transition-colors challenge__modal-link"
+                  className="challenge__modal-link transition-colors"
                   data-cy="challenge-solo"
                   type="button"
                   onClick={() => createPrivateRoom(challenge._id, language)}
@@ -156,63 +157,23 @@ const ChallengeModal = ({
 // };
 
 const ChallengeListPage = () => {
-  const [page, setPage] = useState(1);
-  const [endOfList, setEndOfList] = useState(false);
-  const [challenges, setChallenge] = useState<any[]>([]);
-  const [loadingList, setLoadingList] = useState(false);
-  const [listError, setListError] = useState(false);
   const [selected, setSelected] = useState(null);
-
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('newest');
 
-  const getChallenges = () => {
-    if (loadingList) return; // Stops from sending multiple request to update
-    setLoadingList(true);
-
-    ajaxRequest(
-      `/api/challenge/list?page=${page}&orderBy=${sortBy}&search=${search}`,
-      'GET'
-    )
-      .then((res) => {
-        // Empty list if first page  to clear results from previous filtering
-        if (res.data.challenges.length === 0) {
-          if (page === 1) setChallenge([]);
-          setEndOfList(true);
-          return setLoadingList(false);
-        }
-
-        setChallenge(
-          page === 1
-            ? [...res.data.challenges]
-            : [...challenges, ...res.data.challenges]
-        );
-        setPage(page + 1);
-        setLoadingList(false);
-      })
-      .catch(() => {
-        setEndOfList(true);
-        setListError(true);
-        setLoadingList(false);
-      });
-  };
+  const { data, fetchNextPage, hasNextPage, error, isFetching } =
+    useGetChallenges({
+      search,
+      sortBy,
+    });
 
   const [infiniteRef] = useInfiniteScroll({
-    loading: loadingList,
-    hasNextPage: !endOfList,
-    onLoadMore: getChallenges,
-    disabled: !!listError,
+    loading: isFetching,
+    hasNextPage,
+    onLoadMore: fetchNextPage,
+    disabled: !!error,
     rootMargin: '0px 0px 200px 0px',
   });
-
-  useEffect(() => {
-    getChallenges();
-  }, []);
-
-  useEffect(() => {
-    // Fetch list whenever page is set to 1 due to filter changes
-    if (page === 1) getChallenges();
-  }, [page]);
 
   return (
     <section className="challenges">
@@ -227,7 +188,7 @@ const ChallengeListPage = () => {
             }}
           >
             <input
-              className="transition-colors challenges__search"
+              className="challenges__search transition-colors"
               type="text"
               placeholder="Search"
               value={search}
@@ -268,30 +229,34 @@ const ChallengeListPage = () => {
         ) : null}
 
         <div className="challenges__list">
-          {challenges.map((challenge) => (
-            <div key={challenge._id} className="challenges__item">
-              <div className="challenges__info">
-                <h3 className="challenges__title">{challenge.title}</h3>
+          {data
+            ? data.pages.map((challenges) =>
+                challenges.map((challenge) => (
+                  <div key={challenge._id} className="challenges__item">
+                    <div className="challenges__info">
+                      <h3 className="challenges__title">{challenge.title}</h3>
 
-                <div className="challenges__summary">
-                  {challenge.summary || challenge.prompt}
-                </div>
-              </div>
+                      <div className="challenges__summary">
+                        {challenge.summary || challenge.prompt}
+                      </div>
+                    </div>
 
-              <div className="challenges__options">
-                <button
-                  className="transition-colors challenges__select"
-                  type="button"
-                  onClick={() => setSelected(challenge)}
-                  data-cy="select-challenge"
-                >
-                  Start Challenge
-                </button>
-              </div>
-            </div>
-          ))}
+                    <div className="challenges__options">
+                      <button
+                        className="challenges__select transition-colors"
+                        type="button"
+                        onClick={() => setSelected(challenge)}
+                        data-cy="select-challenge"
+                      >
+                        Start Challenge
+                      </button>
+                    </div>
+                  </div>
+                )),
+              )
+            : null}
 
-          {endOfList && challenges.length === 0 ? (
+          {!hasNextPage && data && data.pageParams.length === 1 ? (
             <div className="challenges__item">
               <p className="challenges__empty">
                 No challenge matching this search
@@ -299,7 +264,7 @@ const ChallengeListPage = () => {
             </div>
           ) : null}
 
-          {!endOfList ? (
+          {hasNextPage ? (
             <div
               ref={infiniteRef}
               className=" challenge__item challenges__item--end"
