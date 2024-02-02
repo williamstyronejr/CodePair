@@ -1,7 +1,7 @@
 import { SyntheticEvent } from 'react';
 import { Navigate } from 'react-router-dom';
 import GithubButton from '../auth/GithubButton';
-import Input from '../../components/shared/Inputs';
+import Input from '../../components/shared/Input';
 import useUserContext from '../../hooks/context/useUserContext';
 import useSignup from '../../hooks/api/useSignup';
 import './styles/signupPage.css';

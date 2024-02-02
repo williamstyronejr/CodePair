@@ -2,7 +2,7 @@ import { SyntheticEvent } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import useUserContext from '../../hooks/context/useUserContext';
 import useSignin from '../../hooks/api/useSignin';
-import Input from '../../components/shared/Inputs';
+import Input from '../../components/shared/Input';
 import GithubButton from '../auth/GithubButton';
 import './styles/signinPage.css';
 
