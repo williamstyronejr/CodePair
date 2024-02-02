@@ -1,11 +1,13 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { javascript } from '@codemirror/lang-javascript';
 import CodeMirror from 'rodemirror';
+import useGetProfile from '../../hooks/api/useGetProfile';
+import useGetSolutions from '../../hooks/api/useGetSolutions';
 import Loading from '../../components/shared/Loading';
 import basicExts from '../../utils/codemirror';
-import { ajaxRequest, dateToText } from '../../utils/utils';
+import { dateToText } from '../../utils/utils';
 import './styles/profilePage.css';
 
 const UserNotFound = () => (
@@ -55,63 +57,39 @@ const Stats = ({
 };
 
 const Solutions = ({ username }: { username: string }) => {
-  const [solutions, setSolutions] = useState<any[]>([]);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [endOfList, setEndOfList] = useState(false);
-  const [error, setError] = useState<boolean>(false);
   const extensions = useMemo(() => [...basicExts, javascript()], []);
-
-  const getSolutions = () => {
-    if (loading) return;
-
-    setLoading(true);
-
-    ajaxRequest(`/api/user/${username}/profile/solutions?page=${page}`)
-      .then((res) => {
-        if (res.data.solutions.length === 0) {
-          setEndOfList(true);
-          return setLoading(false);
-        }
-
-        setSolutions((old) => [...old, ...res.data.solutions]);
-        setLoading(false);
-        setPage(page + 1);
-      })
-      .catch(() => {
-        setError(true);
-        setLoading(false);
-      });
-  };
+  const { data, fetchNextPage, hasNextPage, error, isFetching } =
+    useGetSolutions({ username });
 
   const [infiniteRef] = useInfiniteScroll({
-    loading,
-    hasNextPage: !endOfList,
+    loading: isFetching,
+    hasNextPage: hasNextPage,
     disabled: !!error,
-    onLoadMore: getSolutions,
+    onLoadMore: fetchNextPage,
     rootMargin: '0px 0px 200px 0px',
   });
-
-  const solutionList = solutions.map((item) => (
-    <li key={item._id} className="solutions__item">
-      <h3 className="solutions__heading">{item.challengeName}</h3>
-      <div className="solutions__language">{item.language}</div>
-      <div className="solutions__content">
-        <CodeMirror
-          // className="solutions__code"
-          value={item.code}
-          extensions={extensions}
-        />
-      </div>
-    </li>
-  ));
 
   return (
     <div className="solutions">
       <ul className="solutions__list">
-        {solutionList}
+        {data &&
+          data.pages.map((solutions) =>
+            solutions.map((solution) => (
+              <li key={`solution-${solution._id}`} className="solutions__item">
+                <h3 className="solutions__heading">{solution.challengeName}</h3>
+                <div className="solutions__language">{solution.language}</div>
+                <div className="solutions__content">
+                  <CodeMirror
+                    // className="solutions__code"
+                    value={solution.code}
+                    extensions={extensions}
+                  />
+                </div>
+              </li>
+            ))
+          )}
 
-        {endOfList && solutions.length === 0 ? (
+        {!hasNextPage && data && data.pageParams.length === 1 ? (
           <li className="solutions__item">
             <h3 className="solutions__heading">
               Challenge solution will be seen here
@@ -119,7 +97,7 @@ const Solutions = ({ username }: { username: string }) => {
           </li>
         ) : null}
 
-        {!endOfList ? (
+        {hasNextPage ? (
           <li
             ref={infiniteRef}
             className="solutions__item solutions__item--end"
@@ -134,35 +112,22 @@ const Solutions = ({ username }: { username: string }) => {
 
 const ProfilePage = () => {
   const { username } = useParams();
-  const [profileData, setProfileData] = useState<any>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [selected, setSelected] = useState('stats');
+  const { data, isPending, error } = useGetProfile({
+    username: username || '',
+  });
 
-  useEffect(() => {
-    // Grab profile data
-    ajaxRequest(`/api/user/${username}/profile/stats`)
-      .then((res) => {
-        setProfileData(res.data);
-      })
-      .catch(() => {
-        setError(true);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <Loading />;
+  if (isPending) return <Loading />;
   if (error) return <UserNotFound />;
 
   let content = null;
+
   switch (selected) {
     case 'stats':
       content = (
         <Stats
-          challengesCompleted={profileData.completed}
-          achievements={profileData.achievements}
+          challengesCompleted={data.completed}
+          achievements={data.achievements}
         />
       );
       break;
@@ -181,13 +146,13 @@ const ProfilePage = () => {
           <img
             className="profile__image"
             alt="User profile"
-            src={profileData.profileImage}
+            src={data.profileImage}
           />
 
           <div className="profile__info">
-            <h4 className="profile__heading">{profileData.displayName}</h4>
+            <h4 className="profile__heading">{data.displayName}</h4>
             <div className="profile__date">
-              Member Since: {dateToText(profileData.created)}
+              Member Since: {dateToText(data.created)}
             </div>
           </div>
         </header>
