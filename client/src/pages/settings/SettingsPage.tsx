@@ -1,106 +1,54 @@
-import { createRef, useState, useEffect, SyntheticEvent } from 'react';
+import { createRef, SyntheticEvent } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { useAppSelector } from '../../hooks/reactRedux';
-import { ajaxRequest } from '../../utils/utils';
-import { updateUser } from '../../reducers/userReducer';
+import useUserContext from '../../hooks/context/useUserContext';
+import useUpdatePassword from '../../hooks/api/useUpdatePassword';
+import useUpdateAccount from '../../hooks/api/useUpdateAccount';
+import Input from '../../components/shared/Input';
 import './styles/settingsPage.css';
 
 const AccountForm = ({
   currentUsername,
   currentEmail,
   currentImage,
-  updateUserData,
 }: {
   currentUsername: string;
   currentEmail: string;
   currentImage: string;
-  updateUserData: (data: any) => void;
 }) => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [notification, setNotification] = useState<string | null>(null);
-  const [error, setError] = useState<{
-    username?: string;
-    email?: string;
-  }>({});
+  const { mutate, data, isPending, error } = useUpdateAccount();
   const fileRef = createRef<HTMLInputElement>();
-
-  // Timeout for clearing notification message
-  useEffect(() => {
-    let notificationTimer: number;
-    if (notification)
-      notificationTimer = window.setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-
-    return () => {
-      if (notificationTimer) clearTimeout(notificationTimer);
-    };
-  }, [notification]);
 
   const submitForm = (evt: SyntheticEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    setSubmitting(true);
-    setNotification(null);
-    setError({});
 
-    const formData = new FormData();
+    const formData = new FormData(evt.currentTarget);
+    if (formData.get('username') === '') formData.delete('username');
+    if (formData.get('email') === '') formData.delete('email');
 
-    if (username) formData.append('username', username);
-    if (email) formData.append('email', email);
-
-    ajaxRequest('/api/settings/account', 'POST', formData, {
-      headers: { 'content-type': 'multipart/form-data' },
-    })
-      .then((res) => {
-        setSubmitting(false);
-        if (res.data.success) {
-          updateUserData(res.data.data);
-          return setNotification('Successfully updated user information.');
-        }
-        setNotification('An error has occurred. Please try again.');
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        if (err.response.status === 400) {
-          setError(err.response.data.errors);
-        }
-      });
+    mutate({ formData });
   };
 
   const onSubmitProfileImage = (file: any, remove = false) => {
-    setError({});
     const formData = new FormData();
 
     if (file) formData.append('profileImage', file);
     if (remove) formData.append('remove', remove ? 'true' : 'false');
 
-    ajaxRequest('/api/settings/account', 'POST', formData, {
-      headers: { 'content-type': 'multipart/form-data' },
-    })
-      .then((res) => {
-        setSubmitting(false);
-        if (res.data.success) {
-          updateUserData(res.data.data);
-          return setNotification('Successfully updated user information.');
-        }
-        setNotification('An error has occurred. Please try again.');
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        if (err.response.status === 400) {
-          setError(err.response.data.errors);
-        }
-      });
+    mutate({ formData });
   };
 
   return (
     <form className="settings__form" onSubmit={submitForm}>
       <header className="settings__header">
-        {notification ? (
-          <p className="settings__notification" data-cy="notification">
-            {notification}
+        {data && data.success ? (
+          <p className="settings__notification" data-cy="notification-success">
+            Your account has been updated.
+          </p>
+        ) : null}
+
+        {error ? (
+          <p className="settings__notification" data-cy="notification-error">
+            An error has occurred on the server, please try again.
           </p>
         ) : null}
       </header>
@@ -110,7 +58,7 @@ const AccountForm = ({
           <button
             type="button"
             className="btn btn--small"
-            disabled={submitting}
+            disabled={isPending}
             onClick={() => (fileRef.current ? fileRef.current.click() : null)}
           >
             <img src={currentImage} alt="Profile" className="settings__image" />
@@ -136,54 +84,24 @@ const AccountForm = ({
       </fieldset>
 
       <fieldset className="settings__field">
-        <label className="settings__label" htmlFor="username">
-          <span className="settings__title">Username</span>
+        <Input
+          type="text"
+          name="username"
+          label="Username"
+          error={data && data.errors ? data.errors.username : null}
+        />
 
-          {error.username ? (
-            <span className="settings__error" data-cy="error">
-              {error.username}
-            </span>
-          ) : null}
-
-          <input
-            id="username"
-            name="username"
-            type="text"
-            className="settings__input settings__input--text"
-            data-cy="username"
-            value={username}
-            placeholder={currentUsername}
-            onChange={(evt) => setUsername(evt.target.value)}
-          />
-        </label>
+        <Input
+          type="text"
+          name="email"
+          label="Email"
+          error={data && data.errors ? data.errors.username : null}
+        />
       </fieldset>
 
       <fieldset className="settings__field">
-        <label className="settings__label" htmlFor="email">
-          <span className="settings__title">Email</span>
-
-          {error.email ? (
-            <span className="settings__error" data-cy="error">
-              {error.email}
-            </span>
-          ) : null}
-
-          <input
-            id="email"
-            name="email"
-            type="text"
-            className="settings__input settings__input--text"
-            data-cy="email"
-            value={email}
-            placeholder={currentEmail}
-            onChange={(evt) => setEmail(evt.target.value)}
-          />
-        </label>
-      </fieldset>
-
-      <fieldset className="settings__field">
-        <button className="btn btn--submit" type="submit" disabled={submitting}>
-          {submitting ? (
+        <button className="btn btn--submit" type="submit" disabled={isPending}>
+          {isPending ? (
             <i className="fas fa-spinner fa-spin spinner-space" />
           ) : null}
           Update
@@ -194,129 +112,55 @@ const AccountForm = ({
 };
 
 const PasswordForm = () => {
-  const [currentPassword, setCurrent] = useState('');
-  const [newPassword, setNew] = useState('');
-  const [confirmPassword, setConfirm] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<{
-    password?: string;
-    confirmPassword?: string;
-    newPassword?: string;
-  }>({});
-  const [notification, setNotification] = useState<string | null>(null);
-
-  // Timeout for clearing notification message
-  useEffect(() => {
-    let notificationTimer: number;
-    if (notification)
-      notificationTimer = window.setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-
-    return () => {
-      clearTimeout(notificationTimer);
-    };
-  }, [notification]);
-
   const submitForm = (evt: SyntheticEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    setSubmitting(true);
-    setNotification(null);
-    setError({});
 
-    ajaxRequest('/api/settings/password', 'POST', {
-      password: currentPassword,
-      newPassword,
-      confirmPassword,
-    })
-      .then((res) => {
-        setSubmitting(false);
-        if (res.data.success) {
-          setCurrent('');
-          setNew('');
-          setConfirm('');
-          setNotification('Successfully updated password.');
-        }
-      })
-      .catch((err) => {
-        setSubmitting(false);
-        if (err.response.status === 400)
-          return setError(err.response.data.errors);
-        setNotification('An error has occurred. Please try again.');
-      });
+    const formData = new FormData(evt.currentTarget);
+    const currentPassword = formData.get('currentPassword') as string;
+    const newPassword = formData.get('newPassword') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+    mutate({ currentPassword, newPassword, confirmPassword });
   };
+
+  const { data, mutate, isPending, error } = useUpdatePassword();
 
   return (
     <form className="settings__form" onSubmit={submitForm}>
       <header className="settings__header">
-        {notification ? (
-          <p className="settings__notification" data-cy="notification">
-            {notification}
+        {data && data.success ? (
+          <p className="settings__notification" data-cy="notification-success">
+            Successfully updated password.
+          </p>
+        ) : null}
+
+        {error ? (
+          <p className="settings__notification" data-cy="notification-error">
+            An error occurred, please try again.
           </p>
         ) : null}
       </header>
 
       <fieldset className="settings__field">
-        <label className="settings__label" htmlFor="password">
-          <span className="settings__title">Current Password</span>
+        <Input
+          type="password"
+          name="currentPassword"
+          label="Current Password"
+          error={data && data.errors ? data.errors.currentPassword : null}
+        />
 
-          {error.password ? (
-            <span className="settings__error" data-cy="error">
-              {error.password}
-            </span>
-          ) : null}
+        <Input
+          type="password"
+          name="newPassword"
+          label="New Password"
+          error={data && data.errors ? data.errors.newPassword : null}
+        />
 
-          <input
-            id="password"
-            className="settings__input settings__input--text"
-            type="password"
-            data-cy="password"
-            value={currentPassword}
-            onChange={(evt) => setCurrent(evt.target.value)}
-          />
-        </label>
-      </fieldset>
-
-      <fieldset className="settings__field">
-        <label className="settings__label" htmlFor="newPassword">
-          <span className="settings__title">New Password</span>
-
-          {error.newPassword ? (
-            <span className="settings__error" data-cy="error">
-              {error.newPassword}
-            </span>
-          ) : null}
-
-          <input
-            id="newPassword"
-            className="settings__input settings__input--text"
-            type="password"
-            data-cy="newPassword"
-            value={newPassword}
-            onChange={(evt) => setNew(evt.target.value)}
-          />
-        </label>
-      </fieldset>
-
-      <fieldset className="settings__field">
-        <label className="settings__label" htmlFor="confirmPassword">
-          <span className="settings__title">Confirm Password</span>
-
-          {error.confirmPassword ? (
-            <span className="settings__error" data-cy="error">
-              {error.confirmPassword}
-            </span>
-          ) : null}
-
-          <input
-            id="confirmPassword"
-            className="settings__input settings__input--text"
-            type="password"
-            data-cy="confirmPassword"
-            value={confirmPassword}
-            onChange={(evt) => setConfirm(evt.target.value)}
-          />
-        </label>
+        <Input
+          type="password"
+          name="confirmPassword"
+          label="Confirm Password"
+          error={data && data.errors ? data.errors.confirmPassword : null}
+        />
       </fieldset>
 
       <fieldset className="settings__field">
@@ -324,9 +168,9 @@ const PasswordForm = () => {
           className="btn btn--submit"
           type="submit"
           data-cy="submit"
-          disabled={submitting}
+          disabled={isPending}
         >
-          {submitting ? (
+          {isPending ? (
             <i className="fas fa-spinner fa-spin spinner-space" />
           ) : null}
           Update Password
@@ -337,7 +181,7 @@ const PasswordForm = () => {
 };
 
 const SettingsPage = () => {
-  const user = useAppSelector((state) => state.user);
+  const user = useUserContext();
   const { type } = useParams();
   let displayedForm;
 
@@ -348,7 +192,6 @@ const SettingsPage = () => {
           currentUsername={user.username}
           currentEmail={user.email}
           currentImage={user.profileImage}
-          updateUserData={updateUser}
         />
       );
       break;
