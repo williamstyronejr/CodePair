@@ -174,6 +174,7 @@ const ChallengePage = () => {
           userId={user.id}
           username={user.username}
           privateRoom={data.room.private}
+          initMessages={data.room.messages}
         />
       </div>
     </section>
