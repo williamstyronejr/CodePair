@@ -66,14 +66,15 @@ function leaveRoom(roomId, username) {
  *  messages to the room. Only works if the client making the request is in
  *  the room.
  * @param {String} roomId Id of room to send message to
+ * @param {String} authorId Id of user sending message
+ * @param {String} authorName Name of user sending message
  * @param {String} msg Content of message
  * @param {String} time Time message was sent
- * @param {String} author Id of user sending message
  */
-function sendMessage(roomId, msg, time, author) {
+function sendMessage(roomId, authorId, authorName, content, time) {
   if (this.rooms.has(roomId)) {
-    addMessageById(roomId, { content: msg, time, author });
-    this.in(roomId).emit('receiveMessage', msg, time, author);
+    addMessageById(roomId, { authorId, authorName, content, time });
+    this.in(roomId).emit('receiveMessage', authorId, authorName, content, time);
   }
 }
 
