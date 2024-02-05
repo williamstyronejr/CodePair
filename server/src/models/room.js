@@ -11,7 +11,8 @@ const roomSchema = new mongoose.Schema({
     {
       content: { type: String },
       time: { type: Date },
-      author: { type: String },
+      authorId: { type: String },
+      authorName: { type: String },
     },
   ],
   usersInRoom: { type: Number, default: 0 },
