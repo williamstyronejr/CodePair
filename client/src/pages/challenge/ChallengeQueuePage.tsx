@@ -87,59 +87,61 @@ const ChallengeQueuePage = () => {
 
   return (
     <section className="queue" data-cy="challenge-queue">
-      {matchStatus !== 'pending' ? (
-        <div className="queue__notification">
-          <div className="queue__box">
-            <h2 className="queue__heading">
-              {matchStatus === 'accepted' ? 'Accepted Match' : 'Pair Found'}
-            </h2>
-            <span className="queue__match-timer">{matchTimer}</span>
+      <div className="queue__wrapper">
+        {matchStatus !== 'pending' ? (
+          <div className="queue__notification">
+            <div className="queue__box">
+              <h2 className="queue__heading">
+                {matchStatus === 'accepted' ? 'Accepted Match' : 'Pair Found'}
+              </h2>
+              <span className="queue__match-timer">{matchTimer}</span>
 
-            {matchStatus !== 'accepted' ? (
-              <>
-                <button
-                  type="button"
-                  className="btn btn--pair btn--pair-accept"
-                  onClick={() => {
-                    socket.emit('acceptMatch', matchId);
-                    setMatchStatus('accepted');
-                  }}
-                >
-                  Accept Pair
-                </button>
+              {matchStatus !== 'accepted' ? (
+                <>
+                  <button
+                    type="button"
+                    className="transition-colors queue__accept"
+                    onClick={() => {
+                      socket.emit('acceptMatch', matchId);
+                      setMatchStatus('accepted');
+                    }}
+                  >
+                    Accept Pair
+                  </button>
 
-                <button
-                  type="button"
-                  className="btn btn--pair btn--pair-decline"
-                  onClick={() => {
-                    setMatchStatus('declined');
-                  }}
-                >
-                  Decline Pair
-                </button>
-              </>
-            ) : null}
+                  <button
+                    type="button"
+                    className="transition-colors queue__decline"
+                    onClick={() => {
+                      setMatchStatus('declined');
+                    }}
+                  >
+                    Decline Pair
+                  </button>
+                </>
+              ) : null}
+            </div>
           </div>
+        ) : null}
+
+        <header className="queue__header">
+          <h2 className="queue__heading">In Queue</h2>
+        </header>
+
+        <div className="queue__info">
+          <Timer isPaused={matchStatus !== 'pending'} />
+
+          <button
+            className="transition-colors queue__cancel"
+            type="button"
+            data-cy="cancel"
+            onClick={() => {
+              setMatchStatus('declined');
+            }}
+          >
+            Cancel
+          </button>
         </div>
-      ) : null}
-
-      <header className="queue__header">
-        <h2 className="queue__heading">In Queue</h2>
-      </header>
-
-      <div className="queue__info">
-        <Timer isPaused={matchStatus !== 'pending'} />
-
-        <button
-          className="btn btn--cancel"
-          type="button"
-          data-cy="cancel"
-          onClick={() => {
-            setMatchStatus('declined');
-          }}
-        >
-          Cancel
-        </button>
       </div>
     </section>
   );
