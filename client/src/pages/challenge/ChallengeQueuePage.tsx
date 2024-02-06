@@ -24,7 +24,6 @@ const ChallengeQueuePage = () => {
     });
 
     socket.on('userLogged', () => {
-      console.log('user logged');
       setReady(true);
     });
 

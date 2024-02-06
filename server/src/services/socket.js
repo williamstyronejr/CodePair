@@ -140,7 +140,6 @@ function joinQueue(queueId, maxSize = 2) {
  * @param {String} queueId Id of queue to leave
  */
 function leaveQueue(queueId) {
-  console.log('removing user from queue', queueId);
   removeUserFromQueue(queueId, socketClients[this.id]);
 }
 
