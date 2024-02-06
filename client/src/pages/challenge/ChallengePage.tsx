@@ -109,7 +109,7 @@ const ChallengePage = () => {
     return <LoadingScreen message="Connecting to Room" />;
 
   return (
-    <section className="challenge">
+    <section className="challenge" data-cy="challenge">
       <div className="challenge__content">
         <div className="challenge__details">
           <nav className="challenge__nav">

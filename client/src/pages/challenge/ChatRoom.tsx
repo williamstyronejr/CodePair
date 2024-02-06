@@ -149,7 +149,7 @@ export default function ChatRoom({
 
   if (!active)
     return (
-      <div className="chat chat--hidden" data-cy="chat">
+      <div className="chat chat--hidden" data-cy="chatToggle">
         <button
           className="btn"
           type="button"
