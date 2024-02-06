@@ -13,8 +13,9 @@ const {
   addUsersToPendingQueue,
   getPendingQueue,
 } = require('../redis');
+const Challenge = require('../../models/challenge');
 const { connectDatabase, disconnectDatabase } = require('../database');
-const { createRandomString } = require('../../utils/utils');
+const { createRandomString, createPendingKey } = require('../../utils/utils');
 
 const { DB_TEST_URI, IP: ip, PORT: port } = process.env;
 
@@ -29,6 +30,7 @@ let socket3; // Client socket used for attacking (breaking) system attempts
 const socketUserId1 = 'user1';
 const socketUserId2 = 'user2';
 const attackUserId = 'user3'; // Id of user trying to force an action on system
+let randomChallenge = null;
 
 // Set up fake server, redis, and socket.io, and mongoose
 beforeAll((done) => {
@@ -38,32 +40,38 @@ beforeAll((done) => {
     redisClient = client;
 
     connectDatabase(DB_TEST_URI).then(() => {
-      server.listen(PORT, IP, () => {
-        // Brackets need for IPv6
-        socket1 = io.connect(`http://${IP}:${PORT}`, {
-          transports: ['websocket'],
-        });
-        socket2 = io.connect(`http://${IP}:${PORT}`, {
-          transports: ['websocket'],
-        });
+      Challenge.findOne({})
+        .exec()
+        .then((res) => {
+          randomChallenge = res;
 
-        // Connect sockets and emit message for logging user ids with sockets
-        socket1.on('connect', () => {
-          socket1.on('userLogged', () => {
-            if (socket2.connected) done();
+          server.listen(PORT, IP, () => {
+            // Brackets need for IPv6
+            socket1 = io.connect(`http://${IP}:${PORT}`, {
+              transports: ['websocket'],
+            });
+            socket2 = io.connect(`http://${IP}:${PORT}`, {
+              transports: ['websocket'],
+            });
+
+            // Connect sockets and emit message for logging user ids with sockets
+            socket1.on('connect', () => {
+              socket1.on('userLogged', () => {
+                if (socket2.connected) done();
+              });
+
+              socket1.emit('logUser', socketUserId1);
+            });
+
+            socket2.on('connect', () => {
+              socket2.on('userLogged', () => {
+                if (socket1.connected) done();
+              });
+
+              socket2.emit('logUser', socketUserId2);
+            });
           });
-
-          socket1.emit('logUser', socketUserId1);
         });
-
-        socket2.on('connect', () => {
-          socket2.on('userLogged', () => {
-            if (socket1.connected) done();
-          });
-
-          socket2.emit('logUser', socketUserId2);
-        });
-      });
     });
   });
 }, 30000);
@@ -125,17 +133,16 @@ describe('Joining/Leaving queue through socket', () => {
 });
 
 describe('Accepting/Declining pending queue', () => {
-  let pendingQueue = createRandomString(8);
-  let challengeId = createRandomString(8);
+  let pendingQueue = '';
 
   beforeEach(async () => {
-    pendingQueue = createRandomString(8);
-    challengeId = createRandomString(8);
+    const challengeId = randomChallenge.id;
+    pendingQueue = createPendingKey(`${challengeId}-node`);
 
     await addUsersToPendingQueue(
       pendingQueue,
       [socketUserId1, socketUserId2],
-      challengeId
+      challengeId,
     );
   }, 10000);
 
@@ -196,11 +203,12 @@ describe('Accepting/Declining pending queue', () => {
 });
 
 describe('Joining and leaving room', () => {
-  const pendingQueue = createRandomString(8);
-  const challengeId = createRandomString(9);
   let roomId;
 
   beforeAll((done) => {
+    const challengeId = randomChallenge.id;
+    const pendingQueue = createPendingKey(`${challengeId}-node`);
+
     // Event handler for room creation
     socket1.on('roomCreated', (rId) => {
       roomId = rId;
@@ -219,7 +227,7 @@ describe('Joining and leaving room', () => {
     addUsersToPendingQueue(
       pendingQueue,
       [socketUserId1, socketUserId2],
-      challengeId
+      challengeId,
     ).then(() => {
       // Users accept queue
       socket1.emit('acceptMatch', pendingQueue);
@@ -259,11 +267,12 @@ describe('Joining and leaving room', () => {
 });
 
 describe('Sending message in room', () => {
-  const pendingQueue = createRandomString(8);
-  const challengeId = createRandomString(8);
   let roomId;
 
   beforeAll((done) => {
+    const challengeId = randomChallenge.id;
+    const pendingQueue = createPendingKey(`${challengeId}-node`);
+
     // Event handler for room creation
     socket1.on('roomCreated', (rId) => {
       roomId = rId;
@@ -282,7 +291,7 @@ describe('Sending message in room', () => {
     addUsersToPendingQueue(
       pendingQueue,
       [socketUserId1, socketUserId2],
-      challengeId
+      challengeId,
     ).then(() => {
       // Users accept queue
       socket1.emit('acceptMatch', pendingQueue);
