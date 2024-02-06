@@ -36,7 +36,7 @@ exports.setupRedis = async (host, port, url = null) => {
   await redisClient.ping();
 
   logger.info(
-    `Connected to redis server ${url === null ? `${host}:${port}` : url}`
+    `Connected to redis server ${url === null ? `${host}:${port}` : url}`,
   );
 
   redisClient.on('error', (err) => {
@@ -144,7 +144,7 @@ exports.addUsersToPendingQueue = async (queueId, userIds, challengeId) => {
   // Adds 'false' after each userId as a ready flag
   const args = userIds.reduce(
     (r, a) => r.concat(a, 'false'),
-    ['challengeId', challengeId]
+    ['challengeId', challengeId],
   );
   await redisClient.hSet(queueId, args);
   return redisClient.expire(queueId, 12);
