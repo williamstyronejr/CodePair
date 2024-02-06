@@ -6,6 +6,7 @@ const {
   addUsersToPendingQueue,
 } = require('./redis');
 const { emitMessageToUserId } = require('./socket');
+const { createPendingKey } = require('../utils/utils');
 
 let inProgress = false; // Flag to prevent running queue parallel
 
@@ -44,9 +45,7 @@ async function createMatch(queueId, numOfUsers) {
   }
 
   // Generate unique id for match
-  const pendingQueueId = `${crypto
-    .pseudoRandomBytes(16)
-    .toString('hex')}-${queueId}`;
+  const pendingQueueId = createPendingKey(queueId);
 
   return addUsersToPendingQueue(pendingQueueId, users, challengeId).then(
     (result) => {
