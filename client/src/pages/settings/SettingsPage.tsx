@@ -95,7 +95,7 @@ const AccountForm = ({
           type="text"
           name="email"
           label="Email"
-          error={data && data.errors ? data.errors.username : null}
+          error={data && data.errors ? data.errors.email : null}
         />
       </fieldset>
 
