@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
-import { ajaxRequest } from '../../utils/utils';
 import Loading from '../../components/shared/Loading';
 import LoadingScreen from '../../components/shared/LoadingScreen';
+import useGetChallenges from '../../hooks/api/useGetChallenges';
+import useCreatePrivateRoom from '../../hooks/api/useCreatePrivateRoom';
 import './styles/challengeList.css';
 import './styles/challengeModal.css';
 
@@ -15,8 +16,6 @@ const ChallengeModal = ({
   onClose: () => void;
 }) => {
   const navigate = useNavigate();
-  const [creatingRoom, setCreatingRoom] = useState(false);
-  const [roomError, setRoomError] = useState<boolean | string>(false);
   const [language, setLanguage] = useState(challenge.initialCode[0].language);
 
   useEffect(() => {
@@ -26,43 +25,23 @@ const ChallengeModal = ({
     document.addEventListener('keydown', onEsc);
 
     return () => document.removeEventListener('keydown', onEsc);
-  }, []);
+  }, [onClose]);
 
-  const createPrivateRoom = useCallback((challengeId: string, lang: string) => {
-    setCreatingRoom(true);
-    setRoomError(false);
+  const { data, mutate, isPending, error } = useCreatePrivateRoom();
 
-    ajaxRequest(`/api/challenge/${challengeId}/create`, 'POST', {
-      language: lang,
-    })
-      .then((res) => {
-        if (!res.data.room) {
-          setRoomError(true);
-        }
-
-        navigate(`/c/${challengeId}/r/${res.data.room}`);
-      })
-      .catch((err) => {
-        if (err.response && err.response.status === 404) {
-          setRoomError(
-            'Invalid language, please selected a different language.'
-          );
-        } else if (err.response && err.response.status === 500) {
-          setRoomError('Server error ocurred, please try again.');
-        }
-        setCreatingRoom(false);
-      });
-  }, []);
+  if (data && data.room) navigate(`/c/${challenge._id}/r/${data.room}`);
 
   return (
     <div className="challenge__modal">
       <div className="challenge__modal-content">
-        {creatingRoom && !roomError ? (
-          <LoadingScreen message="Creating Room" />
+        {isPending ? (
+          <div className="challenge__modal-info">
+            <LoadingScreen message="Creating Room" />
+          </div>
         ) : (
           <header className="challenge__modal-header">
             <button
-              className="transition-colors challenge__modal-close"
+              className="challenge__modal-close transition-colors"
               type="button"
               onClick={() => onClose()}
             >
@@ -71,163 +50,90 @@ const ChallengeModal = ({
           </header>
         )}
 
-        {roomError ? (
+        {error ? (
           <div className="challenge__modal-error">
             An error occurred during request, please try again.
           </div>
         ) : null}
 
-        {!creatingRoom && !roomError ? (
-          <>
-            <div className="challenge__modal-details">
-              <h3 className="challenge__modal-title">{challenge.title}</h3>
+        <div className="challenge__modal-details">
+          <h3 className="challenge__modal-title">{challenge.title}</h3>
 
-              <p className="challenge__modal-prompt">
-                {challenge.summary || challenge.prompt}
-              </p>
-            </div>
+          <p className="challenge__modal-prompt">
+            {challenge.summary || challenge.prompt}
+          </p>
+        </div>
 
-            <hr className="challenge__modal-dividor" />
+        <hr className="challenge__modal-dividor" />
 
-            <div className="challenge__modal-options">
-              <h4 className="">Select Language</h4>
-              <select
-                className="challenge__modal-languages"
-                value={language}
-                onChange={(evt) => {
-                  setLanguage(evt.target.value);
-                }}
-              >
-                {challenge.initialCode.map((data: any) => (
-                  <option value={data.language} key={data.language}>
-                    {data.language}
-                  </option>
-                ))}
-              </select>
+        <div className="challenge__modal-options">
+          <h4 className="">Select Language</h4>
+          <select
+            className="challenge__modal-languages"
+            value={language}
+            onChange={(evt) => {
+              setLanguage(evt.target.value);
+            }}
+          >
+            {challenge.initialCode.map((data: any) => (
+              <option value={data.language} key={data.language}>
+                {data.language}
+              </option>
+            ))}
+          </select>
 
-              <hr className="challenge__modal-dividor" />
+          <hr className="challenge__modal-dividor" />
 
-              <div className="challenge__modal-wrapper">
-                <Link
-                  className="transition-colors challenge__modal-link"
-                  to={`/c/${challenge._id}/${language}`}
-                  data-cy="challenge-pair"
-                >
-                  Join Queue
-                </Link>
+          <div className="challenge__modal-wrapper">
+            <Link
+              className="challenge__modal-link transition-colors"
+              to={`/c/${challenge._id}/${language}`}
+              data-cy="challenge-pair"
+            >
+              Join Queue
+            </Link>
 
-                <button
-                  className="transition-colors challenge__modal-link"
-                  data-cy="challenge-solo"
-                  type="button"
-                  onClick={() => createPrivateRoom(challenge._id, language)}
-                >
-                  Solo
-                </button>
-              </div>
-            </div>
-          </>
-        ) : null}
+            <button
+              className="challenge__modal-link transition-colors"
+              data-cy="challenge-solo"
+              type="button"
+              onClick={() => mutate({ challengeId: challenge._id, language })}
+            >
+              Solo
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-// const ChallengeItem = ({
-//   challenge,
-//   setSelected,
-// }: {
-//   challenge: any;
-//   setSelected: Function;
-// }) => {
-//   return (
-//     <div className="challenges__item" key={`challenge-item-${challenge._id}`}>
-//       <div className="challenges__details">
-//         <button
-//           className="transition-colors challenges__title"
-//           type="button"
-//           onClick={() => setSelected(challenge)}
-//         >
-//           {challenge.title}
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
 const ChallengeListPage = () => {
-  const [page, setPage] = useState(1);
-  const [endOfList, setEndOfList] = useState(false);
-  const [challenges, setChallenge] = useState<any[]>([]);
-  const [loadingList, setLoadingList] = useState(false);
-  const [listError, setListError] = useState(false);
   const [selected, setSelected] = useState(null);
-
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('newest');
 
-  const getChallenges = () => {
-    if (loadingList) return; // Stops from sending multiple request to update
-    setLoadingList(true);
-
-    ajaxRequest(
-      `/api/challenge/list?page=${page}&orderBy=${sortBy}&search=${search}`,
-      'GET'
-    )
-      .then((res) => {
-        // Empty list if first page  to clear results from previous filtering
-        if (res.data.challenges.length === 0) {
-          if (page === 1) setChallenge([]);
-          setEndOfList(true);
-          return setLoadingList(false);
-        }
-
-        setChallenge(
-          page === 1
-            ? [...res.data.challenges]
-            : [...challenges, ...res.data.challenges]
-        );
-        setPage(page + 1);
-        setLoadingList(false);
-      })
-      .catch(() => {
-        setEndOfList(true);
-        setListError(true);
-        setLoadingList(false);
-      });
-  };
+  const { data, fetchNextPage, hasNextPage, error, isFetching } =
+    useGetChallenges({
+      search,
+      sortBy,
+    });
 
   const [infiniteRef] = useInfiniteScroll({
-    loading: loadingList,
-    hasNextPage: !endOfList,
-    onLoadMore: getChallenges,
-    disabled: !!listError,
+    loading: isFetching,
+    hasNextPage,
+    onLoadMore: fetchNextPage,
+    disabled: !!error,
     rootMargin: '0px 0px 200px 0px',
   });
-
-  useEffect(() => {
-    getChallenges();
-  }, []);
-
-  useEffect(() => {
-    // Fetch list whenever page is set to 1 due to filter changes
-    if (page === 1) getChallenges();
-  }, [page]);
 
   return (
     <section className="challenges">
       <header className="challenges__header">
         <div className="challenges__filter">
-          <form
-            className="challenges__option challenges__option--flex"
-            onSubmit={(evt) => {
-              evt.preventDefault();
-              setEndOfList(false);
-              setPage(1);
-            }}
-          >
+          <div className="challenges__option challenges__option--flex">
             <input
-              className="transition-colors challenges__search"
+              className="challenges__search transition-colors"
               type="text"
               placeholder="Search"
               value={search}
@@ -236,7 +142,7 @@ const ChallengeListPage = () => {
             <button className="challenges__search-btn" type="submit">
               Search
             </button>
-          </form>
+          </div>
 
           <div className="challenges__option">
             <label htmlFor="sortBy">
@@ -245,11 +151,7 @@ const ChallengeListPage = () => {
                 id="sortBy"
                 className="challenges__sort"
                 value={sortBy}
-                onChange={(evt) => {
-                  setSortBy(evt.target.value);
-                  setEndOfList(false);
-                  setPage(1);
-                }}
+                onChange={(evt) => setSortBy(evt.target.value)}
               >
                 <option value="newest">Newest</option>
                 <option value="oldest">Oldest</option>
@@ -268,30 +170,34 @@ const ChallengeListPage = () => {
         ) : null}
 
         <div className="challenges__list">
-          {challenges.map((challenge) => (
-            <div key={challenge._id} className="challenges__item">
-              <div className="challenges__info">
-                <h3 className="challenges__title">{challenge.title}</h3>
+          {data
+            ? data.pages.map((challenges) =>
+                challenges.map((challenge) => (
+                  <div key={challenge._id} className="challenges__item">
+                    <div className="challenges__info">
+                      <h3 className="challenges__title">{challenge.title}</h3>
 
-                <div className="challenges__summary">
-                  {challenge.summary || challenge.prompt}
-                </div>
-              </div>
+                      <div className="challenges__summary">
+                        {challenge.summary || challenge.prompt}
+                      </div>
+                    </div>
 
-              <div className="challenges__options">
-                <button
-                  className="transition-colors challenges__select"
-                  type="button"
-                  onClick={() => setSelected(challenge)}
-                  data-cy="select-challenge"
-                >
-                  Start Challenge
-                </button>
-              </div>
-            </div>
-          ))}
+                    <div className="challenges__options">
+                      <button
+                        className="challenges__select transition-colors"
+                        type="button"
+                        onClick={() => setSelected(challenge)}
+                        data-cy="select-challenge"
+                      >
+                        Start Challenge
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )
+            : null}
 
-          {endOfList && challenges.length === 0 ? (
+          {!hasNextPage && data && data.pageParams.length === 1 ? (
             <div className="challenges__item">
               <p className="challenges__empty">
                 No challenge matching this search
@@ -299,7 +205,7 @@ const ChallengeListPage = () => {
             </div>
           ) : null}
 
-          {!endOfList ? (
+          {hasNextPage ? (
             <div
               ref={infiniteRef}
               className=" challenge__item challenges__item--end"

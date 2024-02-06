@@ -124,8 +124,6 @@ function Challenge({
       let testPass = 0;
       let testFail = 0;
 
-      console.log(testErrors);
-
       const listItems = testErrors ? (
         <li
           className="challenge__item challenge__item--error"

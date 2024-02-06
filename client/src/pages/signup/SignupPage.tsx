@@ -1,53 +1,27 @@
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent } from 'react';
 import { Navigate } from 'react-router-dom';
-import { ajaxRequest } from '../../utils/utils';
-import { setUserData } from '../../reducers/userReducer';
 import GithubButton from '../auth/GithubButton';
-import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
+import Input from '../../components/shared/Input';
+import useUserContext from '../../hooks/context/useUserContext';
+import useSignup from '../../hooks/api/useSignup';
 import './styles/signupPage.css';
 
 const SignupPage = () => {
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const user = useUserContext();
+  const { mutate, isPending, error, data } = useSignup();
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [email, setEmail] = useState('');
-  const [requesting, setRequesting] = useState(false);
-  const [error, setError] = useState<{
-    confirm?: string;
-    password?: string;
-    email?: string;
-    username?: string;
-    general?: string;
-  }>({});
-
-  if (user.authenticated) return <Navigate to="/challenges" />;
+  if (user) return <Navigate to="/challenges" />;
 
   function onSubmit(evt: SyntheticEvent<HTMLFormElement>) {
     evt.preventDefault();
-    if (requesting) return;
 
-    setRequesting(true);
-    setError({});
+    const formData = new FormData(evt.currentTarget);
+    const username = formData.get('username') as string;
+    const confirm = formData.get('confirmPassword') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
-    ajaxRequest('/api/signup', 'POST', {
-      username,
-      password,
-      confirm,
-      email,
-    })
-      .then((res) => {
-        setRequesting(false);
-        if (res.data.success) dispatch(setUserData(res.data.user));
-      })
-      .catch((err) => {
-        setRequesting(false);
-        if (err.response && err.response.data)
-          return setError(err.response.data.errors);
-        setError({ general: 'Server error occurred, please try again.' });
-      });
+    mutate({ username, password, confirm, email });
   }
 
   return (
@@ -63,101 +37,46 @@ const SignupPage = () => {
           <hr />
         </div>
 
-        <fieldset className="form__field">
-          <label className="form__label" htmlFor="email">
-            <span className="form__labeling">Email</span>
-
-            {error.email && (
-              <span className="form__error" data-cy="error">
-                {error.email}
-              </span>
-            )}
-
-            <input
-              id="email"
-              name="email"
-              className="form__input form__input--text"
-              type="text"
-              placeholder="Email"
-              value={email}
-              onChange={(evt) => setEmail(evt.target.value)}
-              data-cy="email"
-            />
-          </label>
-        </fieldset>
+        {error ? (
+          <div className="form__error">
+            An error occurred during request, please try again
+          </div>
+        ) : null}
 
         <fieldset className="form__field">
-          <label className="form__label" htmlFor="username">
-            <span className="form__labeling">Username</span>
-
-            {error.username && (
-              <span className="form__error" data-cy="error">
-                {error.username}
-              </span>
-            )}
-            <input
-              id="username"
-              name="username"
-              className="form__input form__input--text"
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(evt) => setUsername(evt.target.value)}
-              data-cy="username"
-            />
-          </label>
-        </fieldset>
-
-        <fieldset className="form__field">
-          <label className="form__label" htmlFor="password">
-            <span className="form__labeling">Password</span>
-
-            {error.password && (
-              <span className="form__error" data-cy="error">
-                {error.password}
-              </span>
-            )}
-            <input
-              id="password"
-              name="password"
-              className="form__input form__input--text"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(evt) => setPassword(evt.target.value)}
-              data-cy="password"
-            />
-          </label>
-        </fieldset>
-
-        <fieldset className="form__field">
-          <label className="form__label" htmlFor="confirm">
-            <span className="form__labeling">Confirm Password</span>
-            {error.confirm && (
-              <span className="form__error" data-cy="error">
-                {error.confirm}
-              </span>
-            )}
-            <input
-              id="confirm"
-              name="confirmPassword"
-              className="form__input form__input--text"
-              type="password"
-              placeholder="Confirm Password"
-              value={confirm}
-              onChange={(evt) => setConfirm(evt.target.value)}
-              data-cy="confirm"
-            />
-          </label>
+          <Input
+            name="email"
+            type="text"
+            label="Email"
+            error={data && data.errors ? data.errors.email : null}
+          />
+          <Input
+            type="text"
+            name="username"
+            label="Username"
+            error={data && data.errors ? data.errors.username : null}
+          />
+          <Input
+            type="password"
+            name="password"
+            label="Password"
+            error={data && data.errors ? data.errors.password : null}
+          />
+          <Input
+            type="password"
+            name="confirmPassword"
+            label="Confirm Password"
+            error={data && data.errors ? data.errors.confirm : null}
+          />
         </fieldset>
 
         <button
           className="btn btn--submit btn--auth"
           type="submit"
           data-cy="submit"
-          disabled={requesting}
+          disabled={isPending}
         >
-          {requesting ? (
+          {isPending ? (
             <i className="fas fa-spinner fa-spin spinner-space" />
           ) : null}
           Sign Up

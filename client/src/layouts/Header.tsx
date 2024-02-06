@@ -1,22 +1,22 @@
 import { useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import useDetectOutsideClick from '../components/shared/useDetectOutsideClick';
-import { useAppDispatch, useAppSelector } from '../hooks/reactRedux';
-import { signoutUser } from '../reducers/userReducer';
+import useUserContext from '../hooks/context/useUserContext';
+import useSignout from '../hooks/api/useSignout';
 import './styles/header.css';
 
 const AuthHeader = ({
   username,
-  signout,
   profileImage,
 }: {
   profileImage: string;
   username: string;
-  signout: () => void;
 }) => {
+  const { mutate: signout } = useSignout();
   const location = useLocation();
   const userMenuRef = useRef(null);
   const navMenuRef = useRef(null);
+
   const [navMenu, setNavMenu] = useDetectOutsideClick(navMenuRef, false);
   const [userMenu, setUserMenu] = useDetectOutsideClick(userMenuRef, false);
 
@@ -230,14 +230,15 @@ const UnAuthHeader = () => {
 };
 
 const Header = () => {
-  const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
+  const user = useUserContext();
 
-  return user.authenticated ? (
+  // const user = useAppSelector((state) => state.user);
+  // const dispatch = useAppDispatch();
+
+  return user ? (
     <AuthHeader
       username={user.username || ''}
       profileImage={user.profileImage}
-      signout={() => dispatch(signoutUser())}
     />
   ) : (
     <UnAuthHeader />

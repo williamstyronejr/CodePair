@@ -53,7 +53,7 @@ exports.setupConsumer = (queue, messageHandler) => {
     (msg) => {
       messageHandler(channel, msg);
     },
-    { noAck: false }
+    { noAck: false },
   );
 };
 
@@ -66,6 +66,5 @@ exports.setupConsumer = (queue, messageHandler) => {
  */
 exports.publishToQueue = (queue, data, options = {}) => {
   if (!channel) throw new Error('No connection has been made.');
-
   return channel.sendToQueue(queue, Buffer.from(data), options);
 };

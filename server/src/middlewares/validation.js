@@ -41,7 +41,7 @@ const userEmailValidation = [
     .custom((value) =>
       User.findOne({ username: value }).then((user) => {
         if (user) throw new Error('Username is already taken.');
-      })
+      }),
     ),
   body('email', 'Invalid email.')
     .optional()
@@ -51,7 +51,7 @@ const userEmailValidation = [
     .custom((value) =>
       User.findOne({ email: value }).then((user) => {
         if (user) throw new Error('Email is already in use');
-      })
+      }),
     ),
 ];
 
@@ -88,7 +88,7 @@ const usernameValidation = (fieldName = 'username') => [
     .custom((value) =>
       User.findOne({ username: value }).then((user) => {
         if (user) throw new Error('Username is already taken.');
-      })
+      }),
     ),
 ];
 
@@ -108,7 +108,7 @@ const emailValidation = (fieldName = 'email') => [
     .custom((value) =>
       User.findOne({ email: value }).then((user) => {
         if (user) throw new Error('Email is already in use');
-      })
+      }),
     ),
 ];
 
@@ -139,7 +139,7 @@ exports.validateSettingsUpdate = [
     .custom((value) =>
       User.findOne({ username: value }).then((user) => {
         if (user) throw new Error('Username is already taken.');
-      })
+      }),
     ),
   body('email')
     .optional()
@@ -149,7 +149,7 @@ exports.validateSettingsUpdate = [
     .custom((value) =>
       User.findOne({ email: value }).then((user) => {
         if (user) throw new Error('Email is already in use');
-      })
+      }),
     ),
   checkValdation,
 ];
@@ -182,7 +182,6 @@ exports.validatePasswordReset = [
  */
 exports.validateCodeTest = [
   body('code').exists().withMessage('Code must be provided to run test'),
-  body('language').exists().withMessage('A language must be provided.'),
   checkValdation,
 ];
 

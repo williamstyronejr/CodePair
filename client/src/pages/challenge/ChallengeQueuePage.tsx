@@ -1,135 +1,147 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
-import { openSocket } from '../../reducers/socketReducer';
 import Timer from '../../components/shared/Timer';
 import LoadingScreen from '../../components/shared/LoadingScreen';
-import {
-  joinQueue,
-  leaveQueue,
-  clearQueue,
-  declineQueue,
-  acceptQueue,
-  matchTimeout,
-} from '../../reducers/queueReducer';
+import useUserContext from '../../hooks/context/useUserContext';
+import socket from '../../utils/socket';
 import './styles/challengeQueuePage.css';
 
 const ChallengeQueuePage = () => {
-  const dispatch = useAppDispatch();
-  const { queue, socket } = useAppSelector((state) => ({
-    socket: state.socket,
-    queue: state.queue,
-  }));
+  const user = useUserContext();
   const { cId, lang } = useParams();
-  const { leavingQueue, roomId, matchFound, acceptedMatch, declinedMatch } =
-    queue;
+  const [ready, setReady] = useState(false);
+  const [matchId, setMatchId] = useState('');
+  const [matchStatus, setMatchStatus] = useState<
+    'pending' | 'found' | 'accepted' | 'declined'
+  >('pending');
   const [matchTimer, setMatchTimer] = useState(10);
-  const queueId = `${cId}-${lang}`; // Id of queue the user is joining
+  const [roomId, setRoomId] = useState('');
+  const queueId = useMemo(() => `${cId}-${lang}`, [cId, lang]); // Match queueid
 
   useEffect(() => {
-    let matchInterval: number; // Interval for when a match appears
-    // Keeps track of match found timer.
-    if (matchFound) {
-      matchInterval = window.setInterval(() => {
-        if (matchTimer <= 0) {
-          if (roomId !== '') return;
-          if (acceptedMatch) {
-            setMatchTimer(10); // Reset timer
-            return dispatch(clearQueue());
-          }
-          return dispatch(matchTimeout());
-        }
+    socket.on('connect', () => {
+      socket.emit('logUser', user?.id);
+    });
 
-        setMatchTimer(matchTimer - 1);
+    socket.on('userLogged', () => {
+      setReady(true);
+    });
+
+    return () => {
+      socket.emit('leaveQueue', queueId);
+      socket.off('userLogged');
+    };
+  }, [user, queueId]);
+
+  useEffect(() => {
+    if (ready && matchStatus === 'pending') {
+      socket.emit('joinQueue', queueId, 2);
+
+      return () => {
+        socket.off('joinQueue');
+      };
+    }
+  }, [ready, queueId, matchStatus]);
+
+  useEffect(() => {
+    socket.on('matchFound', (id: string) => {
+      setMatchStatus('found');
+      setMatchId(id);
+    });
+
+    socket.on('roomCreated', (roomId: string) => {
+      setRoomId(roomId);
+    });
+
+    socket.connect();
+    return () => {
+      socket.off('matchFound');
+      socket.off('roomCreated');
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    let matchInterval: number;
+    if (matchStatus === 'accepted' && matchTimer <= 0) {
+      setMatchStatus('pending');
+      setMatchTimer(10);
+    } else if (matchStatus === 'found' || matchStatus === 'accepted') {
+      matchInterval = window.setTimeout(() => {
+        if (matchTimer <= 0) {
+          setMatchStatus('declined');
+        } else {
+          setMatchTimer((old) => old - 1);
+        }
       }, 1000);
     }
 
     return () => {
-      clearInterval(matchInterval);
+      if (matchInterval) clearTimeout(matchInterval);
     };
-  }, [matchFound, matchTimer, roomId, acceptedMatch, dispatch]);
+  }, [matchStatus, matchTimer]);
 
-  useEffect(() => {
-    if (!socket.connected && !socket.connecting) {
-      dispatch(openSocket());
-    } else if (socket.ready && !queue.inQueue && !queue.leavingQueue) {
-      dispatch(joinQueue({ cId: queueId, size: 2 }));
-    }
-  }, [
-    socket.connected,
-    socket.ready,
-    queue.inQueue,
-    queue.leavingQueue,
-    socket.connecting,
-    queueId,
-    dispatch,
-  ]);
-
-  useEffect(() => {
-    // Clean up on unmount
-    return () => {
-      dispatch(leaveQueue(queueId));
-      dispatch(clearQueue());
-    };
-  }, [dispatch, queueId]);
-
-  if (!socket.ready) return <LoadingScreen message="Connecting to server" />;
-
-  if (leavingQueue) return <Navigate to="/challenges" />;
+  if (!ready) return <LoadingScreen message="Connecting to server" />;
+  if (matchStatus === 'declined') return <Navigate to="/challenges" />;
   if (roomId !== '') return <Navigate to={`/c/${cId}/r/${roomId}`} />;
 
   return (
     <section className="queue" data-cy="challenge-queue">
-      {matchFound ? (
-        <div className="queue__notification">
-          <div className="queue__box">
-            <h2 className="queue__heading">
-              {acceptedMatch ? 'Accepted Match' : 'Pair Found'}
-            </h2>
-            <span className="queue__match-timer">{matchTimer}</span>
+      <div className="queue__wrapper">
+        {matchStatus !== 'pending' ? (
+          <div className="queue__notification">
+            <div className="queue__box">
+              <h2 className="queue__heading">
+                {matchStatus === 'accepted' ? 'Accepted Match' : 'Pair Found'}
+              </h2>
+              <span className="queue__match-timer">{matchTimer}</span>
 
-            {!acceptedMatch ? (
-              <>
-                <button
-                  type="button"
-                  className="btn btn--pair btn--pair-accept"
-                  onClick={() => dispatch(acceptQueue(queue.matchId))}
-                >
-                  Accept Pair
-                </button>
+              {matchStatus !== 'accepted' ? (
+                <>
+                  <button
+                    type="button"
+                    className="transition-colors queue__accept"
+                    onClick={() => {
+                      socket.emit('acceptMatch', matchId);
+                      setMatchStatus('accepted');
+                    }}
+                  >
+                    Accept Pair
+                  </button>
 
-                <button
-                  type="button"
-                  className="btn btn--pair btn--pair-decline"
-                  onClick={() => dispatch(declineQueue(queue.matchId))}
-                >
-                  Decline Pair
-                </button>
-              </>
-            ) : null}
+                  <button
+                    type="button"
+                    className="transition-colors queue__decline"
+                    onClick={() => {
+                      setMatchStatus('declined');
+                    }}
+                  >
+                    Decline Pair
+                  </button>
+                </>
+              ) : null}
+            </div>
           </div>
+        ) : null}
+
+        <header className="queue__header">
+          <h2 className="queue__heading">In Queue</h2>
+        </header>
+
+        <div className="queue__info">
+          <Timer isPaused={matchStatus !== 'pending'} />
+
+          <button
+            className="transition-colors queue__cancel"
+            type="button"
+            data-cy="cancel"
+            onClick={() => {
+              setMatchStatus('declined');
+            }}
+          >
+            Cancel
+          </button>
         </div>
-      ) : null}
-
-      <header className="queue__header">
-        <h2 className="queue__heading">In Queue</h2>
-      </header>
-
-      <div className="queue__info">
-        <Timer
-          isPaused={
-            (matchFound && !acceptedMatch && !declinedMatch) || acceptedMatch
-          }
-        />
-
-        <button
-          className="btn btn--cancel"
-          type="button"
-          data-cy="cancel"
-          onClick={() => dispatch(leaveQueue(queueId))}
-        >
-          Cancel
-        </button>
       </div>
     </section>
   );

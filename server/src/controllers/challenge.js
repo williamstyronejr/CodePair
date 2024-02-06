@@ -85,7 +85,15 @@ exports.createPrivateRoom = async (req, res, next) => {
       throw error;
     }
 
-    const room = await createRoom(cId, [userId], language, true);
+    let initCode = '';
+
+    challenge.initialCode.forEach((template) => {
+      if (template.language === language) {
+        initCode = template.code;
+      }
+    });
+
+    const room = await createRoom(cId, [userId], language, true, 2, initCode);
 
     res.json({ room: room.id });
   } catch (err) {
@@ -116,7 +124,7 @@ exports.getRoomInfo = async (req, res, next) => {
      */
     if (!challenge || !room) {
       const error = new Error(
-        `${challenge ? `Challenge ${cId}` : `Room ${rId}`} does not exist. `
+        `${challenge ? `Challenge ${cId}` : `Room ${rId}`} does not exist. `,
       );
       error.status = 404;
       throw error;
@@ -148,7 +156,7 @@ exports.convertRoomToPublic = async (req, res, next) => {
 
     if (!room) {
       const e = new Error(
-        `User, ${uId}, trying to make room public, but not apart of the room.`
+        `User, ${uId}, trying to make room public, but not apart of the room.`,
       );
       e.status = 401;
       e.msg = { error: 'Current user can not make this request.' };
@@ -227,7 +235,7 @@ exports.receiveSolution = async (channel, msg) => {
         correlationId,
         [],
         false,
-        error
+        error,
       );
     }
 
@@ -242,7 +250,7 @@ exports.receiveSolution = async (channel, msg) => {
           challenge.title,
           room.code,
           room.users,
-          room.language
+          room.language,
         ),
       ];
 
@@ -258,7 +266,7 @@ exports.receiveSolution = async (channel, msg) => {
       correlationId,
       testResults,
       failedTests === 0,
-      null
+      null,
     );
     channel.ack(msg);
   } catch (err) {
@@ -275,10 +283,11 @@ exports.receiveSolution = async (channel, msg) => {
  * @param {Function} next Next function to be called
  */
 exports.testSolution = async (req, res, next) => {
-  const { code, language } = req.body;
+  const { code } = req.body;
   const { cId, rId } = req.params;
   const { id: userId } = req.user;
 
+  let room;
   try {
     const challenge = await findChallengeById(cId);
 
@@ -290,11 +299,11 @@ exports.testSolution = async (req, res, next) => {
     }
 
     // Save code to room
-    const room = await saveCodeById(rId, userId, code);
+    room = await saveCodeById(rId, userId, code);
 
     if (!room) {
       const error = new Error(
-        `Room, ${rId}, could not be found with User, ${userId}`
+        `Room, ${rId}, could not be found with User, ${userId}`,
       );
       error.status = 422;
       throw error;
@@ -309,11 +318,11 @@ exports.testSolution = async (req, res, next) => {
   }
 
   try {
-    // Send code to launcher through RabbitMQ
+    // Send message to code runner through SQS Broker
     const sent = publishToQueue(
       PRODUCER_QUEUE,
-      JSON.stringify({ code, language, challengeId: cId }),
-      { correlationId: rId }
+      JSON.stringify({ code, language: room.language, challengeId: cId }),
+      { correlationId: rId },
     );
 
     if (!sent) {

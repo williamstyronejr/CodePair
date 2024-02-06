@@ -1,41 +1,25 @@
-import { useState } from 'react';
 import { SyntheticEvent } from 'react';
 import { Navigate, Link } from 'react-router-dom';
+import useUserContext from '../../hooks/context/useUserContext';
+import useSignin from '../../hooks/api/useSignin';
+import Input from '../../components/shared/Input';
 import GithubButton from '../auth/GithubButton';
-import { setUserData } from '../../reducers/userReducer';
-import { ajaxRequest } from '../../utils/utils';
-import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
 import './styles/signinPage.css';
 
 const SigninPage = () => {
-  const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
+  const user = useUserContext();
+  const { mutate, error, isPending } = useSignin();
 
-  const [username, setUser] = useState('');
-  const [password, setPassword] = useState('');
-  const [requesting, setRequesting] = useState(false);
-  const [error, setError] = useState(false);
-
-  if (user.authenticated) return <Navigate to="/challenges" />;
+  if (user) return <Navigate to="/challenges" />;
 
   function onSubmit(evt: SyntheticEvent<HTMLFormElement>) {
     evt.preventDefault();
 
-    if (requesting) return;
-    setRequesting(true);
-    setError(false);
+    const formData = new FormData(evt.currentTarget);
+    const username = formData.get('username') as string;
+    const password = formData.get('password') as string;
 
-    ajaxRequest('/api/signin', 'POST', { username, password })
-      .then((res) => {
-        setRequesting(false);
-        if (res.data.success) {
-          dispatch(setUserData(res.data.user));
-        }
-      })
-      .catch(() => {
-        setRequesting(false);
-        setError(true);
-      });
+    mutate({ username, password });
   }
 
   return (
@@ -57,45 +41,16 @@ const SigninPage = () => {
           </div>
         )}
 
-        <div className="form__field">
-          <label className="form__label" htmlFor="username">
-            <span className="form__labeling">Username</span>
-            <input
-              id="username"
-              name="username"
-              className="form__input form__input--text"
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(evt) => setUser(evt.target.value)}
-              data-cy="username"
-            />
-          </label>
-        </div>
-
-        <div className="form__field">
-          <label className="form__label" htmlFor="password">
-            <span className="form__labeling">Password</span>
-            <input
-              id="password"
-              name="password"
-              className="form__input form__input--text"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(evt) => setPassword(evt.target.value)}
-              data-cy="password"
-            />
-          </label>
-        </div>
+        <Input type="text" name="username" label="Username" />
+        <Input type="password" name="password" label="Password" />
 
         <button
           className="btn btn--submit btn--auth"
           type="submit"
-          disabled={requesting}
+          disabled={isPending}
           data-cy="submit"
         >
-          {requesting ? (
+          {isPending ? (
             <i className="fas fa-spinner fa-spin spinner-space" />
           ) : null}
           Log in

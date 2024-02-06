@@ -44,14 +44,16 @@ async function createMatch(queueId, numOfUsers) {
   }
 
   // Generate unique id for match
-  const pendingQueueId = crypto.pseudoRandomBytes(16).toString('hex');
+  const pendingQueueId = `${crypto
+    .pseudoRandomBytes(16)
+    .toString('hex')}-${queueId}`;
 
   return addUsersToPendingQueue(pendingQueueId, users, challengeId).then(
     (result) => {
       if (result == null) return null;
       notifyUsers(pendingQueueId, users);
       return pendingQueueId;
-    }
+    },
   );
 }
 

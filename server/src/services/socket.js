@@ -7,6 +7,7 @@ const {
 } = require('./redis');
 const { createRoom, saveCodeById, addMessageById } = require('./room');
 const logger = require('./logger');
+const { getInitialCodeByLanguage } = require('./challenge');
 
 /**
  * TODO: Better implementation of sockerId <-> userId
@@ -66,14 +67,15 @@ function leaveRoom(roomId, username) {
  *  messages to the room. Only works if the client making the request is in
  *  the room.
  * @param {String} roomId Id of room to send message to
+ * @param {String} authorId Id of user sending message
+ * @param {String} authorName Name of user sending message
  * @param {String} msg Content of message
  * @param {String} time Time message was sent
- * @param {String} author Id of user sending message
  */
-function sendMessage(roomId, msg, time, author) {
+function sendMessage(roomId, authorId, authorName, content, time) {
   if (this.rooms.has(roomId)) {
-    addMessageById(roomId, { content: msg, time, author });
-    this.in(roomId).emit('receiveMessage', msg, time, author);
+    addMessageById(roomId, { authorId, authorName, content, time });
+    this.in(roomId).emit('receiveMessage', authorId, authorName, content, time);
   }
 }
 
@@ -146,9 +148,11 @@ function leaveQueue(queueId) {
  *  the room id.
  * @param {String} challengeId Id of challenge in the room.
  * @param {Array<Object>} users Array of user objects
+ * @param {String} lang Programming language for the room
  */
-async function prepareRoom(challengeId, users) {
-  const room = await createRoom(challengeId, users, 'node');
+async function prepareRoom(challengeId, users, lang) {
+  const initCode = await getInitialCodeByLanguage(challengeId, lang);
+  const room = await createRoom(challengeId, users, lang, false, 2, initCode);
 
   users.forEach((user) => {
     io.to(userClients[user]).emit('roomCreated', room.id);
@@ -173,8 +177,9 @@ async function acceptQueue(pendingQueueId) {
       const users = Object.keys(matchData).filter((v) => v !== 'challengeId');
 
       if (users && users.length > 0) {
+        const language = pendingQueueId.split('-')[2];
         removePendingQueue(pendingQueueId);
-        prepareRoom(matchData.challengeId, users);
+        prepareRoom(matchData.challengeId, users, language);
       }
     }
   } catch (err) {
