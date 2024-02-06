@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
 import * as themes from '@uiw/codemirror-themes-all';
+import { javascript } from '@codemirror/lang-javascript';
 import { Extension } from '@codemirror/state';
+import socket from '../../utils/socket';
 import DropDown from '../../components/shared/DropDown';
-import { useState } from 'react';
+import usePublicizeRoom from '../../hooks/api/usePublicizeRoom';
 
 const extensions = [javascript({ jsx: false })];
 
@@ -37,17 +39,55 @@ const EditorThemes: Record<string, Extension> = {
 };
 
 export default function ChallengeEditor({
+  roomId,
+  challengeId,
   initCode,
   privateRoom,
+  inviteKey,
+  testCode,
+  isTesting,
 }: {
+  roomId: string;
+  challengeId: string;
   initCode: string;
   privateRoom: boolean;
+  inviteKey: string;
+  testCode: (code: string) => void;
+  isTesting: boolean;
 }) {
   const [theme, setTheme] = useState(() => {
     const defaultTheme = localStorage.getItem('editor-theme') || '';
     return EditorThemes[defaultTheme] ? defaultTheme : 'VSCode Dark';
   });
   const [code, setCode] = useState(initCode);
+  const [codeHasChanged, setCodeHasChanged] = useState(false);
+  const [inviteVisible, setInviteVisibility] = useState(false);
+  const { mutate: makeRoomPublic, isPending } = usePublicizeRoom({ roomId });
+
+  useEffect(() => {
+    const savingInterval = setInterval(() => {
+      if (codeHasChanged) {
+        socket.emit('saveCode', roomId, code);
+        setCodeHasChanged(false);
+      }
+    }, 5000);
+
+    return () => {
+      if (savingInterval) clearInterval(savingInterval);
+    };
+  }, [code, roomId, codeHasChanged]);
+
+  useEffect(() => {
+    if (!privateRoom) {
+      socket.on('receiveCode', (newCode: string) => {
+        setCode(newCode);
+      });
+
+      return () => {
+        socket.off('receiveCode');
+      };
+    }
+  }, [privateRoom]);
 
   return (
     <div className="challenge__tools">
@@ -76,7 +116,11 @@ export default function ChallengeEditor({
           theme={EditorThemes[theme]}
           extensions={[...extensions]}
           onUpdate={(val) => {
-            if (val.docChanged) setCode(val.state.doc.toString());
+            if (val.docChanged) {
+              socket.emit('sendCode', roomId, val.state.doc.toString());
+              setCode(val.state.doc.toString());
+              setCodeHasChanged(true);
+            }
           }}
         />
       </div>
@@ -86,7 +130,11 @@ export default function ChallengeEditor({
           className="transition-colors challenge__btn-test"
           data-cy="runTest"
           type="button"
-          onClick={() => {}}
+          disabled={isTesting}
+          onClick={() => {
+            socket.emit('testRequested', roomId);
+            testCode(code);
+          }}
         >
           Run Tests
         </button>
@@ -96,10 +144,45 @@ export default function ChallengeEditor({
             className="transition-colors challenge__btn-public"
             type="button"
             data-cy="public"
-            onClick={() => {}}
+            onClick={() => makeRoomPublic()}
+            disabled={isPending}
           >
             Invite
           </button>
+        ) : null}
+
+        {!privateRoom ? (
+          <>
+            <button
+              className="transition-colors challenge__btn-public"
+              type="button"
+              data-cy="showInvite"
+              onClick={() => setInviteVisibility((old) => !old)}
+            >
+              Invite
+            </button>
+            <div
+              className={`challenge__invite ${
+                inviteVisible ? '' : 'box--hidden'
+              }`}
+            >
+              <div className="challenge__invite-wrapper">
+                <button
+                  className="btn btn--close btn--right"
+                  type="button"
+                  onClick={() => setInviteVisibility(!inviteVisible)}
+                >
+                  X
+                </button>
+
+                <p>Share link to invite another user</p>
+
+                <p className="challenge__invite-link" data-cy="invite">
+                  {`${window.location.origin}/invite/${inviteKey}`}
+                </p>
+              </div>
+            </div>
+          </>
         ) : null}
       </div>
     </div>
