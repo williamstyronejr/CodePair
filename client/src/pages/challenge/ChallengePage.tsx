@@ -1,32 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import socket from '../../utils/socket';
 import useGetRoom from '../../hooks/api/useGetRoom';
 import useUserContext from '../../hooks/context/useUserContext';
+import useTestCode from '../../hooks/api/useTestCode';
 import LoadingScreen from '../../components/shared/LoadingScreen';
 import ChallengeEditor from './ChallengeEditor';
 import ChatRoom from './ChatRoom';
 import './styles/challenge.css';
-import {
-  resetChatData,
-  setMessage,
-  toggleChatVisibility,
-  sendMessage,
-} from '../../reducers/chatReducer';
-import {
-  getChallenge,
-  clearChallengeData,
-  setCode,
-  saveCode,
-  testCode,
-  convertRoomToPublic,
-} from '../../reducers/challengeReducer';
-import {
-  closeSocket,
-  openSocket,
-  joinRoom,
-} from '../../reducers/socketReducer';
-import { chatTypingIndicator } from '../../middlewares/socket';
+
+type TestResults = {
+  passed: boolean;
+  results: any[];
+  errors: string;
+};
 
 const ChallengeErrorPage = ({ message }: { message: string }) => (
   <section className="challenge challenge--error">
@@ -57,11 +44,23 @@ const ChallengePage = () => {
   const { rId, cId } = useParams();
   const [tab, setTab] = useState('prompt');
   const [ready, setReady] = useState(false);
-  const [testResults, setTestResults] = useState([]);
-  const [testError, setTestError] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const [testingResults, setTestingResults] = useState<TestResults>({
+    passed: false,
+    results: [],
+    errors: '',
+  });
   const { data, isPending, error } = useGetRoom({
     roomId: rId as string,
     challengeId: cId as string,
+  });
+  const { mutate: testCode, isPending: isRequestingTest } = useTestCode({
+    challengeId: cId as string,
+    roomId: rId as string,
+    onSuccess: () => {
+      setTesting(true);
+      setTestingResults({ passed: false, results: [], errors: '' });
+    },
   });
 
   useEffect(() => {
@@ -82,27 +81,24 @@ const ChallengePage = () => {
   useEffect(() => {
     socket.connect();
 
+    socket.on('testingCode', () => {
+      setTesting(true);
+    });
+
+    socket.on(
+      'testCompleted',
+      (results: any, success: boolean, errors: any) => {
+        setTestingResults({ results, passed: success, errors });
+        setTesting(false);
+      }
+    );
+
     return () => {
+      socket.off('testingCode');
+      socket.off('testCompleted');
       socket.disconnect();
     };
   }, []);
-
-  // Open socket and connect to room
-  // useEffect(() => {
-  //   if (!socket.connected) {
-  //     dispatch(openSocket());
-  //   } else if (socket.ready && !socket.inRoom && rId) {
-  //     dispatch(joinRoom({ room: rId, username }));
-  //   }
-  // }, [
-  //   rId,
-  //   username,
-  //   dispatch,
-  //   socket.connected,
-  //   socket.inRoom,
-  //   socket.ready,
-  //   challenge.private,
-  // ]);
 
   if (isPending) return <LoadingScreen message="Getting room data" />;
   if (error)
@@ -111,11 +107,6 @@ const ChallengePage = () => {
     );
   if (!ready && !data.room.private)
     return <LoadingScreen message="Connecting to Room" />;
-
-  // Display loading message until chat is connected in public room
-  // if (!challenge.private && (!socket.connected || !socket.inRoom)) {
-  //   return <LoadingScreen message="Connecting to room" />;
-  // }
 
   return (
     <section className="challenge">
@@ -148,9 +139,38 @@ const ChallengePage = () => {
             {tab === 'output' ? (
               <div className="challenge__output" data-cy="tab-tests">
                 <header className="challenge__results">
-                  <h5 className="challenge__status"></h5>
+                  <h5 className="challenge__status">
+                    {testing ? 'Status: Requesting test' : null}
+                    {!testing && testingResults.results.length === 0
+                      ? 'Test results will appear below'
+                      : null}
+                  </h5>
 
-                  <div className="challenge__test-stats"></div>
+                  {testingResults.errors ? (
+                    <h6 className="challenge__status challenge__status-error">
+                      Error Running Code
+                    </h6>
+                  ) : null}
+
+                  <div className="challenge__test-stats">
+                    {testingResults.results.map((test) => (
+                      <li
+                        key={`test-${test.name}`}
+                        className={`challenge__item ${test.status} ? 'challenge__item--pass' : 'challenge__item--fail'`}
+                        data-cy="testResult"
+                      >
+                        <p className="challenge__test-name">{test.name}</p>
+                        {test.expects.map((expect: any) => (
+                          <span
+                            key={`test-expect-${expect.name}`}
+                            className="challenge__expect"
+                          >
+                            {expect.name}
+                          </span>
+                        ))}
+                      </li>
+                    ))}
+                  </div>
                 </header>
               </div>
             ) : (
@@ -163,10 +183,13 @@ const ChallengePage = () => {
         </div>
 
         <ChallengeEditor
+          roomId={rId as string}
+          challengeId={cId as string}
           initCode={data.room.code}
           privateRoom={data.room.private}
-          roomId={rId as string}
           inviteKey={data.room.inviteKey}
+          testCode={testCode}
+          isTesting={isRequestingTest || testing}
         />
 
         <ChatRoom
@@ -176,39 +199,18 @@ const ChallengePage = () => {
           privateRoom={data.room.private}
           initMessages={data.room.messages}
         />
+
+        {testingResults.passed ? (
+          <div className="challenge__popup">
+            <div className="challenge__completed">
+              <h2>Challenge Completed!</h2>
+              <Link to="/challenges">Click here</Link> to go to challenge list.
+            </div>
+          </div>
+        ) : null}
       </div>
     </section>
   );
-
-  // return (
-  //   <Challenge
-  //     privateRoom={challenge.private}
-  //     title={challenge.title}
-  //     prompt={challenge.prompt}
-  //     code={challenge.code}
-  //     testing={challenge.testing}
-  //     testPassed={challenge.testPassed}
-  //     testResults={challenge.testResults}
-  //     testErrors={challenge.testErrors}
-  //     inviteLink={challenge.inviteLink}
-  //     messages={chat.messages}
-  //     chatInput={chat.chatInput}
-  //     chatVisible={chat.visible}
-  //     usersTyping={chat.usersTyping}
-  //     challengeError={challenge.challengeError}
-  //     userId={userId}
-  //     toggleChatVisibility={() => dispatch(toggleChatVisibility())}
-  //     setMessage={(text) => dispatch(setMessage(text))}
-  //     messageIndicator={(typing) => chatTypingIndicator(rId, username, typing)}
-  //     sendMessage={(msg) => dispatch(sendMessage({ roomId: rId, msg, userId }))}
-  //     setCode={(code) => dispatch(setCode({ room: rId, code }))}
-  //     saveCode={() => dispatch(saveCode({ rId, code: challenge.code }))}
-  //     convertRoomToPublic={() => dispatch(convertRoomToPublic(rId))}
-  //     testCode={(code) =>
-  //       dispatch(testCode({ cId, rId, code, language: challenge.language }))
-  //     }
-  //   />
-  // );
 };
 
 export default ChallengePage;
