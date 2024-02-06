@@ -1,6 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function useSignup() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ['user', 'signup'],
     mutationFn: async ({
@@ -33,6 +35,10 @@ export default function useSignup() {
       }
 
       throw new Error('An server error occurred, please try again.');
+    },
+    onSuccess: (data) => {
+      if (data.success)
+        queryClient.invalidateQueries({ queryKey: ['get', 'user'] });
     },
   });
 }
