@@ -16,6 +16,7 @@
   max-width: 1920px;
   position: relative;
   margin: 0 auto;
+  justify-content: right;
 }
 
 .header__right {
@@ -31,6 +32,7 @@
   position: absolute;
   height: 100%;
   width: 0;
+  left: 0;
   z-index: 5;
   background-color: #151c29;
   transition: width 0.3s;
@@ -141,7 +143,7 @@
   right: 10px;
   width: 200px;
   border-radius: 10px;
-  background-color: #212121;
+  background: radial-gradient(circle at 60% 50%, #202e50 0%, #1d273f 70%);
 }
 
 .menu__nav {
@@ -178,6 +180,7 @@
 .menu__list--stack {
   display: block;
   text-align: center;
+  width: 100%;
 }
 
 .menu__item {
@@ -255,7 +258,7 @@
 }
 
 .menu__item--block .menu__link:hover {
-  background-color: #373737;
+  background-color: #273453;
 }
 
 .menu__dividor {
