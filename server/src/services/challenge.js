@@ -15,7 +15,7 @@ exports.createChallenge = (
   prompt,
   tags,
   initialCode,
-  isPublic = false
+  isPublic = false,
 ) => {
   return Challenge({
     title,
@@ -42,7 +42,7 @@ exports.getChallengeList = (
   limit = 10,
   filter = { isPublic: true },
   sort = {},
-  projection = null
+  projection = null,
 ) => {
   return Challenge.find(filter, projection)
     .sort(sort)
@@ -74,6 +74,26 @@ exports.findChallengeById = (id, projection = null) => {
 exports.findChallengeByLanguage = (id, language, projection = null) => {
   return Challenge.findOne(
     { _id: id, 'initialCode.language': language },
-    projection
+    projection,
   ).exec();
+};
+
+exports.getInitialCodeByLanguage = async (id, language) => {
+  const challenge = await Challenge.findById(id).exec();
+
+  if (!challenge) {
+    const error = new Error(`Challenge ${id} does not exists.`);
+    error.status = 404;
+    throw error;
+  }
+
+  let initCode = '';
+
+  challenge.initialCode.forEach((template) => {
+    if (template.language === language) {
+      initCode = template.code;
+    }
+  });
+
+  return initCode;
 };

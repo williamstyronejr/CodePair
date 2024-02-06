@@ -7,6 +7,7 @@ const {
 } = require('./redis');
 const { createRoom, saveCodeById, addMessageById } = require('./room');
 const logger = require('./logger');
+const { getInitialCodeByLanguage } = require('./challenge');
 
 /**
  * TODO: Better implementation of sockerId <-> userId
@@ -139,6 +140,7 @@ function joinQueue(queueId, maxSize = 2) {
  * @param {String} queueId Id of queue to leave
  */
 function leaveQueue(queueId) {
+  console.log('removing user from queue', queueId);
   removeUserFromQueue(queueId, socketClients[this.id]);
 }
 
@@ -147,9 +149,11 @@ function leaveQueue(queueId) {
  *  the room id.
  * @param {String} challengeId Id of challenge in the room.
  * @param {Array<Object>} users Array of user objects
+ * @param {String} lang Programming language for the room
  */
-async function prepareRoom(challengeId, users) {
-  const room = await createRoom(challengeId, users, 'node');
+async function prepareRoom(challengeId, users, lang) {
+  const initCode = await getInitialCodeByLanguage(challengeId, lang);
+  const room = await createRoom(challengeId, users, lang, false, 2, initCode);
 
   users.forEach((user) => {
     io.to(userClients[user]).emit('roomCreated', room.id);
@@ -174,8 +178,9 @@ async function acceptQueue(pendingQueueId) {
       const users = Object.keys(matchData).filter((v) => v !== 'challengeId');
 
       if (users && users.length > 0) {
+        const language = pendingQueueId.split('-')[2];
         removePendingQueue(pendingQueueId);
-        prepareRoom(matchData.challengeId, users);
+        prepareRoom(matchData.challengeId, users, language);
       }
     }
   } catch (err) {

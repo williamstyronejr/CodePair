@@ -24,13 +24,15 @@ exports.createRoom = (
   users,
   language,
   isPrivate = false,
-  size = 2
+  size = 2,
+  initCode = '',
 ) => {
   const inviteKey = !isPrivate ? createInviteKey() : null;
 
   return Room({
     challenge: challengeId,
     language,
+    code: initCode,
     users,
     private: isPrivate,
     inviteKey,
@@ -71,7 +73,7 @@ exports.setRoomToJoinable = (roomId, userId) => {
   return Room.findOneAndUpdate(
     { _id: roomId, users: userId },
     { private: false, inviteKey: createInviteKey() },
-    { new: true }
+    { new: true },
   ).exec();
 };
 
@@ -92,7 +94,7 @@ exports.addUserToRoom = (roomId, userId, options = null) => {
       users: { $ne: userId },
     },
     { $addToSet: { users: userId }, $inc: { usersInRoom: 1 } },
-    options
+    options,
   ).exec();
 };
 
@@ -109,7 +111,7 @@ exports.saveCodeById = (id, userId, code, getNew = true) => {
   return Room.findOneAndUpdate(
     { _id: id, users: userId },
     { code },
-    { new: getNew }
+    { new: getNew },
   ).exec();
 };
 
@@ -124,7 +126,7 @@ exports.addMessageById = (id, message, options = null) => {
   return Room.findOneAndUpdate(
     { _id: id },
     { $push: { messages: message } },
-    options
+    options,
   ).exec();
 };
 
@@ -141,7 +143,7 @@ exports.markRoomCompleted = (id, options = null) => {
     {
       completed: true,
     },
-    options
+    options,
   ).exec();
 };
 
@@ -163,6 +165,6 @@ exports.deleteCompletedRooms = () => {
 exports.expireOldRooms = (date) => {
   return Room.updateMany(
     { createdBy: { $gt: date }, completed: false },
-    { completed: true }
+    { completed: true },
   ).exec();
 };

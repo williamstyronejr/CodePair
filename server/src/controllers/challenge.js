@@ -85,7 +85,15 @@ exports.createPrivateRoom = async (req, res, next) => {
       throw error;
     }
 
-    const room = await createRoom(cId, [userId], language, true);
+    let initCode = '';
+
+    challenge.initialCode.forEach((template) => {
+      if (template.language === language) {
+        initCode = template.code;
+      }
+    });
+
+    const room = await createRoom(cId, [userId], language, true, 2, initCode);
 
     res.json({ room: room.id });
   } catch (err) {
