@@ -71,11 +71,12 @@ describe('Challenge Page', () => {
     cy.get('[data-cy=public]').click();
     cy.get('[data-cy=showInvite]').click();
     cy.get('[data-cy=invite]').should('exist');
-    cy.get('[data-cy=chat]').should('exist');
+    cy.get('[data-cy=chatToggle]').should('exist');
   });
 
   it('Sending message in chat should appear in message list', () => {
     cy.get('[data-cy=public]').click();
+    cy.get('[data-cy=chatToggle]').click();
 
     const testMessage = 'Testing';
     cy.get('[data-cy=chatInput]').type(testMessage);

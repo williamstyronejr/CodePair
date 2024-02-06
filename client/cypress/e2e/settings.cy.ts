@@ -36,7 +36,7 @@ describe('Settings - Account', () => {
     cy.get("input[name='username']").type(newUsername);
     cy.get("button[type='submit']").click();
 
-    cy.get("[data-cy='notification']").should('have.length', 1);
+    cy.get("[data-cy='notification-success']").should('have.length', 1);
 
     // Check if new username works for login
     cy.get("[data-cy='menu']").click();
