@@ -7,7 +7,7 @@
 exports.createRandomString = (length, append = '') => {
   let s = '';
   do {
-    s += Math.random().toString(36).substr(2);
+    s += Math.random().toString(36).substring(2);
   } while (s.length < length);
   s = s.substring(0, length);
 
