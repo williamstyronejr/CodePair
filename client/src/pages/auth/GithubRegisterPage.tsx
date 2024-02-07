@@ -1,27 +1,20 @@
 import { useState, SyntheticEvent } from 'react';
 import { Navigate } from 'react-router-dom';
-import { setUserData } from '../../reducers/userReducer';
-import { validateUsername, ajaxRequest } from '../../utils/utils';
-import { useAppDispatch, useAppSelector } from '../../hooks/reactRedux';
+import useUserContext from '../../hooks/context/useUserContext';
+import useSetUsername from '../../hooks/api/useSetUsername';
+import { validateUsername } from '../../utils/utils';
 
 const GithubPage = () => {
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const user = useUserContext() as User;
   const [username, setUsername] = useState('');
   const [validation, setValidation] = useState<{ username?: string }>({});
-  const [requesting, setRequesting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { mutate, isPending, data } = useSetUsername();
 
-  // Check if user is logged in with no username
-  if (!user.authenticating && (!user.authenticated || user.username)) {
-    return <Navigate to="/challenges" />;
-  }
+  if (user.username) return <Navigate to="/challenge" />;
 
   const onSubmit = (evt: SyntheticEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
-    if (requesting) return;
-    setError(null);
     setValidation({});
 
     const userValidation = validateUsername(username);
@@ -29,24 +22,7 @@ const GithubPage = () => {
     if (userValidation)
       return setValidation({ ...validation, username: userValidation });
 
-    setRequesting(true);
-
-    ajaxRequest('/account/register', 'POST', { username })
-      .then((res) => {
-        setRequesting(false);
-        dispatch(setUserData(res.data.user));
-      })
-      .catch((err) => {
-        setRequesting(false);
-        if (err.response && err.response.status === 400) {
-          setError(err.response.data.errors.username);
-          return;
-        }
-
-        setError(
-          'An error occurred with setting your username, please try again.'
-        );
-      });
+    mutate({ username });
   };
 
   return (
@@ -54,9 +30,9 @@ const GithubPage = () => {
       <form className="form" method="POST" onSubmit={onSubmit}>
         <h3 className="form__heading">Github User Registration</h3>
 
-        {error ? (
+        {data && data.errors.username ? (
           <div className="form__error" data-cy="error">
-            <p className="">{error}</p>
+            <p className="">{data.errors.username}</p>
           </div>
         ) : null}
 
@@ -82,9 +58,9 @@ const GithubPage = () => {
           className="btn btn--submit"
           type="submit"
           data-cy="submit"
-          disabled={requesting}
+          disabled={isPending}
         >
-          {requesting ? (
+          {isPending ? (
             <i className="fas fa-spinner fa-spin spinner-space" />
           ) : null}
           Set Username
