@@ -40,20 +40,18 @@ const EditorThemes: Record<string, Extension> = {
 
 export default function ChallengeEditor({
   roomId,
-  challengeId,
   initCode,
   privateRoom,
   inviteKey,
-  testCode,
   isTesting,
+  testCode,
 }: {
   roomId: string;
-  challengeId: string;
   initCode: string;
   privateRoom: boolean;
   inviteKey: string;
-  testCode: (code: string) => void;
   isTesting: boolean;
+  testCode: (code: string) => void;
 }) {
   const [theme, setTheme] = useState(() => {
     const defaultTheme = localStorage.getItem('editor-theme') || '';

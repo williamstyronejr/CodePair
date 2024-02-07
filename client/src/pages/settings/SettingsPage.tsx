@@ -28,6 +28,7 @@ const AccountForm = ({
     mutate({ formData });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmitProfileImage = (file: any, remove = false) => {
     const formData = new FormData();
 
@@ -88,6 +89,7 @@ const AccountForm = ({
           type="text"
           name="username"
           label="Username"
+          placeholder={currentUsername}
           error={data && data.errors ? data.errors.username : null}
         />
 
@@ -95,6 +97,7 @@ const AccountForm = ({
           type="text"
           name="email"
           label="Email"
+          placeholder={currentEmail}
           error={data && data.errors ? data.errors.email : null}
         />
       </fieldset>
@@ -181,7 +184,7 @@ const PasswordForm = () => {
 };
 
 const SettingsPage = () => {
-  const user = useUserContext();
+  const user = useUserContext() as User;
   const { type } = useParams();
   let displayedForm;
 

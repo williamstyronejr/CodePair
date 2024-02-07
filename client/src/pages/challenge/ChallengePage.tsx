@@ -40,7 +40,7 @@ const ChallengePrompt = ({
 };
 
 const ChallengePage = () => {
-  const user = useUserContext();
+  const user = useUserContext() as User;
   const { rId, cId } = useParams();
   const [tab, setTab] = useState('prompt');
   const [ready, setReady] = useState(false);
@@ -184,7 +184,6 @@ const ChallengePage = () => {
 
         <ChallengeEditor
           roomId={rId as string}
-          challengeId={cId as string}
           initCode={data.room.code}
           privateRoom={data.room.private}
           inviteKey={data.room.inviteKey}

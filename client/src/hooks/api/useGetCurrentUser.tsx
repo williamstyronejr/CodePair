@@ -9,7 +9,9 @@ export default function useGetCurrentUser() {
 
       if (res.ok) return await res.json();
 
-      throw new Error('');
+      if (res.status === 401) return null;
+
+      throw new Error('An error occurred during request, please try again.');
     },
   });
 }

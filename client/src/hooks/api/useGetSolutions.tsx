@@ -13,15 +13,10 @@ export default function useGetSolutions({ username }: { username: string }) {
 
       throw new Error('An error occurred during request, please try again.');
     },
-    getNextPageParam: (lastPage, allPages, lastPageParam, allPageParmas) => {
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       return lastPage.length !== 0 ? lastPageParam + 1 : null;
     },
-    getPreviousPageParam: (
-      firstPage,
-      allPages,
-      firstPageParam,
-      allPageParams
-    ) => {
+    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
       return firstPageParam !== 1 ? firstPageParam - 1 : null;
     },
   });

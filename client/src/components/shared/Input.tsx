@@ -5,11 +5,13 @@ export default function Input({
   name,
   type,
   initVal,
+  placeholder = '',
   error,
 }: {
   label: string;
   name: string;
   type: string;
+  placeholder?: string;
   initVal?: string;
   error?: string;
 }) {
@@ -31,7 +33,7 @@ export default function Input({
           name={name}
           className="form__input form__input--text"
           type={type}
-          placeholder={label}
+          placeholder={placeholder}
           value={input}
           onChange={(evt) => setInput(evt.target.value)}
           data-cy="username"

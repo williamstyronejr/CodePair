@@ -11,7 +11,7 @@ export default function useGetChallenges({
     queryKey: ['get', 'challenges', sortBy, search],
     queryFn: async ({ pageParam }: { pageParam: number }) => {
       const res = await fetch(
-        `/api/challenge/list?page=${pageParam}&orderBy=${sortBy}&search=${search}`,
+        `/api/challenge/list?page=${pageParam}&orderBy=${sortBy}&search=${search}`
       );
 
       if (res.ok) {
@@ -22,15 +22,10 @@ export default function useGetChallenges({
       throw new Error('An error occurred during request, please try again.');
     },
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages, lastPageParam, allPageParmas) => {
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       return lastPage.length !== 0 ? lastPageParam + 1 : null;
     },
-    getPreviousPageParam: (
-      firstPage,
-      allPages,
-      firstPageParam,
-      allPageParams,
-    ) => {
+    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
       return firstPageParam !== 1 ? firstPageParam - 1 : null;
     },
   });
