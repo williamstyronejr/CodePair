@@ -5,7 +5,7 @@ const Stream = require('stream');
 const Docker = require('dockerode');
 const logger = require('./logger');
 
-const { IMAGE_NODE } = process.env;
+const { IMAGE_NODE, IMAGE_PYTHON } = process.env;
 
 const CODE_PATH = path.join(__dirname, '../', 'temp', 'code');
 const docker = new Docker({
@@ -76,6 +76,27 @@ function parseOutput(output, errOutput, lang) {
       break;
     }
 
+    case 'python': {
+      if (output === '' && errOutput === '') {
+        const err = new Error('No output from container');
+        err.msg =
+          'Unknown error occurred during code runner, please try again.';
+        err.status = 500;
+        throw err;
+      }
+
+      try {
+        console.log(errOutput);
+        formattedOutput = JSON.parse(errOutput === '' ? output : errOutput);
+      } catch (err) {
+        console.log(err);
+        const e = new Error();
+        e.msg = 'Unknown error occurred during code runner, please try again.';
+        throw e;
+      }
+      break;
+    }
+
     default: {
       const err = new Error('Invalid or unsupported langauge.');
       err.status = 422;
@@ -132,6 +153,22 @@ async function launchContainer(code, language, challengeId) {
       };
       break;
 
+    case 'python':
+      imageName = IMAGE_PYTHON;
+      fileName = `${createRandomString()}.py`;
+      commands = ['python3', `main.py`, `${challengeId}`];
+      timeout = 8000;
+
+      options = {
+        AutoRemove: true,
+        Tty: false,
+        Binds: [
+          `${path.join(__dirname, '..', 'challengeTests', 'python')}:tests`,
+          `${path.join(__dirname, '..', 'temp', 'code', fileName)}:usercode.py`,
+        ],
+      };
+      break;
+
     default: {
       const err = new Error('Invalid or unsupported language.');
       err.msg = `Invalid/unsupported langauge: ${language}`;
@@ -156,11 +193,13 @@ async function launchContainer(code, language, challengeId) {
 
       // Use streams to capture the output from docker container
       streamErr._write = (chunk, encoding, cb) => {
+        console.log(chunk);
         errChunks.push(chunk);
         cb();
       };
 
       outStream._write = (chunk, encoding, cb) => {
+        console.log(chunk);
         chunks.push(chunk);
         cb();
       };
