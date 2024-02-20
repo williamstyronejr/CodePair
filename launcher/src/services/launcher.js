@@ -86,10 +86,8 @@ function parseOutput(output, errOutput, lang) {
       }
 
       try {
-        console.log(errOutput);
         formattedOutput = JSON.parse(errOutput === '' ? output : errOutput);
       } catch (err) {
-        console.log(err);
         const e = new Error();
         e.msg = 'Unknown error occurred during code runner, please try again.';
         throw e;
@@ -130,17 +128,18 @@ async function launchContainer(code, language, challengeId) {
       imageName = IMAGE_NODE;
       fileName = `${createRandomString()}.js`;
       timeout = 8000;
-      commands = ['node', './src/testingLibrary.js'];
+      commands = ['node', './src/testingLib.js'];
 
       options = {
         AutoRemove: true,
         Tty: false,
         Binds: [
-          `${path.join(__dirname, '../', 'challengeTests')}:/app/src/tests`,
           `${path.join(
             __dirname,
-            'testingLibrary.js'
-          )}:/app/src/testingLibrary.js`,
+            '../',
+            'challengeTests',
+            'node'
+          )}:/app/src/tests`,
           `${path.join(
             __dirname,
             '../',
@@ -193,13 +192,11 @@ async function launchContainer(code, language, challengeId) {
 
       // Use streams to capture the output from docker container
       streamErr._write = (chunk, encoding, cb) => {
-        console.log(chunk);
         errChunks.push(chunk);
         cb();
       };
 
       outStream._write = (chunk, encoding, cb) => {
-        console.log(chunk);
         chunks.push(chunk);
         cb();
       };
@@ -210,6 +207,7 @@ async function launchContainer(code, language, challengeId) {
 
       outStream.on('finish', () => {
         if (launcherTimeout) clearTimeout(launcherTimeout);
+
         dockerOutput = Buffer.concat(chunks).toString('utf8');
         errOutput = Buffer.concat(errChunks).toString('utf8');
 
