@@ -1,5 +1,5 @@
-# Build Command
-# docker build . --no-cache -t runner-python
+# Build Command (from launcher)
+# docker build . --no-cache -t runner-python -f docker/python/Dockerfile
 
 FROM python:3
 
@@ -13,5 +13,3 @@ WORKDIR /app
 
 COPY /src/services/testRunners/python/testingLib.py /app/testingLib.py
 COPY /src/services/testRunners/python/main.py /app/main.py
-
-
