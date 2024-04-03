@@ -46,7 +46,7 @@ describe('Running node code through launcher', () => {
 });
 
 describe('Running python code through launcher', () => {
-  const testCode = `def main(x):\n  return x * x`;
+  const testCode = `def main(x,y):\n  return pow(x, y)`;
 
   test('Valid parameters should response with object containing results', async () => {
     const language = 'python';
