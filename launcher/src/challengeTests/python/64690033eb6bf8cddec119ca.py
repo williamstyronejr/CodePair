@@ -1,27 +1,39 @@
 import testingLib
+import sys
+sys.path.append("..")
+from usercode import main as runUserCode
+
 
 def test_1(id):
   params = ["String"]
   expectedValue = "SSttrriinngg"
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 def test_2(id):
   params = ["string"]
   expectedValue = "ssttrriinngg"
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue)
 
 def test_3(id):
   params = ["Hello World!"]
   expectedValue = "HHeelllloo  WWoorrlldd!!"
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue)
 
 def test_4(id):
   params = ["1234!_ "]
   expectedValue = "11223344!!__  "
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue)
 
 

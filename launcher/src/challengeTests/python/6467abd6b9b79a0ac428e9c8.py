@@ -1,33 +1,46 @@
 import testingLib
+import sys
+sys.path.append("..")
+from usercode import main as runUserCode
 
 def test_1(id):
   params = [2, 8]
   expectedValue = 20
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 def test_2(id):
   params = [90, 20]
   expectedValue = 220
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 def test_3(id):
   params = [25, 25]
   expectedValue = 100
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 def test_4(id):
   params = [1, 8]
   expectedValue = 18
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 def test_5(id):
   params = [8, 1]
   expectedValue = 18
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 testingLib.test("main(2, 8)   should equal 20", test_1);

@@ -1,23 +1,32 @@
 import testingLib
+import sys
+sys.path.append("..")
+from usercode import main as runUserCode
 
 def test_1(id):
   params = [8,10]
   expectedValue = 17
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 
 def test_2(id):
   params = [9, 2]
   expectedValue = 10
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 
 def test_3(id):
   params = [5, 7]
   expectedValue = 11
-  test = testingLib.expect(id, params)
+
+  userResult = runUserCode(*params)
+  test = testingLib.expect(id, userResult)
   test.toBe(expectedValue=expectedValue)
 
 
