@@ -162,8 +162,19 @@ async function launchContainer(code, language, challengeId) {
         AutoRemove: true,
         Tty: false,
         Binds: [
-          `${path.join(__dirname, '..', 'challengeTests', 'python')}:tests`,
-          `${path.join(__dirname, '..', 'temp', 'code', fileName)}:usercode.py`,
+          `${path.join(
+            __dirname,
+            '..',
+            'challengeTests',
+            'python'
+          )}:/app/tests`,
+          `${path.join(
+            __dirname,
+            '..',
+            'temp',
+            'code',
+            fileName
+          )}:/app/usercode.py`,
         ],
       };
       break;
