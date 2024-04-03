@@ -7,7 +7,7 @@ FROM python:3
 RUN mkdir -p /app
 RUN mkdir -p /app/tests
 RUN mkdir -p /app/temp
-run mkdir -p /app/temp/code
+RUN mkdir -p /app/temp/code
 
 WORKDIR /app
 
