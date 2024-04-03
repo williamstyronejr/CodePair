@@ -1,7 +1,6 @@
 import sys
 import importlib
 import testingLib
-from usercode import main as runUserCode
 
 def printErrorMsg(str):
 	# Should output to console as in json format
