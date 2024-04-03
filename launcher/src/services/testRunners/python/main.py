@@ -18,7 +18,7 @@ def main():
     printErrorMsg("Test file is invalid. Provide a valid file name")
     return
 
-  i = importlib.import_module(f"test.{testName}")
+  i = importlib.import_module(f"tests.{testName}")
   testingLib.run()
 
 main()
