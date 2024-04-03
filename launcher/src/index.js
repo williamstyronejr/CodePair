@@ -43,11 +43,6 @@ function validateMessage(code, language, challengeId) {
     err.msg = 'Please provide the code to run test on.';
     err.status = 422;
     throw err;
-  } else if (!code.includes('function main')) {
-    const err = new Error();
-    err.msg = 'Code needs to contains the function "main" to be tested.';
-    err.status = 422;
-    throw err;
   }
 
   if (!challengeId) {
