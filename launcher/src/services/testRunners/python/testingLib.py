@@ -87,6 +87,5 @@ def searchTestFolder():
 
 def run():
   # if searchTestFolder():
-  print("running test")
   runTestFile()
   showResults()
