@@ -53,7 +53,6 @@ async function startServer() {
       logger.info(`Server is running on ${IP}:${PORT}`);
     });
   } catch (err) {
-    console.log(err);
     logger.log('error', 'Server crashing error: \n', err);
     process.exit(0);
   }
