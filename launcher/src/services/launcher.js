@@ -5,7 +5,7 @@ const Stream = require('stream');
 const Docker = require('dockerode');
 const logger = require('./logger');
 
-const { IMAGE_NODE } = process.env;
+const { IMAGE_NODE, IMAGE_PYTHON } = process.env;
 
 const CODE_PATH = path.join(__dirname, '../', 'temp', 'code');
 const docker = new Docker({
@@ -76,6 +76,25 @@ function parseOutput(output, errOutput, lang) {
       break;
     }
 
+    case 'python': {
+      if (output === '' && errOutput === '') {
+        const err = new Error('No output from container');
+        err.msg =
+          'Unknown error occurred during code runner, please try again.';
+        err.status = 500;
+        throw err;
+      }
+
+      try {
+        formattedOutput = JSON.parse(errOutput === '' ? output : errOutput);
+      } catch (err) {
+        const e = new Error();
+        e.msg = 'Unknown error occurred during code runner, please try again.';
+        throw e;
+      }
+      break;
+    }
+
     default: {
       const err = new Error('Invalid or unsupported langauge.');
       err.status = 422;
@@ -109,17 +128,18 @@ async function launchContainer(code, language, challengeId) {
       imageName = IMAGE_NODE;
       fileName = `${createRandomString()}.js`;
       timeout = 8000;
-      commands = ['node', './src/testingLibrary.js'];
+      commands = ['node', './src/testingLib.js', ' --no-node-snapshot'];
 
       options = {
         AutoRemove: true,
         Tty: false,
         Binds: [
-          `${path.join(__dirname, '../', 'challengeTests')}:/app/src/tests`,
           `${path.join(
             __dirname,
-            'testingLibrary.js'
-          )}:/app/src/testingLibrary.js`,
+            '../',
+            'challengeTests',
+            'node'
+          )}:/app/src/tests`,
           `${path.join(
             __dirname,
             '../',
@@ -129,6 +149,33 @@ async function launchContainer(code, language, challengeId) {
           )}:/app/src/${fileName}`,
         ],
         Env: [`FILENAME=${fileName}`, `CHALLENGEID=${challengeId}`],
+      };
+      break;
+
+    case 'python':
+      imageName = IMAGE_PYTHON;
+      fileName = `${createRandomString()}.py`;
+      commands = ['python3', `main.py`, `${challengeId}`];
+      timeout = 8000;
+
+      options = {
+        AutoRemove: true,
+        Tty: false,
+        Binds: [
+          `${path.join(
+            __dirname,
+            '..',
+            'challengeTests',
+            'python'
+          )}:/app/tests`,
+          `${path.join(
+            __dirname,
+            '..',
+            'temp',
+            'code',
+            fileName
+          )}:/app/usercode.py`,
+        ],
       };
       break;
 
@@ -171,6 +218,7 @@ async function launchContainer(code, language, challengeId) {
 
       outStream.on('finish', () => {
         if (launcherTimeout) clearTimeout(launcherTimeout);
+
         dockerOutput = Buffer.concat(chunks).toString('utf8');
         errOutput = Buffer.concat(errChunks).toString('utf8');
 

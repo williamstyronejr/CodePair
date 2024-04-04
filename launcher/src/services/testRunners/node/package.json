@@ -1,0 +1,19 @@
+{
+  "name": "node-code-runner",
+  "version": "1.0.0",
+  "description": "App used to run untrusted code",
+  "main": "index.js",
+  "engines": {
+    "node": "^20.0.0",
+    "npm": "^10.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "isolated-vm": "^4.7.2"
+  }
+}

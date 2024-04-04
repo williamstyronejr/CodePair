@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const { CHALLENGEID: TESTNAME, DEBUG, TOJSON } = process.env;
+const { CHALLENGEID: TESTNAME, DEBUG } = process.env;
 
 const { log } = console;
 const logError = console.error;

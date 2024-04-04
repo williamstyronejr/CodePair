@@ -187,8 +187,9 @@ const ChallengePage = () => {
           initCode={data.room.code}
           privateRoom={data.room.private}
           inviteKey={data.room.inviteKey}
-          testCode={testCode}
           isTesting={isRequestingTest || testing}
+          lang={data.room.language}
+          testCode={testCode}
         />
 
         <ChatRoom

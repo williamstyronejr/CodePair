@@ -174,7 +174,7 @@ describe('/GET /api/challenge/list', () => {
             expect.objectContaining({
               title: expect.stringMatching(new RegExp(filter, 'i')),
             }),
-          ])
+          ]),
         );
       });
   });
@@ -211,7 +211,7 @@ describe('/GET /api/challenge/:cId/room/:rId', () => {
   });
 
   test('Non-Existing roomId should throw 404 error', async () => {
-    const nonExistingRoomId = `${roomId.substring(0, roomId.length - 1)}1`;
+    const nonExistingRoomId = `${roomId.substring(0, roomId.length - 2)}f9`;
     await request(app)
       .get(routeToTest(nonExistingRoomId, challengeId))
       .set('Cookie', userCookie)
@@ -221,7 +221,7 @@ describe('/GET /api/challenge/:cId/room/:rId', () => {
   test('Non-Existing roomId should throw 404 error', async () => {
     const nonExistingChallengeId = `${challengeId.substring(
       0,
-      challengeId.length - 1
+      challengeId.length - 1,
     )}1`;
 
     await request(app)

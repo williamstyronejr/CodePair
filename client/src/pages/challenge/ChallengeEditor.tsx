@@ -1,13 +1,22 @@
 import { useEffect, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import * as themes from '@uiw/codemirror-themes-all';
+import { python } from '@codemirror/lang-python';
 import { javascript } from '@codemirror/lang-javascript';
 import { Extension } from '@codemirror/state';
-import socket from '../../utils/socket';
 import DropDown from '../../components/shared/DropDown';
 import usePublicizeRoom from '../../hooks/api/usePublicizeRoom';
+import socket from '../../utils/socket';
 
-const extensions = [javascript({ jsx: false })];
+function determineExtentions(lang: string) {
+  switch (lang) {
+    case 'python':
+      return [python()];
+
+    default:
+      return [javascript({ jsx: false })];
+  }
+}
 
 const EditorThemes: Record<string, Extension> = {
   abcdef: themes.abcdef,
@@ -44,6 +53,7 @@ export default function ChallengeEditor({
   privateRoom,
   inviteKey,
   isTesting,
+  lang,
   testCode,
 }: {
   roomId: string;
@@ -51,6 +61,7 @@ export default function ChallengeEditor({
   privateRoom: boolean;
   inviteKey: string;
   isTesting: boolean;
+  lang: string;
   testCode: (code: string) => void;
 }) {
   const [theme, setTheme] = useState(() => {
@@ -112,7 +123,7 @@ export default function ChallengeEditor({
           }}
           value={code}
           theme={EditorThemes[theme]}
-          extensions={[...extensions]}
+          extensions={determineExtentions(lang)}
           onUpdate={(val) => {
             if (val.docChanged) {
               socket.emit('sendCode', roomId, val.state.doc.toString());

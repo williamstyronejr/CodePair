@@ -42,5 +42,22 @@ describe('Running node code through launcher', () => {
     expect(results.testResults).toBeDefined();
     expect(Array.isArray(results.testResults));
     expect(results.passedTests).toBe(results.numOfTests);
-  });
+  }, 10000);
+});
+
+describe('Running python code through launcher', () => {
+  const testCode = `def main(x,y):\n  return pow(x, y)`;
+
+  test('Valid parameters should response with object containing results', async () => {
+    const language = 'python';
+    const challengeId = 'index';
+
+    const results = await launchContainer(testCode, language, challengeId);
+
+    expect(results).toBeDefined();
+    expect(typeof results).toBe('object');
+    expect(results.testResults).toBeDefined();
+    expect(Array.isArray(results.testResults));
+    expect(results.passedTests).toBe(results.numOfTests);
+  }, 20000);
 });

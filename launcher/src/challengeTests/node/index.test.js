@@ -1,3 +1,4 @@
+// This should show error as this is the import in the docker container
 const { runCode } = require('../index');
 
 const { FILENAME } = process.env;
