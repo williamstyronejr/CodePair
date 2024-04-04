@@ -6,9 +6,10 @@ const ivm = require('isolated-vm');
  * Creates a VM to run user supplied code in a sandbox environment,
  *  and log the results to a file for launcher to read from.
  * @param {String} fileName Name of file containing code to run
+ * @param {Array<any>} params Array containing params to pass to user code
  * @return {String} Returns the output of running the code by call main function.
  */
-async function runCode(fileName, ...params) {
+async function runCode(fileName, params) {
   const isolate = new ivm.Isolate({ memoryLimit: 128 });
   const context = await isolate.createContext();
   const jail = context.global;

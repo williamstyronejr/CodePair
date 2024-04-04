@@ -128,7 +128,7 @@ async function launchContainer(code, language, challengeId) {
       imageName = IMAGE_NODE;
       fileName = `${createRandomString()}.js`;
       timeout = 8000;
-      commands = ['node', './src/testingLib.js'];
+      commands = ['node', './src/testingLib.js', ' --no-node-snapshot'];
 
       options = {
         AutoRemove: true,
