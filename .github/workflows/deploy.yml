@@ -43,10 +43,10 @@ jobs:
             launcher
 
       - name: Build Node Image
-        run: docker build . --no-cache -t ${{secrets.IMAGE_NODE}} -f launcher/docker/node/Dockerfile
+        run: docker build ./launcher --no-cache -t ${{secrets.IMAGE_NODE}} -f launcher/docker/node/Dockerfile
 
       - name: Build Python Image
-        run: docker build . --no-cache -t ${{secrets.IMAGE_PYTHON}} -f launcher/docker/python/Dockerfile
+        run: docker build ./launcher --no-cache -t ${{secrets.IMAGE_PYTHON}} -f launcher/docker/python/Dockerfile
 
       - name: Run Client Tests
         run: npm run test --prefix client
