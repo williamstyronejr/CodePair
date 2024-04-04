@@ -15,12 +15,12 @@ async function runCode(fileName, ...params) {
 
   // Possible error if user creates a global value with same name
   jail.setSync('global', jail.derefInto());
-  jail.setSync('challengeInputParamsGlobal', params);
+  jail.setSync('challengeInputParamsGlobal', () => params);
 
   let code = await fs.promises.readFile(path.join(__dirname, fileName), 'utf8');
 
   // Add line to call user's function with given test parameters
-  code = code.concat('\nmain(...challengeInputParamsGlobal)');
+  code = code.concat('\nmain(...challengeInputParamsGlobal())');
 
   const results = await context.eval(code);
 
