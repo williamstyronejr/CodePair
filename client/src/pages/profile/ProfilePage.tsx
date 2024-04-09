@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { javascript } from '@codemirror/lang-javascript';
-import CodeMirror from 'rodemirror';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import CodeMirror from '@uiw/react-codemirror';
 import useGetProfile from '../../hooks/api/useGetProfile';
 import useGetSolutions from '../../hooks/api/useGetSolutions';
 import Loading from '../../components/shared/Loading';
@@ -81,6 +82,10 @@ const Solutions = ({ username }: { username: string }) => {
                 <div className="solutions__content">
                   <CodeMirror
                     // className="solutions__code"
+                    theme={vscodeDark}
+                    basicSetup={{}}
+                    editable={false}
+                    readOnly={true}
                     value={solution.code}
                     extensions={extensions}
                   />
