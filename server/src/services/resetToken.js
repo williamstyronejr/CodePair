@@ -17,8 +17,8 @@ exports.generateToken = (userId) => {
     bcrypt.hash(token, salt).then((hash) =>
       ResetToken({ userId, token: hash })
         .save()
-        .then((resetToken) => ({ id: resetToken.id, token }))
-    )
+        .then((resetToken) => ({ id: resetToken.id, token })),
+    ),
   );
 };
 
@@ -36,4 +36,4 @@ exports.findTokenById = (id) => ResetToken.findById(id).exec();
  * @return {Promise<Object>} A Promise to resolve with the delete token if
  *  found, otherwise null.
  */
-exports.deleteToken = (id) => ResetToken.findByIdAndRemove(id);
+exports.deleteToken = (id) => ResetToken.findOneAndDelete({ _id: id });
